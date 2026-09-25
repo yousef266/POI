@@ -5,7 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 from os import environ
 from threading import Lock
-from time import monotonic, sleep
+from time import monotonic, sleep, time
+from tempfile import gettempdir
+import sqlite3
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlparse
 from urllib.request import Request as HttpRequest, urlopen
@@ -56,14 +58,36 @@ def covers_area(source: dict, requested: Area) -> bool:
             and south <= requested.south and requested.north <= north)
 
 
+def _reserve_shared_request(endpoint: str, rate: float) -> float:
+    """Reserve a time slot atomically across processes on this host."""
+    state = Path(environ.get("POI_RATE_STATE_PATH") or
+                 str(Path(gettempdir()) / "poi_harvester_rate_v1.sqlite3"))
+    state.parent.mkdir(parents=True, exist_ok=True)
+    with sqlite3.connect(state, timeout=30, isolation_level=None) as database:
+        database.execute("CREATE TABLE IF NOT EXISTS slots (endpoint TEXT PRIMARY KEY, next_at REAL NOT NULL)")
+        database.execute("BEGIN IMMEDIATE")
+        prior = database.execute("SELECT next_at FROM slots WHERE endpoint = ?", (endpoint,)).fetchone()
+        now = time()
+        reserved = max(now, prior[0] if prior else now)
+        database.execute("INSERT INTO slots(endpoint, next_at) VALUES (?, ?) "
+                         "ON CONFLICT(endpoint) DO UPDATE SET next_at=excluded.next_at",
+                         (endpoint, reserved + 1 / rate))
+        database.execute("COMMIT")
+    return max(0.0, reserved - time())
+
+
 class TokenBucket:
-    def __init__(self, rate_per_second: float):
+    def __init__(self, rate_per_second: float, endpoint: str | None = None):
         self.rate = rate_per_second
+        self.endpoint = endpoint
         self.next_allowed = 0.0
         self._lock = Lock()
 
     def wait(self) -> None:
         with self._lock:
+            if self.endpoint:
+                sleep(_reserve_shared_request(self.endpoint, self.rate))
+                return
             now = monotonic()
             if now < self.next_allowed:
                 sleep(self.next_allowed - now)
@@ -83,7 +107,7 @@ def _source_limiter(source: dict, requested_ceiling: float | None) -> TokenBucke
     key = source["endpoint"]
     with _LIMITERS_LOCK:
         if key not in _LIMITERS:
-            _LIMITERS[key] = TokenBucket(rate)
+            _LIMITERS[key] = TokenBucket(rate, key)
         else:
             # A later invocation can slow a source down, never speed it up.
             _LIMITERS[key].lower_rate(rate)
@@ -97,6 +121,8 @@ def _robots_allowed(endpoint: str, user_agent: str) -> bool:
         with urlopen(HttpRequest(robots_url, headers={"User-Agent": user_agent}), timeout=10) as response:
             lines = response.read(256_000).decode("utf-8", errors="replace").splitlines()
     except HTTPError as exc:
+        if exc.code == 429:
+            raise RuntimeError(f"robots.txt rate limited for {endpoint}") from exc
         if 400 <= exc.code < 500:
             return True  # RFC 9309: an unavailable robots.txt permits access.
         raise RuntimeError(f"Could not verify robots.txt for {endpoint}: {exc}") from exc
@@ -156,6 +182,8 @@ def _overpass(source: dict, request: Request, prior_cache: dict | None = None,
     endpoint = source["endpoint"]
     if not endpoint.startswith("https://"):
         raise ValueError("Overpass endpoint must use HTTPS")
+    limiter = _source_limiter(source, request.max_requests_per_second)
+    limiter.wait()
     if not _robots_allowed(endpoint, user_agent):
         raise PermissionError(f"robots.txt disallows {endpoint}")
     bbox = request.area.bounds
@@ -171,7 +199,7 @@ def _overpass(source: dict, request: Request, prior_cache: dict | None = None,
         clauses.append(f'nwr["{key}"="{value}"]({box});')
     query = f'[out:json][timeout:60];({"".join(clauses)});out center tags;'
     url = endpoint + "?" + urlencode({"data": query})
-    payload, cache = _get_json(url, _source_limiter(source, request.max_requests_per_second), user_agent, prior_cache)
+    payload, cache = _get_json(url, limiter, user_agent, prior_cache)
     if payload is None:
         if prior_records is None:
             raise RuntimeError("Source returned 304 but no previous records are available")

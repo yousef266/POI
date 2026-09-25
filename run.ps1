@@ -1,15 +1,20 @@
 $ErrorActionPreference = 'Stop'
 $projectRoot = $PSScriptRoot
-$pythonCommand = Get-Command python -ErrorAction SilentlyContinue
-if ($pythonCommand) {
-    $pythonPath = $pythonCommand.Source
-} else {
-    $pythonPath = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
-    if (-not (Test-Path -LiteralPath $pythonPath)) {
-        throw 'Python 3.11+ is required. Install Python or run from a configured environment.'
-    }
-}
 $localDependencies = Join-Path $projectRoot '.local-deps'
+$bundledPython = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+$pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+if ($env:POI_PYTHON) {
+    $pythonPath = $env:POI_PYTHON
+} elseif ((Test-Path -LiteralPath $localDependencies) -and
+          (Test-Path -LiteralPath $bundledPython)) {
+    $pythonPath = $bundledPython
+} elseif ($pythonCommand) {
+    $pythonPath = $pythonCommand.Source
+} elseif (Test-Path -LiteralPath $bundledPython) {
+    $pythonPath = $bundledPython
+} else {
+    throw 'Python 3.11+ is required. Install Python or set POI_PYTHON.'
+}
 if (Test-Path -LiteralPath $localDependencies) {
     $env:PYTHONPATH = $localDependencies + [IO.Path]::PathSeparator + $env:PYTHONPATH
 }

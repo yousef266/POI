@@ -53,6 +53,9 @@ def publish_postgis(records: list[dict], layer: str, database: str, schema: str 
         "longitude": "double precision", "latitude": "double precision",
         "primary_source": "text", "primary_source_id": "text", "footprint_ref": "text",
         "name_en": "text", "name_ar": "text", "alternate_names": "text",
+        "original_name_en": "text", "original_name_ar": "text",
+        "name_en_method": "text", "name_en_version": "text", "name_en_confidence": "double precision",
+        "name_ar_method": "text", "name_ar_version": "text", "name_ar_confidence": "double precision",
         "category": "text", "source_category": "text", "address": "text",
         "address_street": "text", "address_city": "text", "address_region": "text",
         "address_postcode": "text", "address_country": "text",
@@ -102,12 +105,20 @@ def publish_postgis(records: list[dict], layer: str, database: str, schema: str 
             for row in records:
                 lon, lat = float(row["lon"]), float(row["lat"])
                 provenance = row.get("provenance") or {}
-                source_name, _, source_id = (row.get("geometry_provenance") or "").partition(":")
+                source_name, _, source_id = ((row.get("source_keys") or [""])[0]).partition(":")
                 values = {
                     "longitude": lon, "latitude": lat,
                     "primary_source": source_name or None, "primary_source_id": source_id or None,
                     "footprint_ref": row.get("footprint_ref"),
                     "name_en": row.get("name_en"), "name_ar": row.get("name_ar"),
+                    "original_name_en": row.get("original_name_en"),
+                    "original_name_ar": row.get("original_name_ar"),
+                    "name_en_method": row.get("name_en_method"),
+                    "name_en_version": row.get("name_en_version"),
+                    "name_en_confidence": row.get("name_en_confidence"),
+                    "name_ar_method": row.get("name_ar_method"),
+                    "name_ar_version": row.get("name_ar_version"),
+                    "name_ar_confidence": row.get("name_ar_confidence"),
                     "alternate_names": json.dumps(row.get("alternate_names") or [], ensure_ascii=False),
                     "category": row["category"], "source_category": row.get("source_category"),
                     "address": row.get("address"),
@@ -374,16 +385,30 @@ def verify_local(layer: str, database: str, workspace: str, schema: str = "publi
     ))
     abstract = feature_response["featureType"].get("abstract", "")
     expected_count = None
+    expected_generated_names = 0
     source_coordinate_checks = 0
     if output_dir is not None:
         metadata = json.loads((output_dir / "metadata.json").read_text(encoding="utf-8"))
         expected_count = metadata["feature_count"]
+        expected_generated_names = metadata.get("generated_name_count", 0)
         if feature_count != expected_count:
             raise RuntimeError(f"PostGIS count {feature_count} differs from run output {expected_count}")
         missing = [item["attribution"] for item in metadata["contributors"] if item["attribution"] not in abstract]
         if missing:
             raise RuntimeError("GeoServer feature type metadata is missing source attribution")
         expected_records = json.loads((output_dir / "records.json").read_text(encoding="utf-8"))
+        if expected_generated_names:
+            with psycopg.connect(**_pg_kwargs(database)) as name_connection:
+                with name_connection.cursor() as name_cursor:
+                    name_cursor.execute(sql.SQL("""
+                        SELECT count(*) FILTER
+                          (WHERE name_en_method IS NOT NULL OR name_ar_method IS NOT NULL)
+                        FROM {}.{}
+                    """).format(sql.Identifier(schema), sql.Identifier(layer)))
+                    published_generated = name_cursor.fetchone()[0]
+            if published_generated != sum(bool(row.get("name_en_method") or row.get("name_ar_method"))
+                                          for row in expected_records):
+                raise RuntimeError("PostGIS generated-name count differs from saved harvest")
         if set(database_coordinates) != {row["stable_id"] for row in expected_records}:
             raise RuntimeError("PostGIS IDs differ from the saved harvest")
         for row in expected_records:
@@ -415,6 +440,10 @@ def verify_local(layer: str, database: str, workspace: str, schema: str = "publi
                        "name_en", "name_ar", "alternate_names", "email", "footprint_ref",
                        "category", "source_keys", "attributions", "licenses", "geometry_provenance",
                        "provenance_name_en", "provenance_name_ar", "provenance_category"}
+    if expected_generated_names:
+        required_fields.update({"name_en_method", "name_en_version", "name_en_confidence",
+                                "name_ar_method", "name_ar_version", "name_ar_confidence",
+                                "original_name_en", "original_name_ar"})
     if feature_count and (missing_fields := required_fields - wfs_fields):
         raise RuntimeError(f"GeoServer WFS omitted dedicated POI fields: {sorted(missing_fields)}")
     if "properties" in wfs_fields:

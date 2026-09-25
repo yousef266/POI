@@ -1,9 +1,37 @@
 {
   "name": "poi-harvester",
-  "version": "0.1.0",
-  "description": "Harvests licensed POIs, deduplicates them, and publishes an auditable spatial layer.",
+  "version": "0.2.0",
+  "description": "Harvests policy-gated POIs, enriches bilingual names, deduplicates them, and publishes an auditable spatial layer.",
   "entrypoint": "poi-harvester run",
-  "inputs": ["area_of_interest_bbox_or_polygon_or_named_place_catalog", "category_or_categories_or_intent", "declared_use", "source_selection", "contact_for_live_sources", "optional_geocode_catalog", "database", "workspace", "optional_schema"],
-  "outputs": ["poi_layer", "metadata", "change_set", "exclusions", "review_queue"],
-  "states": ["completed", "needs_input", "failed"]
+  "inputs": [
+    "bbox_or_polygon_or_named_place",
+    "category_or_categories_or_English_Arabic_intent",
+    "declared_use",
+    "source_selection",
+    "contact_for_live_sources",
+    "optional_place_catalog_or_provider",
+    "optional_geocode_catalog_or_provider",
+    "database_for_publication",
+    "workspace_for_publication",
+    "optional_schema"
+  ],
+  "outputs": [
+    "poi_layer",
+    "metadata",
+    "change_set",
+    "exclusions",
+    "review_queue"
+  ],
+  "states": [
+    "completed",
+    "needs_input",
+    "failed"
+  ],
+  "contract_status": "NOT_AVAILABLE",
+  "evaluation_outputs": [
+    "report_json",
+    "license_report_json",
+    "taxonomy_report_json",
+    "readiness_markdown"
+  ]
 }

@@ -18,9 +18,9 @@ The callable `poi_harvester.agent.invoke(payload)` provides the same workflow to
 
 For a subsequent harvest, pass `--previous output/demo/records.json` and use a new `--out` directory. This emits added, updated, removed, and unchanged IDs with field-level changes.
 
-For an exact WGS84 polygon AOI, use `--polygon fixtures/riyadh_small_aoi.geojson` instead of `--bbox`. The source query uses the polygon's bounds and the agent filters records against the polygon before merging. Polygon holes and multipolygons are supported. Non-WGS84 coordinates are not supported. To resolve an admin boundary or named place, use `--place "Place name" --place-catalog places.geojson`; the catalog must contain a matching named GeoJSON polygon or multipolygon. No general online place resolver is configured.
+For an exact WGS84 polygon AOI, use `--polygon fixtures/riyadh_small_aoi.geojson` instead of `--bbox`. The source query uses the polygon's bounds and the agent filters records against the polygon before merging. Polygon holes and multipolygons are supported. Non-WGS84 coordinates are not supported. To resolve a named AOI, use `--place "Place name"` with either `--place-catalog places.geojson` or an explicit licensed `--place-provider provider.json`. The local catalog contains named GeoJSON polygons or multipolygons; the HTTP adapter accepts Nominatim-compatible search results. An English or Arabic `--intent` can extract a place, category and nearby radius. Ambiguous results ask for a more specific place. Nearby point or road results use a derived bounding box and carry low-confidence area provenance.
 
-Address-only source records go to the review queue unless a licensed lookup catalog is supplied with `--geocode-catalog geocodes.json`. The catalog format is `{ "provider": { "name": "...", "license": "...", "attribution": "...", "allowed_uses": ["internal"], "commercial_use": false }, "entries": [{ "id": "...", "address": "...", "lat": 0, "lon": 0, "confidence": 0.5 }] }`. It is an optional pluggable local provider, not an online geocoding service. Matched records are marked `geocode_derived`, with geometry provenance and a confidence ceiling of 0.5. OSM way/relation centers are never silently used as verified POI points.
+Address-only source records go to the review queue unless a licensed lookup catalog is supplied with `--geocode-catalog geocodes.json`. The catalog format is `{ "provider": { "name": "...", "license": "...", "attribution": "...", "allowed_uses": ["internal"], "commercial_use": false }, "entries": [{ "id": "...", "address": "...", "lat": 0, "lon": 0, "confidence": 0.5 }] }`. An explicit `--geocode-provider provider.json` also supports licensed Nominatim-compatible live lookup. Ambiguous results go to review; derived coordinates retain provider attribution and confidence at most 0.5. Matched records are marked `geocode_derived`, with geometry provenance and a confidence ceiling of 0.5. OSM way/relation centers are never silently used as verified POI points.
 
 ## Live OpenStreetMap collection
 
@@ -30,11 +30,11 @@ The included registry contains an Overpass adapter driven by the packaged 244-le
 .\run.ps1 run --bbox 24.65 46.62 24.79 46.79 --intent "pharmacies in Riyadh" --sources openstreetmap --contact you@example.com --use internal --out output/riyadh
 ```
 
-Live requests fail closed when `robots.txt` cannot be reached or disallows the endpoint. An HTTP 4xx for `robots.txt` is treated as unavailable under RFC 9309. Source policies in `sources.json` are **operator declarations**, not a legal determination. Review the ODbL and any source-specific terms before commercial use or redistribution. Both uses are deliberately disabled for the OSM source in the starter registry pending that review. The agent never fabricates a missing translation.
+Live requests fail closed when `robots.txt` cannot be reached or disallows the endpoint. An HTTP 4xx for `robots.txt` is treated as unavailable under RFC 9309. Source policies in `sources.json` are **operator declarations**, not a legal determination. Review the ODbL and any source-specific terms before commercial use or redistribution. Both uses are deliberately disabled for the OSM source in the starter registry pending that review. Missing Arabic or English names are filled by a deterministic rule baseline: generic establishment terms are translated and proper names are transliterated. Original names are preserved, generated fields carry method/version/confidence and provenance, and low-confidence names go to review. Human Arabic quality is not certified.
 
 The registry also includes a Swiss OSM Overpass source for a real local test. The 2026-09-25 Zurich run collected 30 pharmacy nodes. The global Overpass endpoint timed out from this PC, so the Swiss test does not verify the Riyadh benchmark.
 
-Natural-language intent can name more than one category. A corrected Zurich run publishes 42 pharmacy/clinic records; a bakery run collected 35 `shop=bakery` POIs. Two same-name clinic nodes with different phone numbers are kept separate. Core Arabic pharmacy, clinic, hospital, and school terms are supported; the other taxonomy leaves currently have English labels only.
+Natural-language intent can name more than one category. A corrected Zurich run publishes 42 pharmacy/clinic records; a bakery run collected 35 `shop=bakery` POIs. Two same-name clinic nodes with different phone numbers are kept separate. Arabic intent supports common categories including pharmacies, clinics, hospitals, schools, restaurants, hotels, mosques, bakeries, banks, ATMs, cafes and fuel stations. The complete 244-leaf taxonomy has not been manually localized.
 
 ```powershell
 .\run.ps1 run --bbox 47.37 8.52 47.39 8.55 --category pharmacy --sources osm_swiss --contact you@example.com --out output/zurich-osm-real
@@ -54,7 +54,7 @@ The agent reads an editable `.env` in the project root automatically, or a diffe
 
 For another server, edit those connection values. On each publishing run, give `--database` and `--workspace`. Add `--schema` when the table should be in a schema other than `public`. The layer name defaults to `poi_<category>`; `--layer` can change it. For unusual network setups, optional `GEOSERVER_PGHOST` tells GeoServer which database address to reach, and `PGSSLMODE` sets the agent's PostgreSQL TLS mode.
 
-Run the local test with the included PowerShell launcher. It uses Python available on this PC and loads `.env` automatically:
+Run the local test with the included PowerShell launcher. It selects a compatible local Python runtime on this PC and loads `.env` automatically:
 
 ```powershell
 .\scripts\start-native-geoserver.ps1
@@ -78,6 +78,65 @@ For a complete local PostGIS + GeoServer demo on Windows after Docker Desktop is
 
 The script creates random local passwords in the git-ignored `.env.container`, starts `postgis/postgis:17-3.5` on host port 5433 and the official GeoServer 2.28.5 image on host port 8080, then runs the agent with `--publish`. The existing Windows PostgreSQL service on port 5432 is left alone. To stop the demo services without deleting their data, run `.\scripts\stop-local.ps1`.
 
-## Current scope and gaps
+## Local evaluator and current evidence
 
-See [AGENT1_AUDIT.md](AGENT1_AUDIT.md) for a requirement-by-requirement result. This is a **working vertical slice**, not yet a claim that all bounty acceptance criteria are met. Bilingual enrichment remains absent: 0 of 42 records in the corrected live Zurich mixed layer have both Arabic and English names. Named AOIs and geocoding require operator-supplied local catalogs. Gold benchmark conflation/category/coordinate scores, Arabic human quality, full crosswalk review, and production validation of source licenses remain unverified. The live global Overpass test on this PC timed out twice on 2026-09-25; Zurich OSM runs completed and published real source nodes locally. The linked Common Agent Contract is not reproduced in the PDF; its exact interface and repository structure must be checked before submission.
+Run the one-command offline evaluator, then inspect its machine-readable reports and readiness table:
+
+```powershell
+.\run.ps1 evaluate --out output/evaluation --readiness docs/AGENT1_READINESS.md
+```
+
+It runs the unit suite, project-authored conflation labels, license and taxonomy reports, a 10,000-record synthetic throughput probe, exact replay, and bilingual reprocessing of the saved 42-record Zurich capture when present. This is local evidence only; the official gold labels and specified benchmark hardware were not supplied. The evaluator marks unavailable scores `NOT_CERTIFIED`. `docs/AGENT1_READINESS.md` lists A1–A12 separately.
+
+The 42-record Zurich capture can be reprocessed without another source request and published to an isolated schema:
+
+```powershell
+.\run.ps1 reprocess --from-run output/zurich-mixed-corrected --out output/zurich-mixed-enriched
+.\run.ps1 replay output/zurich-mixed-enriched
+.\run.ps1 publish --out output/zurich-mixed-enriched --layer poi_clinic_pharmacy --database poi_agent_test --schema osm_enriched --workspace poi_osm_enriched
+.\run.ps1 verify-local --database poi_agent_test --schema osm_enriched --workspace poi_osm_enriched --layer poi_clinic_pharmacy --out output/zurich-mixed-enriched
+```
+
+On this PC, the separate `poi_osm_enriched` layer was verified with 42 real-source points and dedicated bilingual provenance columns. The rule baseline filled both language fields for 42/42 records; low-confidence German-name transliterations require human review. The earlier `poi_osm_mixed` layer remains available.
+
+For an explicitly authorized HTTP place resolver or geocoder, create an operator-owned JSON file with at least:
+
+```json
+{
+  "name": "operator_search",
+  "endpoint": "https://your-approved-service.example/search",
+  "license": "operator-reviewed license",
+  "attribution": "Required attribution",
+  "allowed_uses": ["internal"],
+  "commercial_use": false,
+  "rate_limit_per_second": 1
+}
+```
+
+Use `--place-provider path.json` or `--geocode-provider path.json`, plus `--contact` for a live request. The public OpenStreetMap Nominatim endpoint is rejected as a generic built-in provider; configure a self-hosted or licensed third-party service under its own terms. No live geocoder or named-place provider was available for this PC's run; their adapters are verified with mocked provider responses.
+
+See [AGENT1_AUDIT.md](AGENT1_AUDIT.md) for the requirement audit and [CONTRACT_BLOCKER.md](CONTRACT_BLOCKER.md) for the missing Common Agent Contract. No official bounty score or contract compliance is claimed.
+
+## Reproduce from a clean clone
+
+On Windows PowerShell with Python 3.11+ installed:
+
+```powershell
+git clone https://github.com/yousef266/POI.git
+cd POI
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[postgis]"
+Copy-Item .env.example .env
+```
+
+Edit `.env` with your own PostgreSQL and GeoServer connection settings. Give the database name and workspace at run time; schema is optional. Run the offline fixture and evaluator:
+
+```powershell
+.\.venv\Scripts\python.exe run.py run --bbox 24.70 46.66 24.73 46.69 --category pharmacy --sources demo,demo_alt --out output/demo
+.\.venv\Scripts\python.exe run.py replay output/demo
+.\.venv\Scripts\python.exe run.py evaluate --out output/evaluation --readiness docs/AGENT1_READINESS.md
+.\.venv\Scripts\python.exe scripts/benchmark_agent1.py
+.\.venv\Scripts\python.exe -m unittest tests.test_zurich_regression -v
+```
+
+The 10K command is a synthetic local pipeline probe. The Zurich regression fixture reproduces the same-name/different-phone merge pattern with invented records. The original 42-record live capture is stored locally under `output/zurich-mixed-corrected` and is deliberately not committed as redistributed OSM data. On this PC, reprocess and replay it with `.\run.ps1 reprocess --from-run output/zurich-mixed-corrected --out output/zurich-mixed-enriched` followed by `.\run.ps1 replay output/zurich-mixed-enriched`. A fresh live Zurich request can be made with the `osm_swiss` example above, but the live feature count can change.

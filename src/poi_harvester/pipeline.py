@@ -7,7 +7,8 @@ from pathlib import Path
 from typing import Any
 import json
 
-from .core import Request, canonicalize, change_set, conflate, feature_collection, reconcile_ids, reproducibility_hash
+from .core import Area, Request, canonicalize, change_set, conflate, feature_collection, reconcile_ids, reproducibility_hash
+from .enrichment import VERSION as ENRICHMENT_VERSION, enrich_record
 from .sources import collect, covers_area, license_gate, load_registry
 from .taxonomy import by_id
 
@@ -23,6 +24,7 @@ def run(
     selected_sources: set[str] | None = None,
     previous_path: Path | None = None,
     geocoder: Any | None = None,
+    source_records_override: dict[str, list[dict]] | None = None,
 ) -> dict:
     sources = load_registry(registry_path)
     known = {source["name"] for source in sources}
@@ -53,9 +55,14 @@ def run(
             exclusions.append({"source": source["name"], "reason": "AOI outside declared source coverage"})
             continue
         try:
-            source_records, cache_entry = collect(
-                source, request, registry_path, previous_cache.get(source["name"]),
-                previous_raw.get(source["name"]))
+            if source_records_override is not None:
+                if source["name"] not in source_records_override:
+                    raise ValueError("Captured source records are missing")
+                source_records, cache_entry = source_records_override[source["name"]], None
+            else:
+                source_records, cache_entry = collect(
+                    source, request, registry_path, previous_cache.get(source["name"]),
+                    previous_raw.get(source["name"]))
             if cache_entry:
                 current_cache[source["name"]] = cache_entry
         except Exception as exc:
@@ -83,8 +90,16 @@ def run(
             try:
                 if not request.area.contains(float(record["lat"]), float(record["lon"])):
                     continue
+                if record.get("category") not in by_id():
+                    review.append({"source": source["name"], "record": record,
+                                   "reason": f"Unmapped source category: {record.get('category')!r}"})
+                    continue
                 if record.get("category") not in request.categories:
                     continue
+                record, enrichment_review = enrich_record(record, f"{source['name']}:{record['id']}")
+                if enrichment_review:
+                    review.append({"source": source["name"], "record": record,
+                                   "reason": f"Bilingual enrichment: {enrichment_review}"})
                 captured = {**record, "harvested_at": harvested_at}
                 normalized = canonicalize(captured, source)
             except (ValueError, KeyError, TypeError) as exc:
@@ -123,11 +138,17 @@ def run(
         "source_failures": failures,
         "reproducibility_hash": reproducibility_hash(current),
         "conflation_algorithm_version": 2,
+        "enrichment_algorithm_version": ENRICHMENT_VERSION,
+        "bilingual_complete_count": sum(bool(row.get("language_complete")) for row in current),
+        "generated_name_count": sum(bool(row.get("name_en_method")) + bool(row.get("name_ar_method"))
+                                    for row in current),
         "caveats": [
-            "Missing translations are left empty rather than fabricated.",
+            "Generated translations/transliterations are rule-based and require human quality review.",
             "Source license declarations require operator verification before production use.",
         ],
     }
+    if request.area_resolution:
+        metadata["area_resolution"] = request.area_resolution
     _write_json(output_dir / "raw.json", raw)
     _write_json(output_dir / "http_cache.json", current_cache)
     _write_json(output_dir / "sources_snapshot.json", sources)
@@ -158,3 +179,39 @@ def replay(output_dir: Path) -> dict:
         "reproducibility_hash": reproducibility_hash(rebuilt),
         "feature_count": len(rebuilt),
     }
+
+
+def reprocess_capture(previous_dir: Path, output_dir: Path) -> dict:
+    """Apply current deterministic rules to an immutable, previously accepted capture."""
+    previous_dir = previous_dir.resolve()
+    output_dir = output_dir.resolve()
+    if previous_dir == output_dir:
+        raise ValueError("Reprocessing must use a new output directory")
+    source_list = json.loads((previous_dir / "sources_snapshot.json").read_text(encoding="utf-8"))
+    prior_raw = json.loads((previous_dir / "raw.json").read_text(encoding="utf-8"))
+    prior_meta = json.loads((previous_dir / "metadata.json").read_text(encoding="utf-8"))
+    by_source: dict[str, list[dict]] = {}
+    for item in prior_raw:
+        by_source.setdefault(item["source"], []).append(item["record"])
+    selected = {item["source"] for item in prior_meta["contributors"] if item["kind"] != "geocoder"}
+    if not selected or not selected <= by_source.keys():
+        raise ValueError("Capture is missing records for a contributing source")
+    west, south, east, north = prior_meta["area_bbox"]
+    categories = tuple(prior_meta["categories"])
+    request = Request(Area(south, west, north, east),
+                      categories[0] if len(categories) == 1 else categories,
+                      prior_meta["declared_use"])
+    output_dir.mkdir(parents=True, exist_ok=True)
+    registry_path = output_dir / "capture_registry.json"
+    _write_json(registry_path, {"sources": source_list})
+    result = run(request, registry_path, output_dir, selected,
+                 previous_dir / "records.json", source_records_override=by_source)
+    metadata = result["metadata"]
+    metadata["reprocessed_from"] = str(previous_dir)
+    metadata["source_scope"] = "previously_accepted_raw_only"
+    metadata["caveats"].append("This run reprocessed captured accepted records; it is not a fresh source harvest.")
+    _write_json(output_dir / "metadata.json", metadata)
+    old_review = json.loads((previous_dir / "review_queue.json").read_text(encoding="utf-8"))
+    new_review = json.loads((output_dir / "review_queue.json").read_text(encoding="utf-8"))
+    _write_json(output_dir / "review_queue.json", old_review + new_review)
+    return result

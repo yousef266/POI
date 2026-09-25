@@ -173,6 +173,7 @@ class Request:
     declared_use: str
     operator_contact: str | None = None
     max_requests_per_second: float | None = None
+    area_resolution: dict[str, Any] | None = None
 
     def __post_init__(self) -> None:
         if not self.categories or any(category not in SUPPORTED_CATEGORIES for category in self.categories):
@@ -270,7 +271,7 @@ def canonicalize(raw: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
         "address_country": raw.get("address_country"),
         "footprint_ref": raw.get("footprint_ref"),
     }
-    return {
+    result = {
         "source_key": source_key, "lat": lat, "lon": lon,
         **fields,
         "alternate_names": raw.get("alternate_names") or [],
@@ -281,9 +282,16 @@ def canonicalize(raw: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
         "attribution": source["attribution"], "license": source["license"],
         "geometry_attribution": raw.get("geometry_attribution"),
         "geometry_license": raw.get("geometry_license"),
-        "provenance": {key: source_key for key, val in fields.items() if val is not None},
+        "provenance": {key: raw.get(f"provenance_{key}") or source_key
+                       for key, val in fields.items() if val is not None},
         "geometry_provenance": raw.get("geometry_provenance") or source_key,
     }
+    for language_field in ("name_en", "name_ar"):
+        if raw.get(f"{language_field}_method"):
+            for suffix in ("method", "version", "confidence"):
+                result[f"{language_field}_{suffix}"] = raw.get(f"{language_field}_{suffix}")
+            result[f"original_{language_field}"] = raw.get(f"original_{language_field}")
+    return result
 
 
 def _match_score(a: dict[str, Any], b: dict[str, Any]) -> float:
@@ -370,10 +378,19 @@ def conflate(records: list[dict[str, Any]], algorithm_version: int = 2) -> list[
             "provenance": {},
         }
         for field in ("name_en", "name_ar", "category", "phone", "email", "address", "hours", "source_category", "website", "address_street", "address_city", "address_region", "address_postcode", "address_country", "footprint_ref"):
-            chosen = next((row for row in ranked if row.get(field) is not None), None)
+            choices = [row for row in ranked if row.get(field) is not None]
+            if field in ("name_en", "name_ar"):
+                choices.sort(key=lambda row: (
+                    bool(row["provenance"].get(field, "").startswith("generated:")),
+                    -row["confidence"], row["source_key"]))
+            chosen = choices[0] if choices else None
             merged[field] = chosen[field] if chosen else None
             if chosen:
-                merged["provenance"][field] = chosen["source_key"]
+                merged["provenance"][field] = chosen["provenance"].get(field, chosen["source_key"])
+                if field in ("name_en", "name_ar") and chosen.get(f"{field}_method"):
+                    for suffix in ("method", "version", "confidence"):
+                        merged[f"{field}_{suffix}"] = chosen[f"{field}_{suffix}"]
+                    merged[f"original_{field}"] = chosen.get(f"original_{field}")
         merged["language_complete"] = bool(merged["name_en"] and merged["name_ar"])
         merged["alternate_names"] = sorted({name for row in group for name in row.get("alternate_names", [])})
         output.append(merged)

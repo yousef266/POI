@@ -1,0 +1,13 @@
+{
+  "entities": [
+    {"source_key": "demo:demo-101", "entity_id": "nakheel"},
+    {"source_key": "demo:demo-103", "entity_id": "nakheel"},
+    {"source_key": "demo_alt:alt-501", "entity_id": "nakheel"},
+    {"source_key": "demo:demo-102", "entity_id": "central"}
+  ],
+  "field_truth": [
+    {"source_key": "demo:demo-101", "field": "name_ar", "expected_source_key": "demo:demo-101"},
+    {"source_key": "demo:demo-101", "field": "hours", "expected_source_key": "demo_alt:alt-501"}
+  ],
+  "description": "Project-authored fixture labels. Not the bounty gold benchmark."
+}

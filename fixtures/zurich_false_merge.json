@@ -1,0 +1,18 @@
+[
+  {
+    "id": "clinic-1",
+    "lat": 24.7000000,
+    "lon": 46.6700000,
+    "name_en": "Central Clinic",
+    "phone": "100001",
+    "category": "clinic"
+  },
+  {
+    "id": "clinic-2",
+    "lat": 24.7001638,
+    "lon": 46.6702824,
+    "name_en": "Central Clinic",
+    "phone": "100002",
+    "category": "clinic"
+  }
+]
