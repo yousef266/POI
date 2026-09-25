@@ -1,0 +1,3741 @@
+{
+  "generated_at": "2026-09-25T14:28:06.938297+00:00",
+  "leaf_count": 244,
+  "source_references": {
+    "osm": "https://taginfo.openstreetmap.org/api/4/key/values",
+    "google": "https://developers.google.com/maps/documentation/places/web-service/place-types",
+    "wikidata": "https://www.wikidata.org/wiki/Property:P1282"
+  },
+  "osm_data_until": {
+    "amenity": "2026-09-25T00:59:50Z",
+    "shop": "2026-09-25T00:59:50Z",
+    "tourism": "2026-09-25T00:59:50Z",
+    "leisure": "2026-09-25T00:59:50Z",
+    "healthcare": "2026-09-25T00:59:50Z",
+    "craft": "2026-09-25T00:59:50Z",
+    "office": "2026-09-25T00:59:50Z",
+    "emergency": "2026-09-25T00:59:50Z",
+    "historic": "2026-09-25T00:59:50Z"
+  },
+  "mapping_note": "Google mappings use exact type names or listed overrides. Wikidata classes require a P1282 OSM-tag statement and an exact English label match; other P1282 items remain candidates for manual review.",
+  "leaves": [
+    {
+      "id": "amenity_atm",
+      "parent": "amenity",
+      "label_en": "Atm",
+      "osm_tags": [
+        "amenity=atm"
+      ],
+      "google_types": [
+        "atm"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 243475,
+      "wikidata_p1282_candidates": [
+        "Q81235"
+      ]
+    },
+    {
+      "id": "amenity_bank",
+      "parent": "amenity",
+      "label_en": "Bank",
+      "osm_tags": [
+        "amenity=bank"
+      ],
+      "google_types": [
+        "bank"
+      ],
+      "wikidata_classes": [
+        "Q22687"
+      ],
+      "osm_count_at_snapshot": 412381,
+      "wikidata_p1282_candidates": [
+        "Q21073937",
+        "Q22687"
+      ]
+    },
+    {
+      "id": "amenity_bar",
+      "parent": "amenity",
+      "label_en": "Bar",
+      "osm_tags": [
+        "amenity=bar"
+      ],
+      "google_types": [
+        "bar"
+      ],
+      "wikidata_classes": [
+        "Q187456"
+      ],
+      "osm_count_at_snapshot": 244234,
+      "wikidata_p1282_candidates": [
+        "Q187456"
+      ]
+    },
+    {
+      "id": "amenity_bench",
+      "parent": "amenity",
+      "label_en": "Bench",
+      "osm_tags": [
+        "amenity=bench"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q204776"
+      ],
+      "osm_count_at_snapshot": 3412663,
+      "wikidata_p1282_candidates": [
+        "Q204776"
+      ]
+    },
+    {
+      "id": "amenity_bicycle_parking",
+      "parent": "amenity",
+      "label_en": "Bicycle Parking",
+      "osm_tags": [
+        "amenity=bicycle_parking"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q16243822"
+      ],
+      "osm_count_at_snapshot": 941491,
+      "wikidata_p1282_candidates": [
+        "Q16243822"
+      ]
+    },
+    {
+      "id": "amenity_bicycle_rental",
+      "parent": "amenity",
+      "label_en": "Bicycle Rental",
+      "osm_tags": [
+        "amenity=bicycle_rental"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 94417,
+      "wikidata_p1282_candidates": [
+        "Q61663696"
+      ]
+    },
+    {
+      "id": "amenity_bus_station",
+      "parent": "amenity",
+      "label_en": "Bus Station",
+      "osm_tags": [
+        "amenity=bus_station"
+      ],
+      "google_types": [
+        "bus_station"
+      ],
+      "wikidata_classes": [
+        "Q494829"
+      ],
+      "osm_count_at_snapshot": 67879,
+      "wikidata_p1282_candidates": [
+        "Q494829"
+      ]
+    },
+    {
+      "id": "amenity_cafe",
+      "parent": "amenity",
+      "label_en": "Cafe",
+      "osm_tags": [
+        "amenity=cafe"
+      ],
+      "google_types": [
+        "cafe"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 650780,
+      "wikidata_p1282_candidates": [
+        "Q30022"
+      ]
+    },
+    {
+      "id": "amenity_car_wash",
+      "parent": "amenity",
+      "label_en": "Car Wash",
+      "osm_tags": [
+        "amenity=car_wash"
+      ],
+      "google_types": [
+        "car_wash"
+      ],
+      "wikidata_classes": [
+        "Q1139861"
+      ],
+      "osm_count_at_snapshot": 125575,
+      "wikidata_p1282_candidates": [
+        "Q1139861"
+      ]
+    },
+    {
+      "id": "amenity_charging_station",
+      "parent": "amenity",
+      "label_en": "Charging Station",
+      "osm_tags": [
+        "amenity=charging_station"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q2140665"
+      ],
+      "osm_count_at_snapshot": 205555,
+      "wikidata_p1282_candidates": [
+        "Q2140665"
+      ]
+    },
+    {
+      "id": "amenity_childcare",
+      "parent": "amenity",
+      "label_en": "Childcare",
+      "osm_tags": [
+        "amenity=childcare"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 76551,
+      "wikidata_p1282_candidates": [
+        "Q1455871",
+        "Q364005"
+      ]
+    },
+    {
+      "id": "amenity_college",
+      "parent": "amenity",
+      "label_en": "College",
+      "osm_tags": [
+        "amenity=college"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q189004"
+      ],
+      "osm_count_at_snapshot": 71919,
+      "wikidata_p1282_candidates": [
+        "Q189004",
+        "Q21822439"
+      ]
+    },
+    {
+      "id": "amenity_community_centre",
+      "parent": "amenity",
+      "label_en": "Community Centre",
+      "osm_tags": [
+        "amenity=community_centre"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 221233,
+      "wikidata_p1282_candidates": [
+        "Q77115"
+      ]
+    },
+    {
+      "id": "amenity_dentist",
+      "parent": "amenity",
+      "label_en": "Dentist",
+      "osm_tags": [
+        "amenity=dentist",
+        "healthcare=dentist"
+      ],
+      "google_types": [
+        "dentist"
+      ],
+      "wikidata_classes": [
+        "Q27349"
+      ],
+      "osm_count_at_snapshot": 160639,
+      "wikidata_p1282_candidates": [
+        "Q27349",
+        "Q2979300"
+      ]
+    },
+    {
+      "id": "amenity_doctors",
+      "parent": "amenity",
+      "label_en": "Doctors",
+      "osm_tags": [
+        "amenity=doctors"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 208659,
+      "wikidata_p1282_candidates": [
+        "Q718966"
+      ]
+    },
+    {
+      "id": "amenity_drinking_water",
+      "parent": "amenity",
+      "label_en": "Drinking Water",
+      "osm_tags": [
+        "amenity=drinking_water"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 368310,
+      "wikidata_p1282_candidates": [
+        "Q1630622",
+        "Q94631703"
+      ]
+    },
+    {
+      "id": "amenity_fast_food",
+      "parent": "amenity",
+      "label_en": "Fast Food",
+      "osm_tags": [
+        "amenity=fast_food"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q81799"
+      ],
+      "osm_count_at_snapshot": 664656,
+      "wikidata_p1282_candidates": [
+        "Q1751429",
+        "Q81799"
+      ]
+    },
+    {
+      "id": "amenity_fire_station",
+      "parent": "amenity",
+      "label_en": "Fire Station",
+      "osm_tags": [
+        "amenity=fire_station"
+      ],
+      "google_types": [
+        "fire_station"
+      ],
+      "wikidata_classes": [
+        "Q1195942"
+      ],
+      "osm_count_at_snapshot": 148450,
+      "wikidata_p1282_candidates": [
+        "Q1195942"
+      ]
+    },
+    {
+      "id": "amenity_fountain",
+      "parent": "amenity",
+      "label_en": "Fountain",
+      "osm_tags": [
+        "amenity=fountain"
+      ],
+      "google_types": [
+        "fountain"
+      ],
+      "wikidata_classes": [
+        "Q483453"
+      ],
+      "osm_count_at_snapshot": 202312,
+      "wikidata_p1282_candidates": [
+        "Q483453"
+      ]
+    },
+    {
+      "id": "amenity_fuel",
+      "parent": "amenity",
+      "label_en": "Fuel",
+      "osm_tags": [
+        "amenity=fuel"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 568435,
+      "wikidata_p1282_candidates": [
+        "Q123358029",
+        "Q205495"
+      ]
+    },
+    {
+      "id": "amenity_grave_yard",
+      "parent": "amenity",
+      "label_en": "Grave Yard",
+      "osm_tags": [
+        "amenity=grave_yard"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 160074,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "amenity_hunting_stand",
+      "parent": "amenity",
+      "label_en": "Hunting Stand",
+      "osm_tags": [
+        "amenity=hunting_stand"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 309480,
+      "wikidata_p1282_candidates": [
+        "Q1279822"
+      ]
+    },
+    {
+      "id": "amenity_kindergarten",
+      "parent": "amenity",
+      "label_en": "Kindergarten",
+      "osm_tags": [
+        "amenity=kindergarten"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q126807"
+      ],
+      "osm_count_at_snapshot": 339765,
+      "wikidata_p1282_candidates": [
+        "Q126807"
+      ]
+    },
+    {
+      "id": "amenity_library",
+      "parent": "amenity",
+      "label_en": "Library",
+      "osm_tags": [
+        "amenity=library"
+      ],
+      "google_types": [
+        "library"
+      ],
+      "wikidata_classes": [
+        "Q7075"
+      ],
+      "osm_count_at_snapshot": 113149,
+      "wikidata_p1282_candidates": [
+        "Q7075"
+      ]
+    },
+    {
+      "id": "amenity_marketplace",
+      "parent": "amenity",
+      "label_en": "Marketplace",
+      "osm_tags": [
+        "amenity=marketplace"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q330284"
+      ],
+      "osm_count_at_snapshot": 98695,
+      "wikidata_p1282_candidates": [
+        "Q330284"
+      ]
+    },
+    {
+      "id": "amenity_parcel_locker",
+      "parent": "amenity",
+      "label_en": "Parcel Locker",
+      "osm_tags": [
+        "amenity=parcel_locker"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q2046594"
+      ],
+      "osm_count_at_snapshot": 100566,
+      "wikidata_p1282_candidates": [
+        "Q2046594"
+      ]
+    },
+    {
+      "id": "amenity_parking",
+      "parent": "amenity",
+      "label_en": "Parking",
+      "osm_tags": [
+        "amenity=parking"
+      ],
+      "google_types": [
+        "parking"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 6872818,
+      "wikidata_p1282_candidates": [
+        "Q6501349"
+      ]
+    },
+    {
+      "id": "amenity_parking_entrance",
+      "parent": "amenity",
+      "label_en": "Parking Entrance",
+      "osm_tags": [
+        "amenity=parking_entrance"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q47520013"
+      ],
+      "osm_count_at_snapshot": 283062,
+      "wikidata_p1282_candidates": [
+        "Q47520013"
+      ]
+    },
+    {
+      "id": "amenity_parking_space",
+      "parent": "amenity",
+      "label_en": "Parking Space",
+      "osm_tags": [
+        "amenity=parking_space"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q1433633"
+      ],
+      "osm_count_at_snapshot": 5029465,
+      "wikidata_p1282_candidates": [
+        "Q1433633"
+      ]
+    },
+    {
+      "id": "amenity_place_of_worship",
+      "parent": "amenity",
+      "label_en": "Place Of Worship",
+      "osm_tags": [
+        "amenity=place_of_worship"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 1625700,
+      "wikidata_p1282_candidates": [
+        "Q1370598",
+        "Q831219"
+      ]
+    },
+    {
+      "id": "amenity_police",
+      "parent": "amenity",
+      "label_en": "Police",
+      "osm_tags": [
+        "amenity=police"
+      ],
+      "google_types": [
+        "police"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 162762,
+      "wikidata_p1282_candidates": [
+        "Q861951"
+      ]
+    },
+    {
+      "id": "amenity_post_box",
+      "parent": "amenity",
+      "label_en": "Post Box",
+      "osm_tags": [
+        "amenity=post_box"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q49844"
+      ],
+      "osm_count_at_snapshot": 412727,
+      "wikidata_p1282_candidates": [
+        "Q49844"
+      ]
+    },
+    {
+      "id": "amenity_post_office",
+      "parent": "amenity",
+      "label_en": "Post Office",
+      "osm_tags": [
+        "amenity=post_office"
+      ],
+      "google_types": [
+        "post_office"
+      ],
+      "wikidata_classes": [
+        "Q35054"
+      ],
+      "osm_count_at_snapshot": 218020,
+      "wikidata_p1282_candidates": [
+        "Q35054"
+      ]
+    },
+    {
+      "id": "amenity_pub",
+      "parent": "amenity",
+      "label_en": "Pub",
+      "osm_tags": [
+        "amenity=pub"
+      ],
+      "google_types": [
+        "pub"
+      ],
+      "wikidata_classes": [
+        "Q212198"
+      ],
+      "osm_count_at_snapshot": 199798,
+      "wikidata_p1282_candidates": [
+        "Q212198"
+      ]
+    },
+    {
+      "id": "amenity_recycling",
+      "parent": "amenity",
+      "label_en": "Recycling",
+      "osm_tags": [
+        "amenity=recycling"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 587129,
+      "wikidata_p1282_candidates": [
+        "Q10270100",
+        "Q137510029",
+        "Q4743886",
+        "Q47520309"
+      ]
+    },
+    {
+      "id": "amenity_restaurant",
+      "parent": "amenity",
+      "label_en": "Restaurant",
+      "osm_tags": [
+        "amenity=restaurant"
+      ],
+      "google_types": [
+        "restaurant"
+      ],
+      "wikidata_classes": [
+        "Q11707"
+      ],
+      "osm_count_at_snapshot": 1620020,
+      "wikidata_p1282_candidates": [
+        "Q11707"
+      ]
+    },
+    {
+      "id": "amenity_shelter",
+      "parent": "amenity",
+      "label_en": "Shelter",
+      "osm_tags": [
+        "amenity=shelter"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q989946"
+      ],
+      "osm_count_at_snapshot": 686911,
+      "wikidata_p1282_candidates": [
+        "Q989946"
+      ]
+    },
+    {
+      "id": "amenity_social_facility",
+      "parent": "amenity",
+      "label_en": "Social Facility",
+      "osm_tags": [
+        "amenity=social_facility"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 180121,
+      "wikidata_p1282_candidates": [
+        "Q22908",
+        "Q47520019",
+        "Q837142"
+      ]
+    },
+    {
+      "id": "amenity_telephone",
+      "parent": "amenity",
+      "label_en": "Telephone",
+      "osm_tags": [
+        "amenity=telephone"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q11035"
+      ],
+      "osm_count_at_snapshot": 75031,
+      "wikidata_p1282_candidates": [
+        "Q11035",
+        "Q900977"
+      ]
+    },
+    {
+      "id": "amenity_toilets",
+      "parent": "amenity",
+      "label_en": "Toilets",
+      "osm_tags": [
+        "amenity=toilets"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 523092,
+      "wikidata_p1282_candidates": [
+        "Q813966"
+      ]
+    },
+    {
+      "id": "amenity_townhall",
+      "parent": "amenity",
+      "label_en": "Townhall",
+      "osm_tags": [
+        "amenity=townhall"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 178017,
+      "wikidata_p1282_candidates": [
+        "Q25550691"
+      ]
+    },
+    {
+      "id": "amenity_vending_machine",
+      "parent": "amenity",
+      "label_en": "Vending Machine",
+      "osm_tags": [
+        "amenity=vending_machine"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q211584"
+      ],
+      "osm_count_at_snapshot": 369224,
+      "wikidata_p1282_candidates": [
+        "Q211584"
+      ]
+    },
+    {
+      "id": "amenity_waste_basket",
+      "parent": "amenity",
+      "label_en": "Waste Basket",
+      "osm_tags": [
+        "amenity=waste_basket"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q120475"
+      ],
+      "osm_count_at_snapshot": 1252902,
+      "wikidata_p1282_candidates": [
+        "Q120475"
+      ]
+    },
+    {
+      "id": "amenity_waste_disposal",
+      "parent": "amenity",
+      "label_en": "Waste Disposal",
+      "osm_tags": [
+        "amenity=waste_disposal"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 318807,
+      "wikidata_p1282_candidates": [
+        "Q216530"
+      ]
+    },
+    {
+      "id": "clinic",
+      "parent": "amenity",
+      "label_en": "Clinic",
+      "osm_tags": [
+        "amenity=clinic",
+        "healthcare=clinic"
+      ],
+      "google_types": [
+        "medical_clinic"
+      ],
+      "wikidata_classes": [
+        "Q1774898"
+      ],
+      "osm_count_at_snapshot": 220588,
+      "wikidata_p1282_candidates": [
+        "Q1774898",
+        "Q695416"
+      ]
+    },
+    {
+      "id": "craft_brewery",
+      "parent": "craft",
+      "label_en": "Brewery",
+      "osm_tags": [
+        "craft=brewery"
+      ],
+      "google_types": [
+        "brewery"
+      ],
+      "wikidata_classes": [
+        "Q131734"
+      ],
+      "osm_count_at_snapshot": 11596,
+      "wikidata_p1282_candidates": [
+        "Q131734"
+      ]
+    },
+    {
+      "id": "craft_carpenter",
+      "parent": "craft",
+      "label_en": "Carpenter",
+      "osm_tags": [
+        "craft=carpenter"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q154549"
+      ],
+      "osm_count_at_snapshot": 20949,
+      "wikidata_p1282_candidates": [
+        "Q154549"
+      ]
+    },
+    {
+      "id": "craft_caterer",
+      "parent": "craft",
+      "label_en": "Caterer",
+      "osm_tags": [
+        "craft=caterer"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 10553,
+      "wikidata_p1282_candidates": [
+        "Q377117"
+      ]
+    },
+    {
+      "id": "craft_electrician",
+      "parent": "craft",
+      "label_en": "Electrician",
+      "osm_tags": [
+        "craft=electrician"
+      ],
+      "google_types": [
+        "electrician"
+      ],
+      "wikidata_classes": [
+        "Q165029"
+      ],
+      "osm_count_at_snapshot": 14801,
+      "wikidata_p1282_candidates": [
+        "Q165029"
+      ]
+    },
+    {
+      "id": "craft_electronics_repair",
+      "parent": "craft",
+      "label_en": "Electronics Repair",
+      "osm_tags": [
+        "craft=electronics_repair"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 18564,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "craft_gardener",
+      "parent": "craft",
+      "label_en": "Gardener",
+      "osm_tags": [
+        "craft=gardener"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q758780"
+      ],
+      "osm_count_at_snapshot": 7543,
+      "wikidata_p1282_candidates": [
+        "Q758780"
+      ]
+    },
+    {
+      "id": "craft_grinding_mill",
+      "parent": "craft",
+      "label_en": "Grinding Mill",
+      "osm_tags": [
+        "craft=grinding_mill"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 39227,
+      "wikidata_p1282_candidates": [
+        "Q44494"
+      ]
+    },
+    {
+      "id": "craft_handicraft",
+      "parent": "craft",
+      "label_en": "Handicraft",
+      "osm_tags": [
+        "craft=handicraft"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 7632,
+      "wikidata_p1282_candidates": [
+        "Q11479517"
+      ]
+    },
+    {
+      "id": "craft_hvac",
+      "parent": "craft",
+      "label_en": "Hvac",
+      "osm_tags": [
+        "craft=hvac"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 12608,
+      "wikidata_p1282_candidates": [
+        "Q1798773"
+      ]
+    },
+    {
+      "id": "craft_joiner",
+      "parent": "craft",
+      "label_en": "Joiner",
+      "osm_tags": [
+        "craft=joiner"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 7036,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "craft_metal_construction",
+      "parent": "craft",
+      "label_en": "Metal Construction",
+      "osm_tags": [
+        "craft=metal_construction"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 17054,
+      "wikidata_p1282_candidates": [
+        "Q838566"
+      ]
+    },
+    {
+      "id": "craft_photographer",
+      "parent": "craft",
+      "label_en": "Photographer",
+      "osm_tags": [
+        "craft=photographer"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q33231"
+      ],
+      "osm_count_at_snapshot": 15501,
+      "wikidata_p1282_candidates": [
+        "Q33231"
+      ]
+    },
+    {
+      "id": "craft_plumber",
+      "parent": "craft",
+      "label_en": "Plumber",
+      "osm_tags": [
+        "craft=plumber"
+      ],
+      "google_types": [
+        "plumber"
+      ],
+      "wikidata_classes": [
+        "Q252924"
+      ],
+      "osm_count_at_snapshot": 12198,
+      "wikidata_p1282_candidates": [
+        "Q252924"
+      ]
+    },
+    {
+      "id": "craft_sawmill",
+      "parent": "craft",
+      "label_en": "Sawmill",
+      "osm_tags": [
+        "craft=sawmill"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q505213"
+      ],
+      "osm_count_at_snapshot": 10271,
+      "wikidata_p1282_candidates": [
+        "Q505213"
+      ]
+    },
+    {
+      "id": "craft_shoemaker",
+      "parent": "craft",
+      "label_en": "Shoemaker",
+      "osm_tags": [
+        "craft=shoemaker"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 10158,
+      "wikidata_p1282_candidates": [
+        "Q152355"
+      ]
+    },
+    {
+      "id": "craft_stonemason",
+      "parent": "craft",
+      "label_en": "Stonemason",
+      "osm_tags": [
+        "craft=stonemason"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q328325"
+      ],
+      "osm_count_at_snapshot": 6610,
+      "wikidata_p1282_candidates": [
+        "Q328325"
+      ]
+    },
+    {
+      "id": "craft_window_construction",
+      "parent": "craft",
+      "label_en": "Window Construction",
+      "osm_tags": [
+        "craft=window_construction"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 9608,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "craft_winery",
+      "parent": "craft",
+      "label_en": "Winery",
+      "osm_tags": [
+        "craft=winery"
+      ],
+      "google_types": [
+        "winery"
+      ],
+      "wikidata_classes": [
+        "Q156362"
+      ],
+      "osm_count_at_snapshot": 17563,
+      "wikidata_p1282_candidates": [
+        "Q156362",
+        "Q897317"
+      ]
+    },
+    {
+      "id": "emergency_access_point",
+      "parent": "emergency",
+      "label_en": "Access Point",
+      "osm_tags": [
+        "emergency=access_point"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 195307,
+      "wikidata_p1282_candidates": [
+        "Q1333922"
+      ]
+    },
+    {
+      "id": "emergency_assembly_point",
+      "parent": "emergency",
+      "label_en": "Assembly Point",
+      "osm_tags": [
+        "emergency=assembly_point"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 22538,
+      "wikidata_p1282_candidates": [
+        "Q2217279"
+      ]
+    },
+    {
+      "id": "emergency_defibrillator",
+      "parent": "emergency",
+      "label_en": "Defibrillator",
+      "osm_tags": [
+        "emergency=defibrillator"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 175361,
+      "wikidata_p1282_candidates": [
+        "Q787407"
+      ]
+    },
+    {
+      "id": "emergency_designated",
+      "parent": "emergency",
+      "label_en": "Designated",
+      "osm_tags": [
+        "emergency=designated"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 20457,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "emergency_fire_extinguisher",
+      "parent": "emergency",
+      "label_en": "Fire Extinguisher",
+      "osm_tags": [
+        "emergency=fire_extinguisher"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q190672"
+      ],
+      "osm_count_at_snapshot": 20908,
+      "wikidata_p1282_candidates": [
+        "Q190672"
+      ]
+    },
+    {
+      "id": "emergency_fire_hydrant",
+      "parent": "emergency",
+      "label_en": "Fire Hydrant",
+      "osm_tags": [
+        "emergency=fire_hydrant"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q634299"
+      ],
+      "osm_count_at_snapshot": 2541362,
+      "wikidata_p1282_candidates": [
+        "Q634299"
+      ]
+    },
+    {
+      "id": "emergency_phone",
+      "parent": "emergency",
+      "label_en": "Phone",
+      "osm_tags": [
+        "emergency=phone"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 73976,
+      "wikidata_p1282_candidates": [
+        "Q1613929"
+      ]
+    },
+    {
+      "id": "emergency_siren",
+      "parent": "emergency",
+      "label_en": "Siren",
+      "osm_tags": [
+        "emergency=siren"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q205234"
+      ],
+      "osm_count_at_snapshot": 25752,
+      "wikidata_p1282_candidates": [
+        "Q205234"
+      ]
+    },
+    {
+      "id": "emergency_suction_point",
+      "parent": "emergency",
+      "label_en": "Suction Point",
+      "osm_tags": [
+        "emergency=suction_point"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 19990,
+      "wikidata_p1282_candidates": [
+        "Q31836039"
+      ]
+    },
+    {
+      "id": "emergency_water_tank",
+      "parent": "emergency",
+      "label_en": "Water Tank",
+      "osm_tags": [
+        "emergency=water_tank"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q6501028"
+      ],
+      "osm_count_at_snapshot": 42663,
+      "wikidata_p1282_candidates": [
+        "Q124791903",
+        "Q6501028"
+      ]
+    },
+    {
+      "id": "healthcare_alternative",
+      "parent": "healthcare",
+      "label_en": "Alternative",
+      "osm_tags": [
+        "healthcare=alternative"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 24955,
+      "wikidata_p1282_candidates": [
+        "Q188504"
+      ]
+    },
+    {
+      "id": "healthcare_audiologist",
+      "parent": "healthcare",
+      "label_en": "Audiologist",
+      "osm_tags": [
+        "healthcare=audiologist"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q1644347"
+      ],
+      "osm_count_at_snapshot": 1353,
+      "wikidata_p1282_candidates": [
+        "Q1644347"
+      ]
+    },
+    {
+      "id": "healthcare_birthing_centre",
+      "parent": "healthcare",
+      "label_en": "Birthing Centre",
+      "osm_tags": [
+        "healthcare=birthing_centre"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 1076,
+      "wikidata_p1282_candidates": [
+        "Q1752787"
+      ]
+    },
+    {
+      "id": "healthcare_blood_donation",
+      "parent": "healthcare",
+      "label_en": "Blood Donation",
+      "osm_tags": [
+        "healthcare=blood_donation"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 2607,
+      "wikidata_p1282_candidates": [
+        "Q29982375"
+      ]
+    },
+    {
+      "id": "healthcare_centre",
+      "parent": "healthcare",
+      "label_en": "Centre",
+      "osm_tags": [
+        "healthcare=centre"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 46692,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "healthcare_counselling",
+      "parent": "healthcare",
+      "label_en": "Counselling",
+      "osm_tags": [
+        "healthcare=counselling"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 4738,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "healthcare_dialysis",
+      "parent": "healthcare",
+      "label_en": "Dialysis",
+      "osm_tags": [
+        "healthcare=dialysis"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 1739,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "healthcare_doctor",
+      "parent": "healthcare",
+      "label_en": "Doctor",
+      "osm_tags": [
+        "healthcare=doctor"
+      ],
+      "google_types": [
+        "doctor"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 153559,
+      "wikidata_p1282_candidates": [
+        "Q718966"
+      ]
+    },
+    {
+      "id": "healthcare_hospice",
+      "parent": "healthcare",
+      "label_en": "Hospice",
+      "osm_tags": [
+        "healthcare=hospice"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q608152"
+      ],
+      "osm_count_at_snapshot": 2163,
+      "wikidata_p1282_candidates": [
+        "Q608152"
+      ]
+    },
+    {
+      "id": "healthcare_laboratory",
+      "parent": "healthcare",
+      "label_en": "Laboratory",
+      "osm_tags": [
+        "healthcare=laboratory"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 23723,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "healthcare_midwife",
+      "parent": "healthcare",
+      "label_en": "Midwife",
+      "osm_tags": [
+        "healthcare=midwife"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q185196"
+      ],
+      "osm_count_at_snapshot": 1603,
+      "wikidata_p1282_candidates": [
+        "Q185196"
+      ]
+    },
+    {
+      "id": "healthcare_nurse",
+      "parent": "healthcare",
+      "label_en": "Nurse",
+      "osm_tags": [
+        "healthcare=nurse"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 3522,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "healthcare_occupational_therapist",
+      "parent": "healthcare",
+      "label_en": "Occupational Therapist",
+      "osm_tags": [
+        "healthcare=occupational_therapist"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q631193"
+      ],
+      "osm_count_at_snapshot": 2094,
+      "wikidata_p1282_candidates": [
+        "Q631193"
+      ]
+    },
+    {
+      "id": "healthcare_optometrist",
+      "parent": "healthcare",
+      "label_en": "Optometrist",
+      "osm_tags": [
+        "healthcare=optometrist"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q3354501"
+      ],
+      "osm_count_at_snapshot": 6787,
+      "wikidata_p1282_candidates": [
+        "Q3354501"
+      ]
+    },
+    {
+      "id": "healthcare_physiotherapist",
+      "parent": "healthcare",
+      "label_en": "Physiotherapist",
+      "osm_tags": [
+        "healthcare=physiotherapist"
+      ],
+      "google_types": [
+        "physiotherapist"
+      ],
+      "wikidata_classes": [
+        "Q694748"
+      ],
+      "osm_count_at_snapshot": 28367,
+      "wikidata_p1282_candidates": [
+        "Q186005",
+        "Q694748"
+      ]
+    },
+    {
+      "id": "healthcare_podiatrist",
+      "parent": "healthcare",
+      "label_en": "Podiatrist",
+      "osm_tags": [
+        "healthcare=podiatrist"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q3393065"
+      ],
+      "osm_count_at_snapshot": 5223,
+      "wikidata_p1282_candidates": [
+        "Q3393065"
+      ]
+    },
+    {
+      "id": "healthcare_psychotherapist",
+      "parent": "healthcare",
+      "label_en": "Psychotherapist",
+      "osm_tags": [
+        "healthcare=psychotherapist"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q1900167"
+      ],
+      "osm_count_at_snapshot": 10611,
+      "wikidata_p1282_candidates": [
+        "Q1900167"
+      ]
+    },
+    {
+      "id": "healthcare_rehabilitation",
+      "parent": "healthcare",
+      "label_en": "Rehabilitation",
+      "osm_tags": [
+        "healthcare=rehabilitation"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 6007,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "healthcare_sample_collection",
+      "parent": "healthcare",
+      "label_en": "Sample Collection",
+      "osm_tags": [
+        "healthcare=sample_collection"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 1704,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "healthcare_speech_therapist",
+      "parent": "healthcare",
+      "label_en": "Speech Therapist",
+      "osm_tags": [
+        "healthcare=speech_therapist"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 3376,
+      "wikidata_p1282_candidates": [
+        "Q11762416"
+      ]
+    },
+    {
+      "id": "historic_archaeological_site",
+      "parent": "historic",
+      "label_en": "Archaeological Site",
+      "osm_tags": [
+        "historic=archaeological_site"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q839954"
+      ],
+      "osm_count_at_snapshot": 229596,
+      "wikidata_p1282_candidates": [
+        "Q839954"
+      ]
+    },
+    {
+      "id": "historic_boundary_stone",
+      "parent": "historic",
+      "label_en": "Boundary Stone",
+      "osm_tags": [
+        "historic=boundary_stone"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q134721192"
+      ],
+      "osm_count_at_snapshot": 97182,
+      "wikidata_p1282_candidates": [
+        "Q134721192"
+      ]
+    },
+    {
+      "id": "historic_building",
+      "parent": "historic",
+      "label_en": "Building",
+      "osm_tags": [
+        "historic=building"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 94420,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "historic_castle",
+      "parent": "historic",
+      "label_en": "Castle",
+      "osm_tags": [
+        "historic=castle"
+      ],
+      "google_types": [
+        "castle"
+      ],
+      "wikidata_classes": [
+        "Q23413"
+      ],
+      "osm_count_at_snapshot": 54538,
+      "wikidata_p1282_candidates": [
+        "Q23413"
+      ]
+    },
+    {
+      "id": "historic_charcoal_pile",
+      "parent": "historic",
+      "label_en": "Charcoal Pile",
+      "osm_tags": [
+        "historic=charcoal_pile"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 52220,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "historic_memorial",
+      "parent": "historic",
+      "label_en": "Memorial",
+      "osm_tags": [
+        "historic=memorial"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q5003624"
+      ],
+      "osm_count_at_snapshot": 513492,
+      "wikidata_p1282_candidates": [
+        "Q5003624"
+      ]
+    },
+    {
+      "id": "historic_monument",
+      "parent": "historic",
+      "label_en": "Monument",
+      "osm_tags": [
+        "historic=monument"
+      ],
+      "google_types": [
+        "monument"
+      ],
+      "wikidata_classes": [
+        "Q4989906"
+      ],
+      "osm_count_at_snapshot": 71906,
+      "wikidata_p1282_candidates": [
+        "Q4989906"
+      ]
+    },
+    {
+      "id": "historic_ruins",
+      "parent": "historic",
+      "label_en": "Ruins",
+      "osm_tags": [
+        "historic=ruins"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q109607"
+      ],
+      "osm_count_at_snapshot": 186987,
+      "wikidata_p1282_candidates": [
+        "Q109607"
+      ]
+    },
+    {
+      "id": "historic_shieling",
+      "parent": "historic",
+      "label_en": "Shieling",
+      "osm_tags": [
+        "historic=shieling"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 22075,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "historic_tomb",
+      "parent": "historic",
+      "label_en": "Tomb",
+      "osm_tags": [
+        "historic=tomb"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q381885"
+      ],
+      "osm_count_at_snapshot": 73401,
+      "wikidata_p1282_candidates": [
+        "Q381885"
+      ]
+    },
+    {
+      "id": "historic_wayside_cross",
+      "parent": "historic",
+      "label_en": "Wayside Cross",
+      "osm_tags": [
+        "historic=wayside_cross"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q2309609"
+      ],
+      "osm_count_at_snapshot": 238820,
+      "wikidata_p1282_candidates": [
+        "Q2309609"
+      ]
+    },
+    {
+      "id": "historic_wayside_shrine",
+      "parent": "historic",
+      "label_en": "Wayside Shrine",
+      "osm_tags": [
+        "historic=wayside_shrine"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q3395121"
+      ],
+      "osm_count_at_snapshot": 171661,
+      "wikidata_p1282_candidates": [
+        "Q3395121"
+      ]
+    },
+    {
+      "id": "hospital",
+      "parent": "amenity",
+      "label_en": "Hospital",
+      "osm_tags": [
+        "amenity=hospital",
+        "healthcare=hospital"
+      ],
+      "google_types": [
+        "general_hospital",
+        "hospital"
+      ],
+      "wikidata_classes": [
+        "Q16917"
+      ],
+      "osm_count_at_snapshot": 217485,
+      "wikidata_p1282_candidates": [
+        "Q16917"
+      ]
+    },
+    {
+      "id": "leisure_beach_resort",
+      "parent": "leisure",
+      "label_en": "Beach Resort",
+      "osm_tags": [
+        "leisure=beach_resort"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 15266,
+      "wikidata_p1282_candidates": [
+        "Q1021711"
+      ]
+    },
+    {
+      "id": "leisure_bleachers",
+      "parent": "leisure",
+      "label_en": "Bleachers",
+      "osm_tags": [
+        "leisure=bleachers"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 60914,
+      "wikidata_p1282_candidates": [
+        "Q455941"
+      ]
+    },
+    {
+      "id": "leisure_common",
+      "parent": "leisure",
+      "label_en": "Common",
+      "osm_tags": [
+        "leisure=common"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 30592,
+      "wikidata_p1282_candidates": [
+        "Q2259176"
+      ]
+    },
+    {
+      "id": "leisure_dance",
+      "parent": "leisure",
+      "label_en": "Dance",
+      "osm_tags": [
+        "leisure=dance"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 11802,
+      "wikidata_p1282_candidates": [
+        "Q1188223",
+        "Q1561361"
+      ]
+    },
+    {
+      "id": "leisure_dog_park",
+      "parent": "leisure",
+      "label_en": "Dog Park",
+      "osm_tags": [
+        "leisure=dog_park"
+      ],
+      "google_types": [
+        "dog_park"
+      ],
+      "wikidata_classes": [
+        "Q38516"
+      ],
+      "osm_count_at_snapshot": 30840,
+      "wikidata_p1282_candidates": [
+        "Q38516"
+      ]
+    },
+    {
+      "id": "leisure_firepit",
+      "parent": "leisure",
+      "label_en": "Firepit",
+      "osm_tags": [
+        "leisure=firepit"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 51134,
+      "wikidata_p1282_candidates": [
+        "Q187317",
+        "Q5451647",
+        "Q7111942"
+      ]
+    },
+    {
+      "id": "leisure_fishing",
+      "parent": "leisure",
+      "label_en": "Fishing",
+      "osm_tags": [
+        "leisure=fishing"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q14373"
+      ],
+      "osm_count_at_snapshot": 19619,
+      "wikidata_p1282_candidates": [
+        "Q112685428",
+        "Q14373",
+        "Q47521850"
+      ]
+    },
+    {
+      "id": "leisure_fitness_centre",
+      "parent": "leisure",
+      "label_en": "Fitness Centre",
+      "osm_tags": [
+        "leisure=fitness_centre"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 108172,
+      "wikidata_p1282_candidates": [
+        "Q1065656"
+      ]
+    },
+    {
+      "id": "leisure_fitness_station",
+      "parent": "leisure",
+      "label_en": "Fitness Station",
+      "osm_tags": [
+        "leisure=fitness_station"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 102803,
+      "wikidata_p1282_candidates": [
+        "Q692630"
+      ]
+    },
+    {
+      "id": "leisure_garden",
+      "parent": "leisure",
+      "label_en": "Garden",
+      "osm_tags": [
+        "leisure=garden"
+      ],
+      "google_types": [
+        "garden"
+      ],
+      "wikidata_classes": [
+        "Q1107656"
+      ],
+      "osm_count_at_snapshot": 1572482,
+      "wikidata_p1282_candidates": [
+        "Q1107656"
+      ]
+    },
+    {
+      "id": "leisure_golf_course",
+      "parent": "leisure",
+      "label_en": "Golf Course",
+      "osm_tags": [
+        "leisure=golf_course"
+      ],
+      "google_types": [
+        "golf_course"
+      ],
+      "wikidata_classes": [
+        "Q1048525"
+      ],
+      "osm_count_at_snapshot": 39641,
+      "wikidata_p1282_candidates": [
+        "Q1048525"
+      ]
+    },
+    {
+      "id": "leisure_horse_riding",
+      "parent": "leisure",
+      "label_en": "Horse Riding",
+      "osm_tags": [
+        "leisure=horse_riding"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 21870,
+      "wikidata_p1282_candidates": [
+        "Q1621657"
+      ]
+    },
+    {
+      "id": "leisure_marina",
+      "parent": "leisure",
+      "label_en": "Marina",
+      "osm_tags": [
+        "leisure=marina"
+      ],
+      "google_types": [
+        "marina"
+      ],
+      "wikidata_classes": [
+        "Q721207"
+      ],
+      "osm_count_at_snapshot": 31846,
+      "wikidata_p1282_candidates": [
+        "Q721207"
+      ]
+    },
+    {
+      "id": "leisure_nature_reserve",
+      "parent": "leisure",
+      "label_en": "Nature Reserve",
+      "osm_tags": [
+        "leisure=nature_reserve"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q179049"
+      ],
+      "osm_count_at_snapshot": 150258,
+      "wikidata_p1282_candidates": [
+        "Q179049"
+      ]
+    },
+    {
+      "id": "leisure_outdoor_seating",
+      "parent": "leisure",
+      "label_en": "Outdoor Seating",
+      "osm_tags": [
+        "leisure=outdoor_seating"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 89461,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "leisure_park",
+      "parent": "leisure",
+      "label_en": "Park",
+      "osm_tags": [
+        "leisure=park"
+      ],
+      "google_types": [
+        "park"
+      ],
+      "wikidata_classes": [
+        "Q22698"
+      ],
+      "osm_count_at_snapshot": 1301928,
+      "wikidata_p1282_candidates": [
+        "Q15982170",
+        "Q22698"
+      ]
+    },
+    {
+      "id": "leisure_picnic_table",
+      "parent": "leisure",
+      "label_en": "Picnic Table",
+      "osm_tags": [
+        "leisure=picnic_table"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q2466395"
+      ],
+      "osm_count_at_snapshot": 499814,
+      "wikidata_p1282_candidates": [
+        "Q2466395"
+      ]
+    },
+    {
+      "id": "leisure_pitch",
+      "parent": "leisure",
+      "label_en": "Pitch",
+      "osm_tags": [
+        "leisure=pitch"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q2310214"
+      ],
+      "osm_count_at_snapshot": 2852809,
+      "wikidata_p1282_candidates": [
+        "Q114646415",
+        "Q2310214",
+        "Q626687",
+        "Q741118",
+        "Q8524",
+        "Q860007",
+        "Q891698"
+      ]
+    },
+    {
+      "id": "leisure_playground",
+      "parent": "leisure",
+      "label_en": "Playground",
+      "osm_tags": [
+        "leisure=playground"
+      ],
+      "google_types": [
+        "playground"
+      ],
+      "wikidata_classes": [
+        "Q11875349"
+      ],
+      "osm_count_at_snapshot": 1012561,
+      "wikidata_p1282_candidates": [
+        "Q11875349"
+      ]
+    },
+    {
+      "id": "leisure_resort",
+      "parent": "leisure",
+      "label_en": "Resort",
+      "osm_tags": [
+        "leisure=resort"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q875157"
+      ],
+      "osm_count_at_snapshot": 25680,
+      "wikidata_p1282_candidates": [
+        "Q875157"
+      ]
+    },
+    {
+      "id": "leisure_sauna",
+      "parent": "leisure",
+      "label_en": "Sauna",
+      "osm_tags": [
+        "leisure=sauna"
+      ],
+      "google_types": [
+        "sauna"
+      ],
+      "wikidata_classes": [
+        "Q57036"
+      ],
+      "osm_count_at_snapshot": 18083,
+      "wikidata_p1282_candidates": [
+        "Q57036"
+      ]
+    },
+    {
+      "id": "leisure_slipway",
+      "parent": "leisure",
+      "label_en": "Slipway",
+      "osm_tags": [
+        "leisure=slipway"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q361945"
+      ],
+      "osm_count_at_snapshot": 68688,
+      "wikidata_p1282_candidates": [
+        "Q361945"
+      ]
+    },
+    {
+      "id": "leisure_sports_centre",
+      "parent": "leisure",
+      "label_en": "Sports Centre",
+      "osm_tags": [
+        "leisure=sports_centre"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 269251,
+      "wikidata_p1282_candidates": [
+        "Q1076486"
+      ]
+    },
+    {
+      "id": "leisure_sports_hall",
+      "parent": "leisure",
+      "label_en": "Sports Hall",
+      "osm_tags": [
+        "leisure=sports_hall"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 48094,
+      "wikidata_p1282_candidates": [
+        "Q14092"
+      ]
+    },
+    {
+      "id": "leisure_stadium",
+      "parent": "leisure",
+      "label_en": "Stadium",
+      "osm_tags": [
+        "leisure=stadium"
+      ],
+      "google_types": [
+        "stadium"
+      ],
+      "wikidata_classes": [
+        "Q483110"
+      ],
+      "osm_count_at_snapshot": 52087,
+      "wikidata_p1282_candidates": [
+        "Q483110"
+      ]
+    },
+    {
+      "id": "leisure_swimming_pool",
+      "parent": "leisure",
+      "label_en": "Swimming Pool",
+      "osm_tags": [
+        "leisure=swimming_pool"
+      ],
+      "google_types": [
+        "swimming_pool"
+      ],
+      "wikidata_classes": [
+        "Q1501"
+      ],
+      "osm_count_at_snapshot": 3052461,
+      "wikidata_p1282_candidates": [
+        "Q1501"
+      ]
+    },
+    {
+      "id": "leisure_track",
+      "parent": "leisure",
+      "label_en": "Track",
+      "osm_tags": [
+        "leisure=track"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 165731,
+      "wikidata_p1282_candidates": [
+        "Q1004435"
+      ]
+    },
+    {
+      "id": "leisure_water_park",
+      "parent": "leisure",
+      "label_en": "Water Park",
+      "osm_tags": [
+        "leisure=water_park"
+      ],
+      "google_types": [
+        "water_park"
+      ],
+      "wikidata_classes": [
+        "Q740326"
+      ],
+      "osm_count_at_snapshot": 13332,
+      "wikidata_p1282_candidates": [
+        "Q740326"
+      ]
+    },
+    {
+      "id": "office_accountant",
+      "parent": "office",
+      "label_en": "Accountant",
+      "osm_tags": [
+        "office=accountant"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 18747,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "office_architect",
+      "parent": "office",
+      "label_en": "Architect",
+      "osm_tags": [
+        "office=architect"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 15034,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "office_association",
+      "parent": "office",
+      "label_en": "Association",
+      "osm_tags": [
+        "office=association"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 35877,
+      "wikidata_p1282_candidates": [
+        "Q48204"
+      ]
+    },
+    {
+      "id": "office_company",
+      "parent": "office",
+      "label_en": "Company",
+      "osm_tags": [
+        "office=company"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 304125,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "office_diplomatic",
+      "parent": "office",
+      "label_en": "Diplomatic",
+      "osm_tags": [
+        "office=diplomatic"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 17406,
+      "wikidata_p1282_candidates": [
+        "Q213283"
+      ]
+    },
+    {
+      "id": "office_educational_institution",
+      "parent": "office",
+      "label_en": "Educational Institution",
+      "osm_tags": [
+        "office=educational_institution"
+      ],
+      "google_types": [
+        "educational_institution"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 48512,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "office_employment_agency",
+      "parent": "office",
+      "label_en": "Employment Agency",
+      "osm_tags": [
+        "office=employment_agency"
+      ],
+      "google_types": [
+        "employment_agency"
+      ],
+      "wikidata_classes": [
+        "Q261362"
+      ],
+      "osm_count_at_snapshot": 16975,
+      "wikidata_p1282_candidates": [
+        "Q261362"
+      ]
+    },
+    {
+      "id": "office_estate_agent",
+      "parent": "office",
+      "label_en": "Estate Agent",
+      "osm_tags": [
+        "office=estate_agent"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 102227,
+      "wikidata_p1282_candidates": [
+        "Q519076"
+      ]
+    },
+    {
+      "id": "office_financial",
+      "parent": "office",
+      "label_en": "Financial",
+      "osm_tags": [
+        "office=financial"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 12132,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "office_government",
+      "parent": "office",
+      "label_en": "Government",
+      "osm_tags": [
+        "office=government"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 308250,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "office_insurance",
+      "parent": "office",
+      "label_en": "Insurance",
+      "osm_tags": [
+        "office=insurance"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 80229,
+      "wikidata_p1282_candidates": [
+        "Q27038992"
+      ]
+    },
+    {
+      "id": "office_it",
+      "parent": "office",
+      "label_en": "It",
+      "osm_tags": [
+        "office=it"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 22563,
+      "wikidata_p1282_candidates": [
+        "Q138634342"
+      ]
+    },
+    {
+      "id": "office_lawyer",
+      "parent": "office",
+      "label_en": "Lawyer",
+      "osm_tags": [
+        "office=lawyer"
+      ],
+      "google_types": [
+        "lawyer"
+      ],
+      "wikidata_classes": [
+        "Q40348"
+      ],
+      "osm_count_at_snapshot": 54822,
+      "wikidata_p1282_candidates": [
+        "Q40348"
+      ]
+    },
+    {
+      "id": "office_ngo",
+      "parent": "office",
+      "label_en": "Ngo",
+      "osm_tags": [
+        "office=ngo"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 24196,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "office_religion",
+      "parent": "office",
+      "label_en": "Religion",
+      "osm_tags": [
+        "office=religion"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 18605,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "office_research",
+      "parent": "office",
+      "label_en": "Research",
+      "osm_tags": [
+        "office=research"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 15745,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "office_tax_advisor",
+      "parent": "office",
+      "label_en": "Tax Advisor",
+      "osm_tags": [
+        "office=tax_advisor"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q688576"
+      ],
+      "osm_count_at_snapshot": 14038,
+      "wikidata_p1282_candidates": [
+        "Q688576"
+      ]
+    },
+    {
+      "id": "office_telecommunication",
+      "parent": "office",
+      "label_en": "Telecommunication",
+      "osm_tags": [
+        "office=telecommunication"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 34278,
+      "wikidata_p1282_candidates": [
+        "Q2401749"
+      ]
+    },
+    {
+      "id": "pharmacy",
+      "parent": "amenity",
+      "label_en": "Pharmacy",
+      "osm_tags": [
+        "amenity=pharmacy",
+        "healthcare=pharmacy"
+      ],
+      "google_types": [
+        "pharmacy"
+      ],
+      "wikidata_classes": [
+        "Q13107184"
+      ],
+      "osm_count_at_snapshot": 441442,
+      "wikidata_p1282_candidates": [
+        "Q114500877",
+        "Q13107184"
+      ]
+    },
+    {
+      "id": "school",
+      "parent": "amenity",
+      "label_en": "School",
+      "osm_tags": [
+        "amenity=school"
+      ],
+      "google_types": [
+        "primary_school",
+        "school",
+        "secondary_school"
+      ],
+      "wikidata_classes": [
+        "Q3914"
+      ],
+      "osm_count_at_snapshot": 1447888,
+      "wikidata_p1282_candidates": [
+        "Q3914"
+      ]
+    },
+    {
+      "id": "shop_alcohol",
+      "parent": "shop",
+      "label_en": "Alcohol",
+      "osm_tags": [
+        "shop=alcohol"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 92899,
+      "wikidata_p1282_candidates": [
+        "Q22995",
+        "Q2632011"
+      ]
+    },
+    {
+      "id": "shop_bakery",
+      "parent": "shop",
+      "label_en": "Bakery",
+      "osm_tags": [
+        "shop=bakery"
+      ],
+      "google_types": [
+        "bakery"
+      ],
+      "wikidata_classes": [
+        "Q274393"
+      ],
+      "osm_count_at_snapshot": 255147,
+      "wikidata_p1282_candidates": [
+        "Q274393"
+      ]
+    },
+    {
+      "id": "shop_beauty",
+      "parent": "shop",
+      "label_en": "Beauty",
+      "osm_tags": [
+        "shop=beauty"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 190814,
+      "wikidata_p1282_candidates": [
+        "Q1195245"
+      ]
+    },
+    {
+      "id": "shop_beverages",
+      "parent": "shop",
+      "label_en": "Beverages",
+      "osm_tags": [
+        "shop=beverages"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 31652,
+      "wikidata_p1282_candidates": [
+        "Q47504516"
+      ]
+    },
+    {
+      "id": "shop_bicycle",
+      "parent": "shop",
+      "label_en": "Bicycle",
+      "osm_tags": [
+        "shop=bicycle"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 57084,
+      "wikidata_p1282_candidates": [
+        "Q26721034"
+      ]
+    },
+    {
+      "id": "shop_books",
+      "parent": "shop",
+      "label_en": "Books",
+      "osm_tags": [
+        "shop=books"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 58587,
+      "wikidata_p1282_candidates": [
+        "Q200764"
+      ]
+    },
+    {
+      "id": "shop_butcher",
+      "parent": "shop",
+      "label_en": "Butcher",
+      "osm_tags": [
+        "shop=butcher"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 105039,
+      "wikidata_p1282_candidates": [
+        "Q13164546"
+      ]
+    },
+    {
+      "id": "shop_car",
+      "parent": "shop",
+      "label_en": "Car",
+      "osm_tags": [
+        "shop=car"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 165688,
+      "wikidata_p1282_candidates": [
+        "Q786803"
+      ]
+    },
+    {
+      "id": "shop_car_parts",
+      "parent": "shop",
+      "label_en": "Car Parts",
+      "osm_tags": [
+        "shop=car_parts"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 97054,
+      "wikidata_p1282_candidates": [
+        "Q47516524"
+      ]
+    },
+    {
+      "id": "shop_car_repair",
+      "parent": "shop",
+      "label_en": "Car Repair",
+      "osm_tags": [
+        "shop=car_repair"
+      ],
+      "google_types": [
+        "car_repair"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 294615,
+      "wikidata_p1282_candidates": [
+        "Q1310967"
+      ]
+    },
+    {
+      "id": "shop_chemist",
+      "parent": "shop",
+      "label_en": "Chemist",
+      "osm_tags": [
+        "shop=chemist"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 61889,
+      "wikidata_p1282_candidates": [
+        "Q1260046"
+      ]
+    },
+    {
+      "id": "shop_clothes",
+      "parent": "shop",
+      "label_en": "Clothes",
+      "osm_tags": [
+        "shop=clothes"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 465165,
+      "wikidata_p1282_candidates": [
+        "Q2090555"
+      ]
+    },
+    {
+      "id": "shop_computer",
+      "parent": "shop",
+      "label_en": "Computer",
+      "osm_tags": [
+        "shop=computer"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 36390,
+      "wikidata_p1282_candidates": [
+        "Q43182520"
+      ]
+    },
+    {
+      "id": "shop_confectionery",
+      "parent": "shop",
+      "label_en": "Confectionery",
+      "osm_tags": [
+        "shop=confectionery"
+      ],
+      "google_types": [
+        "confectionery"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 42416,
+      "wikidata_p1282_candidates": [
+        "Q3574069"
+      ]
+    },
+    {
+      "id": "shop_convenience",
+      "parent": "shop",
+      "label_en": "Convenience",
+      "osm_tags": [
+        "shop=convenience"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 840836,
+      "wikidata_p1282_candidates": [
+        "Q7361709"
+      ]
+    },
+    {
+      "id": "shop_copyshop",
+      "parent": "shop",
+      "label_en": "Copyshop",
+      "osm_tags": [
+        "shop=copyshop"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 35190,
+      "wikidata_p1282_candidates": [
+        "Q1131628"
+      ]
+    },
+    {
+      "id": "shop_cosmetics",
+      "parent": "shop",
+      "label_en": "Cosmetics",
+      "osm_tags": [
+        "shop=cosmetics"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 39643,
+      "wikidata_p1282_candidates": [
+        "Q47508166"
+      ]
+    },
+    {
+      "id": "shop_deli",
+      "parent": "shop",
+      "label_en": "Deli",
+      "osm_tags": [
+        "shop=deli"
+      ],
+      "google_types": [
+        "deli"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 26917,
+      "wikidata_p1282_candidates": [
+        "Q3231410"
+      ]
+    },
+    {
+      "id": "shop_department_store",
+      "parent": "shop",
+      "label_en": "Department Store",
+      "osm_tags": [
+        "shop=department_store"
+      ],
+      "google_types": [
+        "department_store"
+      ],
+      "wikidata_classes": [
+        "Q216107"
+      ],
+      "osm_count_at_snapshot": 52578,
+      "wikidata_p1282_candidates": [
+        "Q216107"
+      ]
+    },
+    {
+      "id": "shop_doityourself",
+      "parent": "shop",
+      "label_en": "Doityourself",
+      "osm_tags": [
+        "shop=doityourself"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 68917,
+      "wikidata_p1282_candidates": [
+        "Q811530"
+      ]
+    },
+    {
+      "id": "shop_dry_cleaning",
+      "parent": "shop",
+      "label_en": "Dry Cleaning",
+      "osm_tags": [
+        "shop=dry_cleaning"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 34352,
+      "wikidata_p1282_candidates": [
+        "Q42817497"
+      ]
+    },
+    {
+      "id": "shop_electronics",
+      "parent": "shop",
+      "label_en": "Electronics",
+      "osm_tags": [
+        "shop=electronics"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 84049,
+      "wikidata_p1282_candidates": [
+        "Q7196156"
+      ]
+    },
+    {
+      "id": "shop_farm",
+      "parent": "shop",
+      "label_en": "Farm",
+      "osm_tags": [
+        "shop=farm"
+      ],
+      "google_types": [
+        "farm"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 33668,
+      "wikidata_p1282_candidates": [
+        "Q1371823"
+      ]
+    },
+    {
+      "id": "shop_florist",
+      "parent": "shop",
+      "label_en": "Florist",
+      "osm_tags": [
+        "shop=florist"
+      ],
+      "google_types": [
+        "florist"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 87996,
+      "wikidata_p1282_candidates": [
+        "Q10431511"
+      ]
+    },
+    {
+      "id": "shop_funeral_directors",
+      "parent": "shop",
+      "label_en": "Funeral Directors",
+      "osm_tags": [
+        "shop=funeral_directors"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 35355,
+      "wikidata_p1282_candidates": [
+        "Q1466031"
+      ]
+    },
+    {
+      "id": "shop_furniture",
+      "parent": "shop",
+      "label_en": "Furniture",
+      "osm_tags": [
+        "shop=furniture"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 101526,
+      "wikidata_p1282_candidates": [
+        "Q104817981"
+      ]
+    },
+    {
+      "id": "shop_garden_centre",
+      "parent": "shop",
+      "label_en": "Garden Centre",
+      "osm_tags": [
+        "shop=garden_centre"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 32308,
+      "wikidata_p1282_candidates": [
+        "Q260569"
+      ]
+    },
+    {
+      "id": "shop_general",
+      "parent": "shop",
+      "label_en": "General",
+      "osm_tags": [
+        "shop=general"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 29682,
+      "wikidata_p1282_candidates": [
+        "Q1244860"
+      ]
+    },
+    {
+      "id": "shop_gift",
+      "parent": "shop",
+      "label_en": "Gift",
+      "osm_tags": [
+        "shop=gift"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 74139,
+      "wikidata_p1282_candidates": [
+        "Q865693"
+      ]
+    },
+    {
+      "id": "shop_greengrocer",
+      "parent": "shop",
+      "label_en": "Greengrocer",
+      "osm_tags": [
+        "shop=greengrocer"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q145658"
+      ],
+      "osm_count_at_snapshot": 66943,
+      "wikidata_p1282_candidates": [
+        "Q145658"
+      ]
+    },
+    {
+      "id": "shop_hairdresser",
+      "parent": "shop",
+      "label_en": "Hairdresser",
+      "osm_tags": [
+        "shop=hairdresser"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 414432,
+      "wikidata_p1282_candidates": [
+        "Q3062512"
+      ]
+    },
+    {
+      "id": "shop_hardware",
+      "parent": "shop",
+      "label_en": "Hardware",
+      "osm_tags": [
+        "shop=hardware"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 107405,
+      "wikidata_p1282_candidates": [
+        "Q811530"
+      ]
+    },
+    {
+      "id": "shop_houseware",
+      "parent": "shop",
+      "label_en": "Houseware",
+      "osm_tags": [
+        "shop=houseware"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 25622,
+      "wikidata_p1282_candidates": [
+        "Q47516128"
+      ]
+    },
+    {
+      "id": "shop_interior_decoration",
+      "parent": "shop",
+      "label_en": "Interior Decoration",
+      "osm_tags": [
+        "shop=interior_decoration"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 27655,
+      "wikidata_p1282_candidates": [
+        "Q47516362"
+      ]
+    },
+    {
+      "id": "shop_jewelry",
+      "parent": "shop",
+      "label_en": "Jewelry",
+      "osm_tags": [
+        "shop=jewelry"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 83771,
+      "wikidata_p1282_candidates": [
+        "Q20708021"
+      ]
+    },
+    {
+      "id": "shop_kiosk",
+      "parent": "shop",
+      "label_en": "Kiosk",
+      "osm_tags": [
+        "shop=kiosk"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q693369"
+      ],
+      "osm_count_at_snapshot": 103903,
+      "wikidata_p1282_candidates": [
+        "Q693369"
+      ]
+    },
+    {
+      "id": "shop_laundry",
+      "parent": "shop",
+      "label_en": "Laundry",
+      "osm_tags": [
+        "shop=laundry"
+      ],
+      "google_types": [
+        "laundry"
+      ],
+      "wikidata_classes": [
+        "Q7223085"
+      ],
+      "osm_count_at_snapshot": 59178,
+      "wikidata_p1282_candidates": [
+        "Q1143034",
+        "Q7223085"
+      ]
+    },
+    {
+      "id": "shop_mall",
+      "parent": "shop",
+      "label_en": "Mall",
+      "osm_tags": [
+        "shop=mall"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 78673,
+      "wikidata_p1282_candidates": [
+        "Q11315",
+        "Q31374404"
+      ]
+    },
+    {
+      "id": "shop_massage",
+      "parent": "shop",
+      "label_en": "Massage",
+      "osm_tags": [
+        "shop=massage"
+      ],
+      "google_types": [
+        "massage"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 37194,
+      "wikidata_p1282_candidates": [
+        "Q901922"
+      ]
+    },
+    {
+      "id": "shop_mobile_phone",
+      "parent": "shop",
+      "label_en": "Mobile Phone",
+      "osm_tags": [
+        "shop=mobile_phone"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 103279,
+      "wikidata_p1282_candidates": [
+        "Q47516435"
+      ]
+    },
+    {
+      "id": "shop_motorcycle",
+      "parent": "shop",
+      "label_en": "Motorcycle",
+      "osm_tags": [
+        "shop=motorcycle"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 34415,
+      "wikidata_p1282_candidates": [
+        "Q24455483",
+        "Q47516542"
+      ]
+    },
+    {
+      "id": "shop_newsagent",
+      "parent": "shop",
+      "label_en": "Newsagent",
+      "osm_tags": [
+        "shop=newsagent"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q1528905"
+      ],
+      "osm_count_at_snapshot": 30862,
+      "wikidata_p1282_candidates": [
+        "Q1528905"
+      ]
+    },
+    {
+      "id": "shop_optician",
+      "parent": "shop",
+      "label_en": "Optician",
+      "osm_tags": [
+        "shop=optician"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q1996635"
+      ],
+      "osm_count_at_snapshot": 84257,
+      "wikidata_p1282_candidates": [
+        "Q12043413",
+        "Q1996635"
+      ]
+    },
+    {
+      "id": "shop_outpost",
+      "parent": "shop",
+      "label_en": "Outpost",
+      "osm_tags": [
+        "shop=outpost"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 83086,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "shop_paint",
+      "parent": "shop",
+      "label_en": "Paint",
+      "osm_tags": [
+        "shop=paint"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 20379,
+      "wikidata_p1282_candidates": [
+        "Q47516196"
+      ]
+    },
+    {
+      "id": "shop_pastry",
+      "parent": "shop",
+      "label_en": "Pastry",
+      "osm_tags": [
+        "shop=pastry"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 34910,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "shop_pet",
+      "parent": "shop",
+      "label_en": "Pet",
+      "osm_tags": [
+        "shop=pet"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 50481,
+      "wikidata_p1282_candidates": [
+        "Q220142"
+      ]
+    },
+    {
+      "id": "shop_seafood",
+      "parent": "shop",
+      "label_en": "Seafood",
+      "osm_tags": [
+        "shop=seafood"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 24654,
+      "wikidata_p1282_candidates": [
+        "Q3393867"
+      ]
+    },
+    {
+      "id": "shop_shoes",
+      "parent": "shop",
+      "label_en": "Shoes",
+      "osm_tags": [
+        "shop=shoes"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 82826,
+      "wikidata_p1282_candidates": [
+        "Q7500021"
+      ]
+    },
+    {
+      "id": "shop_sports",
+      "parent": "shop",
+      "label_en": "Sports",
+      "osm_tags": [
+        "shop=sports"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 46425,
+      "wikidata_p1282_candidates": [
+        "Q47516567"
+      ]
+    },
+    {
+      "id": "shop_stationery",
+      "parent": "shop",
+      "label_en": "Stationery",
+      "osm_tags": [
+        "shop=stationery"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 49365,
+      "wikidata_p1282_candidates": [
+        "Q16668826"
+      ]
+    },
+    {
+      "id": "shop_storage_rental",
+      "parent": "shop",
+      "label_en": "Storage Rental",
+      "osm_tags": [
+        "shop=storage_rental"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 40805,
+      "wikidata_p1282_candidates": [
+        "Q401404"
+      ]
+    },
+    {
+      "id": "shop_supermarket",
+      "parent": "shop",
+      "label_en": "Supermarket",
+      "osm_tags": [
+        "shop=supermarket"
+      ],
+      "google_types": [
+        "supermarket"
+      ],
+      "wikidata_classes": [
+        "Q180846"
+      ],
+      "osm_count_at_snapshot": 495002,
+      "wikidata_p1282_candidates": [
+        "Q180846"
+      ]
+    },
+    {
+      "id": "shop_tailor",
+      "parent": "shop",
+      "label_en": "Tailor",
+      "osm_tags": [
+        "craft=tailor",
+        "shop=tailor"
+      ],
+      "google_types": [
+        "tailor"
+      ],
+      "wikidata_classes": [
+        "Q242468"
+      ],
+      "osm_count_at_snapshot": 36776,
+      "wikidata_p1282_candidates": [
+        "Q242468",
+        "Q47508085"
+      ]
+    },
+    {
+      "id": "shop_tattoo",
+      "parent": "shop",
+      "label_en": "Tattoo",
+      "osm_tags": [
+        "shop=tattoo"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 22113,
+      "wikidata_p1282_candidates": [
+        "Q27038997"
+      ]
+    },
+    {
+      "id": "shop_ticket",
+      "parent": "shop",
+      "label_en": "Ticket",
+      "osm_tags": [
+        "shop=ticket"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 29447,
+      "wikidata_p1282_candidates": [
+        "Q47519615"
+      ]
+    },
+    {
+      "id": "shop_tobacco",
+      "parent": "shop",
+      "label_en": "Tobacco",
+      "osm_tags": [
+        "shop=tobacco"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 40005,
+      "wikidata_p1282_candidates": [
+        "Q16406"
+      ]
+    },
+    {
+      "id": "shop_toys",
+      "parent": "shop",
+      "label_en": "Toys",
+      "osm_tags": [
+        "shop=toys"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 24766,
+      "wikidata_p1282_candidates": [
+        "Q1318959"
+      ]
+    },
+    {
+      "id": "shop_trade",
+      "parent": "shop",
+      "label_en": "Trade",
+      "osm_tags": [
+        "shop=trade"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 38021,
+      "wikidata_p1282_candidates": [
+        "Q135301903",
+        "Q811891"
+      ]
+    },
+    {
+      "id": "shop_travel_agency",
+      "parent": "shop",
+      "label_en": "Travel Agency",
+      "osm_tags": [
+        "shop=travel_agency"
+      ],
+      "google_types": [
+        "travel_agency"
+      ],
+      "wikidata_classes": [
+        "Q217107"
+      ],
+      "osm_count_at_snapshot": 49713,
+      "wikidata_p1282_candidates": [
+        "Q217107"
+      ]
+    },
+    {
+      "id": "shop_tyres",
+      "parent": "shop",
+      "label_en": "Tyres",
+      "osm_tags": [
+        "shop=tyres"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 41396,
+      "wikidata_p1282_candidates": [
+        "Q47516839"
+      ]
+    },
+    {
+      "id": "shop_vacant",
+      "parent": "shop",
+      "label_en": "Vacant",
+      "osm_tags": [
+        "shop=vacant"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 82615,
+      "wikidata_p1282_candidates": [
+        "Q47519700"
+      ]
+    },
+    {
+      "id": "shop_variety_store",
+      "parent": "shop",
+      "label_en": "Variety Store",
+      "osm_tags": [
+        "shop=variety_store"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q2301114"
+      ],
+      "osm_count_at_snapshot": 90068,
+      "wikidata_p1282_candidates": [
+        "Q2301114"
+      ]
+    },
+    {
+      "id": "shop_wholesale",
+      "parent": "shop",
+      "label_en": "Wholesale",
+      "osm_tags": [
+        "shop=wholesale"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 20719,
+      "wikidata_p1282_candidates": [
+        "Q320677",
+        "Q7969298"
+      ]
+    },
+    {
+      "id": "shop_wine",
+      "parent": "shop",
+      "label_en": "Wine",
+      "osm_tags": [
+        "shop=wine"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 22227,
+      "wikidata_p1282_candidates": [
+        "Q21117149"
+      ]
+    },
+    {
+      "id": "tourism_alpine_hut",
+      "parent": "tourism",
+      "label_en": "Alpine Hut",
+      "osm_tags": [
+        "tourism=alpine_hut"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 14056,
+      "wikidata_p1282_candidates": [
+        "Q182676"
+      ]
+    },
+    {
+      "id": "tourism_apartment",
+      "parent": "tourism",
+      "label_en": "Apartment",
+      "osm_tags": [
+        "tourism=apartment"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 91637,
+      "wikidata_p1282_candidates": [
+        "Q336532",
+        "Q47520713"
+      ]
+    },
+    {
+      "id": "tourism_aquarium",
+      "parent": "tourism",
+      "label_en": "Aquarium",
+      "osm_tags": [
+        "tourism=aquarium"
+      ],
+      "google_types": [
+        "aquarium"
+      ],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 1702,
+      "wikidata_p1282_candidates": [
+        "Q2281788"
+      ]
+    },
+    {
+      "id": "tourism_artwork",
+      "parent": "tourism",
+      "label_en": "Artwork",
+      "osm_tags": [
+        "tourism=artwork"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 367849,
+      "wikidata_p1282_candidates": [
+        "Q838948"
+      ]
+    },
+    {
+      "id": "tourism_attraction",
+      "parent": "tourism",
+      "label_en": "Attraction",
+      "osm_tags": [
+        "tourism=attraction"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 255174,
+      "wikidata_p1282_candidates": [
+        "Q570116"
+      ]
+    },
+    {
+      "id": "tourism_cabin",
+      "parent": "tourism",
+      "label_en": "Cabin",
+      "osm_tags": [
+        "tourism=cabin"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 879,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "tourism_camp_pitch",
+      "parent": "tourism",
+      "label_en": "Camp Pitch",
+      "osm_tags": [
+        "tourism=camp_pitch"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 142611,
+      "wikidata_p1282_candidates": [
+        "Q99586892"
+      ]
+    },
+    {
+      "id": "tourism_camp_site",
+      "parent": "tourism",
+      "label_en": "Camp Site",
+      "osm_tags": [
+        "tourism=camp_site"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 160148,
+      "wikidata_p1282_candidates": [
+        "Q832778"
+      ]
+    },
+    {
+      "id": "tourism_caravan_site",
+      "parent": "tourism",
+      "label_en": "Caravan Site",
+      "osm_tags": [
+        "tourism=caravan_site"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 36634,
+      "wikidata_p1282_candidates": [
+        "Q1424620"
+      ]
+    },
+    {
+      "id": "tourism_chalet",
+      "parent": "tourism",
+      "label_en": "Chalet",
+      "osm_tags": [
+        "tourism=chalet"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 111674,
+      "wikidata_p1282_candidates": [
+        "Q1371789"
+      ]
+    },
+    {
+      "id": "tourism_checkpoint",
+      "parent": "tourism",
+      "label_en": "Checkpoint",
+      "osm_tags": [
+        "tourism=checkpoint"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 1049,
+      "wikidata_p1282_candidates": [
+        "Q141003337"
+      ]
+    },
+    {
+      "id": "tourism_gallery",
+      "parent": "tourism",
+      "label_en": "Gallery",
+      "osm_tags": [
+        "tourism=gallery"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 22452,
+      "wikidata_p1282_candidates": [
+        "Q1007870"
+      ]
+    },
+    {
+      "id": "tourism_guest_house",
+      "parent": "tourism",
+      "label_en": "Guest House",
+      "osm_tags": [
+        "tourism=guest_house"
+      ],
+      "google_types": [
+        "guest_house"
+      ],
+      "wikidata_classes": [
+        "Q2460422"
+      ],
+      "osm_count_at_snapshot": 199978,
+      "wikidata_p1282_candidates": [
+        "Q2460422"
+      ]
+    },
+    {
+      "id": "tourism_hostel",
+      "parent": "tourism",
+      "label_en": "Hostel",
+      "osm_tags": [
+        "tourism=hostel"
+      ],
+      "google_types": [
+        "hostel"
+      ],
+      "wikidata_classes": [
+        "Q654772"
+      ],
+      "osm_count_at_snapshot": 62675,
+      "wikidata_p1282_candidates": [
+        "Q654772"
+      ]
+    },
+    {
+      "id": "tourism_hotel",
+      "parent": "tourism",
+      "label_en": "Hotel",
+      "osm_tags": [
+        "tourism=hotel"
+      ],
+      "google_types": [
+        "hotel"
+      ],
+      "wikidata_classes": [
+        "Q27686"
+      ],
+      "osm_count_at_snapshot": 453937,
+      "wikidata_p1282_candidates": [
+        "Q27686"
+      ]
+    },
+    {
+      "id": "tourism_information",
+      "parent": "tourism",
+      "label_en": "Information",
+      "osm_tags": [
+        "tourism=information"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 1516128,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "tourism_motel",
+      "parent": "tourism",
+      "label_en": "Motel",
+      "osm_tags": [
+        "tourism=motel"
+      ],
+      "google_types": [
+        "motel"
+      ],
+      "wikidata_classes": [
+        "Q216212"
+      ],
+      "osm_count_at_snapshot": 49546,
+      "wikidata_p1282_candidates": [
+        "Q216212"
+      ]
+    },
+    {
+      "id": "tourism_museum",
+      "parent": "tourism",
+      "label_en": "Museum",
+      "osm_tags": [
+        "tourism=museum"
+      ],
+      "google_types": [
+        "museum"
+      ],
+      "wikidata_classes": [
+        "Q33506"
+      ],
+      "osm_count_at_snapshot": 111320,
+      "wikidata_p1282_candidates": [
+        "Q33506"
+      ]
+    },
+    {
+      "id": "tourism_picnic_site",
+      "parent": "tourism",
+      "label_en": "Picnic Site",
+      "osm_tags": [
+        "tourism=picnic_site"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q47520603"
+      ],
+      "osm_count_at_snapshot": 168731,
+      "wikidata_p1282_candidates": [
+        "Q47520603"
+      ]
+    },
+    {
+      "id": "tourism_theme_park",
+      "parent": "tourism",
+      "label_en": "Theme Park",
+      "osm_tags": [
+        "tourism=theme_park"
+      ],
+      "google_types": [],
+      "wikidata_classes": [
+        "Q2416723"
+      ],
+      "osm_count_at_snapshot": 11137,
+      "wikidata_p1282_candidates": [
+        "Q2416723"
+      ]
+    },
+    {
+      "id": "tourism_trail_riding_station",
+      "parent": "tourism",
+      "label_en": "Trail Riding Station",
+      "osm_tags": [
+        "tourism=trail_riding_station"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 1607,
+      "wikidata_p1282_candidates": []
+    },
+    {
+      "id": "tourism_viewpoint",
+      "parent": "tourism",
+      "label_en": "Viewpoint",
+      "osm_tags": [
+        "tourism=viewpoint"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 263758,
+      "wikidata_p1282_candidates": [
+        "Q6017969"
+      ]
+    },
+    {
+      "id": "tourism_wilderness_hut",
+      "parent": "tourism",
+      "label_en": "Wilderness Hut",
+      "osm_tags": [
+        "tourism=wilderness_hut"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 16976,
+      "wikidata_p1282_candidates": [
+        "Q39425"
+      ]
+    },
+    {
+      "id": "tourism_wine_cellar",
+      "parent": "tourism",
+      "label_en": "Wine Cellar",
+      "osm_tags": [
+        "tourism=wine_cellar"
+      ],
+      "google_types": [],
+      "wikidata_classes": [],
+      "osm_count_at_snapshot": 672,
+      "wikidata_p1282_candidates": [
+        "Q22995"
+      ]
+    },
+    {
+      "id": "tourism_zoo",
+      "parent": "tourism",
+      "label_en": "Zoo",
+      "osm_tags": [
+        "tourism=zoo"
+      ],
+      "google_types": [
+        "zoo"
+      ],
+      "wikidata_classes": [
+        "Q43501"
+      ],
+      "osm_count_at_snapshot": 9278,
+      "wikidata_p1282_candidates": [
+        "Q43501"
+      ]
+    }
+  ]
+}

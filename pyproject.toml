@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "poi-harvester-agent"
+version = "0.1.0"
+description = "Auditable POI harvesting agent for the GURA bounty"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+postgis = ["psycopg[binary]>=3.1,<4"]
+
+[project.scripts]
+poi-harvester = "poi_harvester.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+poi_harvester = ["taxonomy.json"]

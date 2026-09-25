@@ -1,0 +1,60 @@
+{
+  "sources": [
+    {
+      "name": "demo",
+      "kind": "fixture",
+      "path": "fixtures/riyadh_pharmacies.json",
+      "license": "Demo data - project authored",
+      "allowed_uses": ["internal", "commercial", "redistribute"],
+      "commercial_use": true,
+      "auth_mode": "none",
+      "coverage_bbox": [46.60, 24.60, 46.80, 24.80],
+      "freshness": "static demonstration fixture",
+      "attribution": "POI Harvester demo fixture",
+      "rate_limit_per_second": 10,
+      "reliability_weight": 0.9
+    },
+    {
+      "name": "demo_alt",
+      "kind": "fixture",
+      "path": "fixtures/riyadh_pharmacies_alt.json",
+      "license": "Demo data - project authored",
+      "allowed_uses": ["internal", "commercial", "redistribute"],
+      "commercial_use": true,
+      "auth_mode": "none",
+      "coverage_bbox": [46.60, 24.60, 46.80, 24.80],
+      "freshness": "static demonstration fixture",
+      "attribution": "POI Harvester secondary demo fixture",
+      "rate_limit_per_second": 10,
+      "reliability_weight": 0.75
+    },
+    {
+      "name": "openstreetmap",
+      "kind": "overpass",
+      "endpoint": "https://overpass.private.coffee/api/interpreter",
+      "license": "Open Database License 1.0 (ODbL); downstream obligations require review",
+      "allowed_uses": ["internal"],
+      "commercial_use": false,
+      "auth_mode": "none",
+      "coverage_bbox": null,
+      "freshness": "live source; feature dates vary",
+      "attribution": "© OpenStreetMap contributors",
+      "rate_limit_per_second": 0.2,
+      "reliability_weight": 0.8
+    },
+    {
+      "name": "osm_swiss",
+      "kind": "overpass",
+      "endpoint": "https://overpass.osm.ch/api/interpreter",
+      "license": "Open Database License 1.0 (ODbL); downstream obligations require review",
+      "allowed_uses": ["internal"],
+      "commercial_use": false,
+      "auth_mode": "none",
+      "coverage_bbox": [5.9, 45.8, 10.6, 47.9],
+      "freshness": "live Swiss OpenStreetMap extract; feature dates vary",
+      "attribution": "© OpenStreetMap contributors",
+      "rate_limit_per_second": 0.2,
+      "reliability_weight": 0.8
+    }
+  ]
+}

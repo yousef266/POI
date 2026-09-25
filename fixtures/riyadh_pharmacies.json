@@ -1,0 +1,31 @@
+[
+  {
+    "id": "demo-101",
+    "lat": 24.71361,
+    "lon": 46.67530,
+    "name_en": "Al Nakheel Pharmacy",
+    "name_ar": "صيدلية النخيل",
+    "category": "pharmacy",
+    "phone": "+966 11 555 0101",
+    "address": "Olaya, Riyadh"
+  },
+  {
+    "id": "demo-102",
+    "lat": 24.71430,
+    "lon": 46.67620,
+    "name_en": "Central Pharmacy",
+    "name_ar": "الصيدلية المركزية",
+    "category": "pharmacy",
+    "phone": "+966 11 555 0102",
+    "address": "Olaya, Riyadh"
+  },
+  {
+    "id": "demo-103",
+    "lat": 24.71363,
+    "lon": 46.67528,
+    "name_en": "Al Nakheel Pharmacy",
+    "category": "pharmacy",
+    "phone": "+966 11 555 0101",
+    "address": "Olaya Street, Riyadh"
+  }
+]

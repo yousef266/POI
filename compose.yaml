@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_DB: poi
+      POSTGRES_USER: poi
+      POSTGRES_PASSWORD: ${POI_DB_PASSWORD:?Run scripts/start-local.ps1 first}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - poi_postgis_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U poi -d poi"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  geoserver:
+    image: docker.osgeo.org/geoserver:2.28.5
+    environment:
+      GEOSERVER_ADMIN_USER: admin
+      GEOSERVER_ADMIN_PASSWORD: ${POI_GS_PASSWORD:?Run scripts/start-local.ps1 first}
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - poi_geoserver_data:/opt/geoserver_data
+    depends_on:
+      db:
+        condition: service_healthy
+
+  agent:
+    build: .
+    profiles: ["run"]
+    environment:
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: poi
+      PGPASSWORD: ${POI_DB_PASSWORD:?Run scripts/start-local.ps1 first}
+      GEOSERVER_URL: http://geoserver:8080/geoserver
+      GEOSERVER_USER: admin
+      GEOSERVER_PASSWORD: ${POI_GS_PASSWORD:?Run scripts/start-local.ps1 first}
+      GEOSERVER_PGHOST: db
+    volumes:
+      - ./output:/app/output
+    depends_on:
+      db:
+        condition: service_healthy
+      geoserver:
+        condition: service_started
+
+volumes:
+  poi_postgis_data:
+  poi_geoserver_data:
