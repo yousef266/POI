@@ -12,6 +12,8 @@ from .config import load_env_file, require_publish_env
 from .geocode import CatalogGeocoder
 from .geocode_http import load_http_geocoder
 from .evaluation import evaluate_local
+from .benchmark import add_benchmark_arguments, benchmark_10000
+from .name_review import review_names
 from .intent import normalize_intent
 from .place import CatalogPlaceResolver, choose_unique_place, load_http_place_resolver
 from .pipeline import replay, reprocess_capture, run
@@ -53,6 +55,14 @@ def build_parser() -> ArgumentParser:
     run_cmd.add_argument("--workspace", help="GeoServer workspace; required with --publish")
     run_cmd.add_argument("--env-file", type=Path, help="Local PostGIS and GeoServer settings; defaults to .env when present")
 
+    benchmark_cmd = commands.add_parser("benchmark", help="Run the synthetic 10K probe with optional isolated publication")
+    add_benchmark_arguments(benchmark_cmd)
+    review_cmd = commands.add_parser("review-names", help="Prepare/resume human Arabic review and score explicit ratings")
+    review_cmd.add_argument("--dataset", type=Path, default=Path("fixtures/arabic_name_review.json"))
+    review_cmd.add_argument("--ratings", type=Path, default=Path("output/arabic-review/ratings.json"))
+    review_cmd.add_argument("--out", type=Path, default=Path("output/arabic-review/score.json"))
+    review_cmd.add_argument("--interactive", action="store_true")
+    review_cmd.add_argument("--reviewer")
     replay_cmd = commands.add_parser("replay", help="Rebuild from captured raw input without network or LLM")
     replay_cmd.add_argument("output_dir", type=Path)
     reprocess_cmd = commands.add_parser("reprocess", help="Apply current rules to a saved capture without network")
@@ -62,6 +72,12 @@ def build_parser() -> ArgumentParser:
     evaluate_cmd.add_argument("--out", type=Path, default=Path("output/evaluation"))
     evaluate_cmd.add_argument("--registry", type=Path, default=Path("sources.json"))
     evaluate_cmd.add_argument("--readiness", type=Path, default=Path("docs/AGENT1_READINESS.md"))
+    evaluate_cmd.add_argument("--local-services", action="store_true", help="Also publish/verify 10K synthetic points in an isolated target")
+    evaluate_cmd.add_argument("--database")
+    evaluate_cmd.add_argument("--schema", default="poi_submission_probe")
+    evaluate_cmd.add_argument("--workspace")
+    evaluate_cmd.add_argument("--env-file", type=Path)
+    evaluate_cmd.add_argument("--ratings", type=Path, help="Optional explicit human ratings for the 100-name dataset")
     publish_cmd = commands.add_parser("publish", help="Publish an existing harvest without requesting the source again")
     publish_cmd.add_argument("--out", type=Path, required=True, help="Existing run output directory")
     publish_cmd.add_argument("--layer", required=True)
@@ -83,6 +99,14 @@ def build_parser() -> ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
+        if args.command == "review-names":
+            print(json.dumps(review_names(args.dataset, args.ratings, args.out, args.interactive, args.reviewer), indent=2))
+            return 0
+        if args.command == "benchmark":
+            target = {"database": args.database, "schema": args.schema, "workspace": args.workspace} if args.publish else None
+            report = benchmark_10000(args.out, target, args.env_file)
+            print(json.dumps(report, indent=2))
+            return 0 if report["exact_replay"] else 1
         if args.command == "replay":
             result = replay(args.output_dir)
             print(json.dumps(result, indent=2))
@@ -92,7 +116,8 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return 0
         if args.command == "evaluate":
-            report = evaluate_local(args.out, args.registry, args.readiness)
+            target = {"database": args.database, "schema": args.schema, "workspace": args.workspace} if args.local_services else None
+            report = evaluate_local(args.out, args.registry, args.readiness, target, args.env_file, args.ratings)
             summary = {"report": str((args.out / "report.json").resolve()),
                        "readiness": str(args.readiness.resolve()),
                        "unit_tests": report["unit_tests"]["status"],

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from math import cos, radians
 from pathlib import Path
+from math import isfinite
 from urllib.parse import urlencode, urlparse
 import json
 
@@ -68,6 +69,10 @@ class HttpPlaceResolver:
             raise ValueError("Place resolver endpoint must use HTTPS")
         if parsed.hostname == "nominatim.openstreetmap.org":
             raise ValueError("Use an operator-approved self-hosted or third-party search service")
+        if not isfinite(provider["rate_limit_per_second"]) or provider["rate_limit_per_second"] <= 0:
+            raise ValueError("Provider rate must be finite and positive")
+        if not isfinite(provider.get("reliability_weight", 0.5)) or not 0 <= provider.get("reliability_weight", 0.5) <= 1:
+            raise ValueError("Provider reliability must be between zero and one")
         if not contact:
             raise ValueError("A contact is required for live place resolution")
         self.provider = provider
@@ -76,6 +81,8 @@ class HttpPlaceResolver:
         self.cache: dict[tuple[str, int | None], list[dict]] = {}
 
     def resolve(self, name: str, near_radius_m: int | None = None) -> list[dict]:
+        if near_radius_m is not None and (not isfinite(near_radius_m) or near_radius_m <= 0):
+            raise ValueError("Nearby radius must be finite and positive")
         key = (name.casefold().strip(), near_radius_m)
         if key in self.cache:
             return self.cache[key]
@@ -84,8 +91,7 @@ class HttpPlaceResolver:
             "q": name, "format": "jsonv2", "polygon_geojson": 1, "limit": 5})
         agent = f"POIHarvesterAgent/0.1 ({self.contact})"
         limiter = _source_limiter(source, self.max_rate)
-        limiter.wait()
-        if not _robots_allowed(url, agent):
+        if not _robots_allowed(url, agent, limiter):
             raise PermissionError("Place provider robots.txt disallows search endpoint")
         payload, _ = _get_json(url, limiter, agent)
         if not isinstance(payload, list):
@@ -100,8 +106,15 @@ class HttpPlaceResolver:
                 lat, lon = float(candidate["lat"]), float(candidate["lon"])
                 delta_lat = near_radius_m / 111_320
                 delta_lon = near_radius_m / (111_320 * max(0.01, cos(radians(lat))))
-                area = Area(lat - delta_lat, lon - delta_lon,
-                            lat + delta_lat, lon + delta_lon)
+                points = geometry.get("coordinates", []) if geometry.get("type") == "LineString" else [[lon, lat]]
+                if geometry.get("type") == "MultiLineString":
+                    points = [point for line in geometry.get("coordinates", []) for point in line]
+                if not points:
+                    points = [[lon, lat]]
+                area = Area(min(float(point[1]) for point in points) - delta_lat,
+                            min(float(point[0]) for point in points) - delta_lon,
+                            max(float(point[1]) for point in points) + delta_lat,
+                            max(float(point[0]) for point in points) + delta_lon)
                 method, confidence = "derived_nearby_bbox", 0.4
             else:
                 continue

@@ -12,7 +12,7 @@ python run.py replay output/demo
 python -m unittest discover -s tests -v
 ```
 
-The first command writes `poi.geojson`, `records.json`, `raw.json`, `sources_snapshot.json`, `changes.json`, `metadata.json`, and `review_queue.json`. The replay command reconstructs the same merged records from captured raw data, without network access or an LLM.
+The first command writes `poi.geojson`, `records.json`, `raw.json`, `sources_snapshot.json`, `changes.json`, `metadata.json`, `review_queue.json`, plus `source_capture.json`, `provenance.json` and `timings.json`. The replay command reconstructs the same merged records from captured raw data, without network access or an LLM.
 
 The callable `poi_harvester.agent.invoke(payload)` provides the same workflow to a front end, another agent, or a trigger. It asks for a missing area, category, database, or workspace. It publishes by default; pass `"publish": false` for a file-only preview. `agent.json` documents its current inputs and outputs; it is not a substitute for the linked Common Agent Contract.
 
@@ -119,7 +119,7 @@ See [AGENT1_AUDIT.md](AGENT1_AUDIT.md) for the requirement audit and [CONTRACT_B
 
 ## Reproduce from a clean clone
 
-On Windows PowerShell with Python 3.11+ installed:
+On Windows PowerShell with Python 3.12 installed:
 
 ```powershell
 git clone https://github.com/yousef266/POI.git
@@ -140,3 +140,40 @@ Edit `.env` with your own PostgreSQL and GeoServer connection settings. Give the
 ```
 
 The 10K command is a synthetic local pipeline probe. The Zurich regression fixture reproduces the same-name/different-phone merge pattern with invented records. The original 42-record live capture is stored locally under `output/zurich-mixed-corrected` and is deliberately not committed as redistributed OSM data. On this PC, reprocess and replay it with `.\run.ps1 reprocess --from-run output/zurich-mixed-corrected --out output/zurich-mixed-enriched` followed by `.\run.ps1 replay output/zurich-mixed-enriched`. A fresh live Zurich request can be made with the `osm_swiss` example above, but the live feature count can change.
+
+## Submission verification and Arabic review
+
+Current transformations use enrichment `rules-v2` and conflation version 3; historical conflation versions 1 and 2 remain replayable. Known conflicting phone numbers block new cross-source merges, including a bridge through a record without a phone. Address similarity is diagnostic and cannot override distance/category/phone guards.
+
+HTTP transport is serialized per source endpoint across processes, including robots checks. After each response it waits at least the configured interval plus the measured wall-clock resolution. A 429 Retry-After cooldown is shared across processes. The local concurrent test measures actual loopback HTTP arrivals with a high-resolution clock; no real external source is hammered.
+
+The offline evaluator runs tests, repeated 50/50/20 incremental refresh, two canonical replays with capture-integrity hashes, taxonomy/license reports, the synthetic 10K probe and an unreviewed 100-name Arabic dataset. Include actual PostGIS/GeoServer publication only when services and `.env` are configured:
+
+```powershell
+.\run.ps1 evaluate --out output/submission-evaluation --local-services --database poi_agent_test --schema poi_submission_probe --workspace poi_submission_probe
+.\run.ps1 benchmark --out output/benchmark-publication --publish --database poi_agent_test --schema poi_submission_probe --workspace poi_submission_probe
+```
+
+These explicit publication commands create synthetic test layers in the selected isolated schema/workspace. The evaluator also reads saved publication targets in this PC's existing Zurich captures when they use the same database, and verifies those layers without republishing them.
+
+Review the 100 project-authored generated names yourself:
+
+```powershell
+.\run.ps1 review-names --interactive --reviewer "YOUR NAME" --ratings output/arabic-review/ratings.json --out output/arabic-review/score.json
+```
+
+A blank review has no score; a partial review does not become an A8 pass. See [docs/ARABIC_REVIEW.md](docs/ARABIC_REVIEW.md) for the accept/reject/skip/resume workflow. Official status stays `NOT_CERTIFIED` even after a local human review.
+
+The benchmark separates harvesting/normalization, conflation/reconciliation, audit/artifact writing, PostGIS, GeoServer, publication target checks and complete pipeline time. It also records process CPU time, peak RSS and host CPU/RAM when available. These are measurements from this PC, not official hardware results.
+
+For a Docker-enabled host:
+
+```powershell
+docker build -t poi-harvester .
+docker run --rm --entrypoint python poi-harvester -m unittest discover -s tests -v
+docker run --rm -v "$($PWD.Path)/output:/app/output" poi-harvester evaluate --out output/container-evaluation
+```
+
+The image includes tests, scripts, fixtures and documentation. Docker is not installed on this PC, so the image build/run is `NOT_AVAILABLE` locally; the equivalent native workflow is tested. Secrets and local runtimes are excluded from the build context.
+
+See [docs/DESIGN.md](docs/DESIGN.md), [docs/LOCAL_EVALUATION.json](docs/LOCAL_EVALUATION.json) and [docs/AGENT1_READINESS.md](docs/AGENT1_READINESS.md). Raw live OSM captures and service credentials remain local and are excluded from Git. Fresh run timestamps and measured runtimes can change; captured transformation/replay results remain deterministic.

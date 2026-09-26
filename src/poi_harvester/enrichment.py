@@ -11,7 +11,7 @@ import re
 import unicodedata
 
 
-VERSION = "rules-v1"
+VERSION = "rules-v2"
 
 # Common establishment words are translated, never phoneticized as brand text.
 _GENERICS = {
@@ -27,10 +27,13 @@ _GENERICS = {
     "school": ("مدرسة", "School"),
     "schools": ("مدرسة", "School"),
     "mosque": ("مسجد", "Mosque"),
+    "church": ("كنيسة", "Church"), "synagogue": ("كنيس", "Synagogue"),
     "bakery": ("مخبز", "Bakery"),
     "backerei": ("مخبز", "Bakery"),
     "bank": ("بنك", "Bank"),
     "atm": ("صراف آلي", "ATM"),
+    "fuelstation": ("محطة وقود", "Fuel Station"),
+    "cafe": ("مقهى", "Cafe"), "supermarket": ("سوبرماركت", "Supermarket"),
 }
 _CATEGORY_GENERIC = {
     "pharmacy": ("صيدلية", "Pharmacy"),
@@ -40,9 +43,11 @@ _CATEGORY_GENERIC = {
     "shop_bakery": ("مخبز", "Bakery"),
     "amenity_restaurant": ("مطعم", "Restaurant"),
     "tourism_hotel": ("فندق", "Hotel"),
-    "amenity_place_of_worship": ("مسجد", "Mosque"),
+    "amenity_place_of_worship": ("دار عبادة", "Place of Worship"),
     "amenity_bank": ("بنك", "Bank"),
     "amenity_atm": ("صراف آلي", "ATM"),
+    "amenity_fuel": ("محطة وقود", "Fuel Station"),
+    "amenity_cafe": ("مقهى", "Cafe"), "shop_supermarket": ("سوبرماركت", "Supermarket"),
 }
 _AR_GENERICS = {arabic: english for arabic, english in set(_GENERICS.values())}
 _PROPER_EN_AR = {
@@ -83,6 +88,8 @@ def _latin_word(word: str) -> tuple[str, bool]:
     folded = _ascii(word)
     if folded in _PROPER_EN_AR:
         return _PROPER_EN_AR[folded], True
+    if folded.isdigit():
+        return folded, True
     if not re.fullmatch(r"[a-z]+", folded):
         return "", False
     result = []
@@ -110,21 +117,51 @@ def _arabic_word(word: str) -> tuple[str, bool]:
     return "".join(_AR_LETTERS.get(char, "") for char in word).title(), False
 
 
+_LOCATION_TERMS = {"street": "شارع", "road": "طريق", "district": "حي", "north": "شمال", "south": "جنوب"}
+_LOCATION_AR_EN = {arabic: english.title() for english, arabic in _LOCATION_TERMS.items()}
+
+
+def _proper_parts(words: list[str], target: str) -> list[tuple[str, bool]]:
+    parts = []
+    index = 0
+    while index < len(words):
+        word = words[index]
+        if target == "ar":
+            found = next(((width, _PROPER_EN_AR[_ascii(" ".join(words[index:index + width]))])
+                          for width in range(min(3, len(words) - index), 0, -1)
+                          if _ascii(" ".join(words[index:index + width])) in _PROPER_EN_AR), None)
+            if found:
+                parts.append((found[1], True))
+                index += found[0]
+                continue
+            parts.append((_LOCATION_TERMS[_ascii(word)], True) if _ascii(word) in _LOCATION_TERMS
+                         else (word, True) if re.fullmatch(r"[\u0621-\u064a]+", word)
+                         else _latin_word(word))
+        else:
+            parts.append((_LOCATION_AR_EN[word], True) if word in _LOCATION_AR_EN
+                         else (word, True) if re.fullmatch(r"[A-Za-z]+|\d+", word)
+                         else _arabic_word(word))
+        index += 1
+    return parts
+
+
 def _to_arabic(name: str, category: str) -> tuple[str | None, float, str | None]:
+    name = re.sub(r"(?i)\b(?:fuel|gas) station\b", "fuelstation", name)
     words = re.findall(r"[A-Za-zÀ-ÿ]+|[\u0621-\u064a]+|\d+", name)
-    if not words or any(re.search(r"[\u0621-\u064a]", word) for word in words):
-        return None, 0.0, "Mixed/Arabic text in English source field needs review"
+    if not words:
+        return None, 0.0, "Empty source name"
     generics = [_GENERICS[_ascii(word)] for word in words if _ascii(word) in _GENERICS]
+    generics += [(word, _AR_GENERICS[word]) for word in words if word in _AR_GENERICS]
     if len({item[1] for item in generics}) > 1:
         return None, 0.0, "Conflicting generic establishment terms"
     generic = generics[0] if generics else _CATEGORY_GENERIC.get(category)
     if generic is None:
         return None, 0.0, "No reviewed Arabic generic term for category"
-    proper_words = [word for word in words if _ascii(word) not in _GENERICS]
+    proper_words = [word for word in words if _ascii(word) not in _GENERICS and word not in _AR_GENERICS]
     if len(proper_words) >= 2 and _ascii(" ".join(proper_words)) in _PROPER_EN_AR:
         proper, reviewed = _PROPER_EN_AR[_ascii(" ".join(proper_words))], True
     else:
-        parts = [_latin_word(word) for word in proper_words]
+        parts = _proper_parts(proper_words, "ar")
         if any(not value for value, _ in parts):
             return None, 0.0, "Proper name cannot be transliterated deterministically"
         proper = " ".join(value for value, _ in parts)
@@ -134,22 +171,23 @@ def _to_arabic(name: str, category: str) -> tuple[str | None, float, str | None]
 
 
 def _to_english(name: str, category: str) -> tuple[str | None, float, str | None]:
-    words = re.findall(r"[A-Za-z]+|[\u0621-\u064a]+|\d+", name)
+    words = re.findall(r"[A-Za-z]+|[\u0621-\u064a]+|\d+", name.replace("صراف آلي", "صراف").replace("محطة وقود", "محطةوقود"))
     if not words:
         return None, 0.0, "Empty Arabic name"
-    generics = [_AR_GENERICS[word] for word in words if word in _AR_GENERICS]
+    arabic_generics = {**_AR_GENERICS, "صراف": "ATM", "محطةوقود": "Fuel Station"}
+    generics = [arabic_generics[word] for word in words if word in arabic_generics]
+    generics += [_GENERICS[_ascii(word)][1] for word in words if _ascii(word) in _GENERICS]
     if len(set(generics)) > 1:
         return None, 0.0, "Conflicting generic establishment terms"
     generic = generics[0] if generics else (_CATEGORY_GENERIC.get(category) or (None, None))[1]
     if not generic:
         return None, 0.0, "No reviewed English generic term for category"
-    proper_words = [word for word in words if word not in _AR_GENERICS]
+    proper_words = [word for word in words if word not in arabic_generics and _ascii(word) not in _GENERICS]
     proper_ar = " ".join(proper_words)
     if proper_ar in _PROPER_AR_EN:
         proper, reviewed = _PROPER_AR_EN[proper_ar], True
     else:
-        parts = [(word, True) if re.fullmatch(r"[A-Za-z]+|\d+", word)
-                 else _arabic_word(word) for word in proper_words]
+        parts = _proper_parts(proper_words, "en")
         if any(not value for value, _ in parts):
             return None, 0.0, "Proper name cannot be transliterated deterministically"
         proper = " ".join(value for value, _ in parts)
@@ -164,6 +202,9 @@ def enrich_record(record: dict, source_key: str) -> tuple[dict, str | None]:
     en = (record.get("name_en") or "").strip()
     ar = (record.get("name_ar") or "").strip()
     if en and ar:
+        if any(record.get(f"{field}_method") and float(record.get(f"{field}_confidence", 0)) < 0.6
+               for field in ("name_en", "name_ar")):
+            return result, "Low-confidence proper-name transliteration requires human review"
         return result, None
     if not en and not ar:
         return result, "POI has no source name for bilingual enrichment"
@@ -174,6 +215,7 @@ def enrich_record(record: dict, source_key: str) -> tuple[dict, str | None]:
         return result, review
     result[f"original_{target}"] = record.get(target)
     result[target] = generated
+    result[f"{target}_generated"] = True
     result[f"{target}_method"] = "generic_translation+proper_transliteration"
     result[f"{target}_version"] = VERSION
     result[f"{target}_confidence"] = confidence

@@ -90,6 +90,7 @@ class IntentPlaceTests(unittest.TestCase):
         self.assertEqual(resolved["metadata"]["source_id"], "way/42")
         self.assertTrue(resolved["area"].contains(24.7, 46.7))
         self.assertFalse(resolved["area"].contains(24.8, 46.8))
+        self.assertTrue(resolved["area"].contains(24.71, 46.71))
         with patch("poi_harvester.place._robots_allowed", return_value=True), \
                 patch("poi_harvester.place._get_json", return_value=(point * 2, {})), \
                 patch("poi_harvester.place._source_limiter"):

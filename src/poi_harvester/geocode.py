@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from math import isfinite
 import json
 
 from .sources import license_gate
@@ -28,6 +29,9 @@ class CatalogGeocoder:
             lat, lon = float(entry["lat"]), float(entry["lon"])
             if not (-90 <= lat <= 90 and -180 <= lon <= 180):
                 raise ValueError(f"Invalid geocoder coordinate for {entry['address']}")
+            confidence = float(entry.get("confidence", 0.5))
+            if not isfinite(confidence) or not 0 <= confidence <= 1:
+                raise ValueError("Geocoder confidence must be between zero and one")
             self.entries[key] = {"lat": lat, "lon": lon, "reference": str(entry["id"]),
                                  "confidence": min(float(entry.get("confidence", 0.5)), 0.5)}
 

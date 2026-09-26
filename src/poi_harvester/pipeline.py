@@ -5,12 +5,14 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from time import perf_counter, process_time
 import json
 
 from .core import Area, Request, canonicalize, change_set, conflate, feature_collection, reconcile_ids, reproducibility_hash
 from .enrichment import VERSION as ENRICHMENT_VERSION, enrich_record
 from .sources import collect, covers_area, license_gate, load_registry
 from .taxonomy import by_id
+from .audit import build_provenance, canonical_hash, verify_capture_integrity
 
 
 def _write_json(path: Path, value: object) -> None:
@@ -26,8 +28,12 @@ def run(
     geocoder: Any | None = None,
     source_records_override: dict[str, list[dict]] | None = None,
 ) -> dict:
+    started, cpu_started = perf_counter(), process_time()
     sources = load_registry(registry_path)
+    source_captures = []
     known = {source["name"] for source in sources}
+    if selected_sources is not None and not selected_sources:
+        raise ValueError("Select at least one source")
     if selected_sources is not None and not selected_sources <= known:
         raise ValueError(f"Unknown sources: {sorted(selected_sources - known)}")
     raw, canonical, exclusions, review, failures = [], [], [], [], []
@@ -68,11 +74,22 @@ def run(
         except Exception as exc:
             failures.append({"source": source["name"], "error": str(exc)})
             continue
+        source_captures.append({"source": source["name"],
+                                "retrieval_timestamp": datetime.now(timezone.utc).isoformat(),
+                                "capture_hash": canonical_hash(source_records),
+                                "version": cache_entry or {"version": "capture_hash_only"},
+                                "records": source_records})
         accepted_for_source = 0
         for record in source_records:
             reason = record.get("geometry_review_reason") or record.get("category_review_reason")
             if reason:
                 review.append({"source": source["name"], "record": record, "reason": reason})
+                continue
+            if record.get("category") not in by_id():
+                review.append({"source": source["name"], "record": record,
+                               "reason": f"Unmapped source category: {record.get('category')!r}"})
+                continue
+            if record.get("category") not in request.categories:
                 continue
             if record.get("lat") is None or record.get("lon") is None:
                 found = geocoder.lookup(record["address"]) if geocoder and record.get("address") else None
@@ -89,12 +106,6 @@ def run(
                     continue
             try:
                 if not request.area.contains(float(record["lat"]), float(record["lon"])):
-                    continue
-                if record.get("category") not in by_id():
-                    review.append({"source": source["name"], "record": record,
-                                   "reason": f"Unmapped source category: {record.get('category')!r}"})
-                    continue
-                if record.get("category") not in request.categories:
                     continue
                 record, enrichment_review = enrich_record(record, f"{source['name']}:{record['id']}")
                 if enrichment_review:
@@ -113,15 +124,29 @@ def run(
         if accepted_for_source:
             contributors.append({"source": source["name"], "kind": source["kind"], "license": source["license"], "attribution": source["attribution"]})
     if geocoder_used:
-        provider = geocoder.provider
-        contributors.append({"source": provider["name"], "kind": "geocoder",
-                             "license": provider["license"], "attribution": provider["attribution"]})
+        if geocoder is not None:
+            provider = geocoder.provider
+            contributors.append({"source": provider["name"], "kind": "geocoder",
+                                 "license": provider["license"], "attribution": provider["attribution"]})
+        else:
+            # Reprocessing a saved derived point preserves its captured provider attribution.
+            captured_providers = {(item["record"]["geometry_provenance"].split(":")[0],
+                                   item["record"]["geometry_license"],
+                                   item["record"]["geometry_attribution"])
+                                  for item in raw if item["record"].get("geometry_method") == "geocode_derived"}
+            contributors.extend({"source": name, "kind": "geocoder", "license": license_name,
+                                 "attribution": attribution}
+                                for name, license_name, attribution in sorted(captured_providers))
     if exclusions and not canonical and not failures:
         raise RuntimeError(f"No permitted sources for declared use: {exclusions}")
     if failures:
         raise RuntimeError(f"Harvest incomplete; no change set or publication written. Source failures: {failures}")
     previous = json.loads(previous_path.read_text(encoding="utf-8")) if previous_path else []
-    current = reconcile_ids(previous, conflate(canonical))
+    normalization_seconds = perf_counter() - started
+    conflation_started = perf_counter()
+    decisions = []
+    current = reconcile_ids(previous, conflate(canonical, algorithm_version=3, decision_log=decisions))
+    conflation_seconds = perf_counter() - conflation_started
     changes = change_set(previous, current)
     output_dir.mkdir(parents=True, exist_ok=True)
     metadata = {
@@ -137,7 +162,7 @@ def run(
         "exclusions": exclusions,
         "source_failures": failures,
         "reproducibility_hash": reproducibility_hash(current),
-        "conflation_algorithm_version": 2,
+        "conflation_algorithm_version": 3,
         "enrichment_algorithm_version": ENRICHMENT_VERSION,
         "bilingual_complete_count": sum(bool(row.get("language_complete")) for row in current),
         "generated_name_count": sum(bool(row.get("name_en_method")) + bool(row.get("name_ar_method"))
@@ -158,7 +183,17 @@ def run(
     _write_json(output_dir / "changes.json", changes)
     _write_json(output_dir / "metadata.json", metadata)
     _write_json(output_dir / "review_queue.json", review)
-    return {"status": "completed", "output_dir": str(output_dir), "feature_count": len(current), "metadata": metadata}
+    _write_json(output_dir / "source_capture.json", source_captures)
+    _write_json(output_dir / "provenance.json",
+                build_provenance(source_captures, raw, sources, previous, current, decisions, 3))
+    elapsed = perf_counter() - started
+    timings = {"harvesting_normalization_seconds": normalization_seconds,
+               "conflation_reconciliation_seconds": conflation_seconds,
+               "artifact_change_audit_seconds": max(0.0, elapsed - normalization_seconds - conflation_seconds),
+               "pipeline_seconds": elapsed, "process_cpu_seconds": process_time() - cpu_started}
+    _write_json(output_dir / "timings.json", timings)
+    return {"status": "completed", "output_dir": str(output_dir), "feature_count": len(current),
+            "metadata": metadata, "timings": timings}
 
 
 def replay(output_dir: Path) -> dict:
@@ -174,8 +209,11 @@ def replay(output_dir: Path) -> dict:
         previous = json.loads(previous_file.read_text(encoding="utf-8"))
         rebuilt = reconcile_ids(previous, rebuilt)
     expected = json.loads((output_dir / "records.json").read_text(encoding="utf-8"))
+    integrity = verify_capture_integrity(output_dir)
     return {
-        "identical": rebuilt == expected,
+        "identical": rebuilt == expected and integrity["status"] != "FAIL",
+        "capture_integrity": integrity,
+        "comparison_representation": "Canonical UTF-8 JSON with sorted keys and compact separators",
         "reproducibility_hash": reproducibility_hash(rebuilt),
         "feature_count": len(rebuilt),
     }

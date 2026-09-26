@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from difflib import SequenceMatcher
 from hashlib import sha256
-from math import asin, cos, radians, sin, sqrt
+from math import asin, cos, radians, sin, sqrt, isfinite
 from pathlib import Path
 from typing import Any
 import json
@@ -180,7 +180,7 @@ class Request:
             raise ValueError(f"Unsupported category: {self.category}")
         if self.declared_use not in {"internal", "commercial", "redistribute"}:
             raise ValueError(f"Unsupported declared use: {self.declared_use}")
-        if self.max_requests_per_second is not None and self.max_requests_per_second <= 0:
+        if self.max_requests_per_second is not None and (not isfinite(self.max_requests_per_second) or self.max_requests_per_second <= 0):
             raise ValueError("Request rate must be positive")
 
     @property
@@ -291,6 +291,8 @@ def canonicalize(raw: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
             for suffix in ("method", "version", "confidence"):
                 result[f"{language_field}_{suffix}"] = raw.get(f"{language_field}_{suffix}")
             result[f"original_{language_field}"] = raw.get(f"original_{language_field}")
+            if f"{language_field}_generated" in raw:
+                result[f"{language_field}_generated"] = raw[f"{language_field}_generated"]
     return result
 
 
@@ -311,8 +313,9 @@ def _match_score(a: dict[str, Any], b: dict[str, Any]) -> float:
     return 0.60 * name + 0.25 * (1 - metres / 75) + 0.15 * int(phone_match)
 
 
-def conflate(records: list[dict[str, Any]], algorithm_version: int = 2) -> list[dict[str, Any]]:
-    if algorithm_version not in (1, 2):
+def conflate(records: list[dict[str, Any]], algorithm_version: int = 3,
+             decision_log: list[dict] | None = None) -> list[dict[str, Any]]:
+    if algorithm_version not in (1, 2, 3):
         raise ValueError(f"Unsupported conflation algorithm version: {algorithm_version}")
     records = sorted(records, key=lambda row: row["source_key"])
     parent = list(range(len(records)))
@@ -336,13 +339,32 @@ def conflate(records: list[dict[str, Any]], algorithm_version: int = 2) -> list[
             # 0.0007 degrees of latitude exceeds 75 m at every latitude.
             if second["lat"] - first["lat"] > 0.0007:
                 break
-            if first["category"] != second["category"] or first["source_key"] == second["source_key"]:
+            metres = distance_m(first, second)
+            if metres > 75 or first["source_key"] == second["source_key"]:
                 continue
             i, j = sorted((original_index, other_index))
-            if _match_score(records[i], records[j]) >= 0.68:
+            score = _match_score(records[i], records[j])
+            decision = {"left": first["source_key"], "right": second["source_key"],
+                        "distance_m": round(metres, 6), "match_score": round(score, 6),
+                        "address_similarity": round(SequenceMatcher(
+                            None, (first.get("address") or "").casefold(),
+                            (second.get("address") or "").casefold()).ratio(), 6)
+                            if first.get("address") and second.get("address") else None,
+                        "algorithm_version": algorithm_version, "decision": "REJECT",
+                        "reason": "category_mismatch" if first["category"] != second["category"] else "below_match_threshold"}
+            if decision_log is not None:
+                decision_log.append(decision)
+            if score >= 0.68:
                 left, right = root(i), root(j)
                 if left == right:
+                    decision.update(decision="ALREADY_MERGED", reason="existing_cluster")
                     continue
+                if algorithm_version >= 3:
+                    left_phones = {phone for phone in cluster_phones[left].values() if phone}
+                    right_phones = {phone for phone in cluster_phones[right].values() if phone}
+                    if left_phones and right_phones and left_phones != right_phones:
+                        decision["reason"] = "conflicting_phone_numbers"
+                        continue
                 shared = cluster_phones[left].keys() & cluster_phones[right].keys()
                 # Same-source records need stronger evidence than name/distance:
                 # identical nonempty phone and a point separation under 15 m.
@@ -351,7 +373,9 @@ def conflate(records: list[dict[str, Any]], algorithm_version: int = 2) -> list[
                     or cluster_phones[left][source] != cluster_phones[right][source]
                     for source in shared
                 )):
+                    decision["reason"] = "same_source_branch_guard"
                     continue
+                decision.update(decision="MERGE", reason="name_distance_phone_evidence")
                 parent[right] = left
                 cluster_phones[left].update(cluster_phones[right])
 
@@ -391,6 +415,8 @@ def conflate(records: list[dict[str, Any]], algorithm_version: int = 2) -> list[
                     for suffix in ("method", "version", "confidence"):
                         merged[f"{field}_{suffix}"] = chosen[f"{field}_{suffix}"]
                     merged[f"original_{field}"] = chosen.get(f"original_{field}")
+                    if f"{field}_generated" in chosen:
+                        merged[f"{field}_generated"] = chosen[f"{field}_generated"]
         merged["language_complete"] = bool(merged["name_en"] and merged["name_ar"])
         merged["alternate_names"] = sorted({name for row in group for name in row.get("alternate_names", [])})
         output.append(merged)

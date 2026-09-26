@@ -35,6 +35,8 @@ def license_report(registry_path: Path) -> dict:
 
 def taxonomy_report(review_queue_path: Path | None = None) -> dict:
     leaves = catalog()["leaves"]
+    if len({leaf["id"] for leaf in leaves}) != len(leaves) or len(leaves) != catalog()["leaf_count"]:
+        raise ValueError("Taxonomy IDs/count are inconsistent")
     crosswalks = {
         "osm": "osm_tags", "google": "google_types",
         "wikidata": "wikidata_classes",
@@ -61,6 +63,9 @@ def taxonomy_report(review_queue_path: Path | None = None) -> dict:
         ("category", "ambiguous osm tag", "unmapped"))]
     return {
         "status": "PASS", "leaf_count": len(leaves), "coverage": coverage,
+        "review_queue_count": len(review),
+        "unmapped_source_categories": sorted({str(item.get("record", {}).get("category")) for item in category_review
+                                              if "unmapped" in item.get("reason", "").casefold()}),
         "source_category_review_count": len(category_review),
         "source_category_review": category_review,
         "official_category_accuracy": "NOT_CERTIFIED",

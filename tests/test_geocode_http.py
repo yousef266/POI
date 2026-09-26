@@ -26,7 +26,7 @@ class HttpGeocoderTests(unittest.TestCase):
     def test_single_result_is_derived_capped_attributed_and_cached(self):
         response = [{"lat": "24.71", "lon": "46.67", "osm_type": "node", "osm_id": 7}]
         with patch("poi_harvester.geocode_http._source_limiter") as limiter, \
-                patch("poi_harvester.geocode_http._robots_allowed", return_value=True), \
+                patch("poi_harvester.geocode_http._robots_allowed", return_value=True) as robots, \
                 patch("poi_harvester.geocode_http._get_json", return_value=(response, {})) as getter:
             geocoder = HttpGeocoder(PROVIDER, "internal", "contact@example.com")
             first = geocoder.lookup("123 Main Street")
@@ -36,7 +36,8 @@ class HttpGeocoderTests(unittest.TestCase):
         self.assertEqual(first["confidence"], 0.5)
         self.assertEqual(first["attribution"], "Operator geocoder")
         self.assertEqual(getter.call_count, 1)
-        limiter.return_value.wait.assert_called_once()
+        self.assertEqual(robots.call_args.args[2], limiter.return_value)
+        self.assertEqual(getter.call_args.args[1], limiter.return_value)
 
     def test_ambiguous_result_goes_to_review(self):
         response = [{"lat": "24.71", "lon": "46.67"},

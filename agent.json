@@ -1,6 +1,6 @@
 {
   "name": "poi-harvester",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Harvests policy-gated POIs, enriches bilingual names, deduplicates them, and publishes an auditable spatial layer.",
   "entrypoint": "poi-harvester run",
   "inputs": [
@@ -32,6 +32,20 @@
     "report_json",
     "license_report_json",
     "taxonomy_report_json",
-    "readiness_markdown"
+    "readiness_markdown",
+    "arabic_review_score_json",
+    "benchmark_report_json",
+    "tests_log"
+  ],
+  "enrichment_version": "rules-v2",
+  "supported_conflation_versions": [
+    1,
+    2,
+    3
+  ],
+  "audit_outputs": [
+    "source_capture_json",
+    "provenance_json",
+    "timings_json"
   ]
 }

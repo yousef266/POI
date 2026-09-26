@@ -1,0 +1,14 @@
+.git
+.env*
+!.env.example
+.runtime
+.downloads
+.local-deps
+.venv
+output
+build
+*.egg-info
+**/__pycache__
+.pytest_cache
+.codex
+.agents

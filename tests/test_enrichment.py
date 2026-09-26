@@ -15,7 +15,7 @@ class EnrichmentTests(unittest.TestCase):
         self.assertEqual(result["name_ar"], "مستشفى النخيل")
         self.assertEqual(result["name_en"], "Al Nakheel Hospital")
         self.assertEqual(result["name_ar_version"], VERSION)
-        self.assertEqual(result["provenance_name_ar"], "generated:rules-v1:osm:1")
+        self.assertEqual(result["provenance_name_ar"], f"generated:{VERSION}:osm:1")
 
     def test_german_generic_pharmacy_word_is_translated(self):
         result, _ = enrich_record({"name_en": "Olympia Apotheke", "category": "pharmacy"}, "osm:2")

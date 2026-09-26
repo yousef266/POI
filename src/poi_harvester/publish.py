@@ -6,7 +6,7 @@ from base64 import b64encode
 from hashlib import sha256
 from os import environ
 from pathlib import Path
-from time import sleep
+from time import sleep, perf_counter
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -54,6 +54,7 @@ def publish_postgis(records: list[dict], layer: str, database: str, schema: str 
         "primary_source": "text", "primary_source_id": "text", "footprint_ref": "text",
         "name_en": "text", "name_ar": "text", "alternate_names": "text",
         "original_name_en": "text", "original_name_ar": "text",
+        "name_en_generated": "boolean", "name_ar_generated": "boolean",
         "name_en_method": "text", "name_en_version": "text", "name_en_confidence": "double precision",
         "name_ar_method": "text", "name_ar_version": "text", "name_ar_confidence": "double precision",
         "category": "text", "source_category": "text", "address": "text",
@@ -113,6 +114,8 @@ def publish_postgis(records: list[dict], layer: str, database: str, schema: str 
                     "name_en": row.get("name_en"), "name_ar": row.get("name_ar"),
                     "original_name_en": row.get("original_name_en"),
                     "original_name_ar": row.get("original_name_ar"),
+                    "name_en_generated": bool(row.get("name_en_generated") or row.get("name_en_method")),
+                    "name_ar_generated": bool(row.get("name_ar_generated") or row.get("name_ar_method")),
                     "name_en_method": row.get("name_en_method"),
                     "name_en_version": row.get("name_en_version"),
                     "name_en_confidence": row.get("name_en_confidence"),
@@ -331,6 +334,7 @@ def _guard_publication_target(layer: str, database: str, workspace: str, schema:
 
 
 def publish(output_dir: Path, layer: str, database: str, workspace: str, schema: str = "public", allow_demo: bool = False) -> dict:
+    publication_started = perf_counter()
     records = json.loads((output_dir / "records.json").read_text(encoding="utf-8"))
     metadata = json.loads((output_dir / "metadata.json").read_text(encoding="utf-8"))
     snapshot = output_dir / "sources_snapshot.json"
@@ -342,10 +346,19 @@ def publish(output_dir: Path, layer: str, database: str, workspace: str, schema:
         )
     if metadata.get("demo_data") and not allow_demo:
         raise ValueError("Fixture coordinates are invented. Publication requires explicit allow_demo=True for an isolated test.")
+    guard_started = perf_counter()
     _guard_publication_target(layer, database, workspace, schema)
+    postgis_started = perf_counter()
     publish_postgis(records, layer, database, schema, bool(metadata.get("demo_data")))
+    postgis_seconds = perf_counter() - postgis_started
+    geoserver_started = perf_counter()
     url = publish_geoserver(layer, metadata, database, workspace, schema)
+    geoserver_seconds = perf_counter() - geoserver_started
     result = {"database": database, "schema": schema, "layer": f"{workspace}:{layer}", "wms_url": url, "feature_count": len(records), "demo_data": bool(metadata.get("demo_data"))}
+    result["timings"] = {"publication_setup_seconds": guard_started - publication_started,
+                         "target_guard_seconds": postgis_started - guard_started,
+                         "postgis_seconds": postgis_seconds, "geoserver_seconds": geoserver_seconds,
+                         "publication_seconds": perf_counter() - publication_started}
     (output_dir / "publication.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     return result
 
@@ -386,6 +399,7 @@ def verify_local(layer: str, database: str, workspace: str, schema: str = "publi
     abstract = feature_response["featureType"].get("abstract", "")
     expected_count = None
     expected_generated_names = 0
+    expected_records = []
     source_coordinate_checks = 0
     if output_dir is not None:
         metadata = json.loads((output_dir / "metadata.json").read_text(encoding="utf-8"))
@@ -429,25 +443,61 @@ def verify_local(layer: str, database: str, workspace: str, schema: str = "publi
                     raise RuntimeError(f"Published coordinate differs from OSM node for {row['stable_id']}")
                 source_coordinate_checks += 1
     _verify_wms_layer(workspace, layer)
+    service_auth = b64encode(f"{environ['GEOSERVER_USER']}:{environ['GEOSERVER_PASSWORD']}".encode()).decode()
     wfs_url = environ["GEOSERVER_URL"].rstrip("/") + f"/{workspace}/ows?" + urlencode({
         "service": "WFS", "version": "2.0.0", "request": "GetFeature",
         "typeNames": f"{workspace}:{layer}", "outputFormat": "application/json", "count": 1,
     })
-    with urlopen(wfs_url, timeout=30) as response:
+    with urlopen(Request(wfs_url, headers={"Authorization": "Basic " + service_auth}), timeout=30) as response:
         wfs_data = json.load(response)
     wfs_fields = set(wfs_data["features"][0]["properties"]) if wfs_data.get("features") else set()
     required_fields = {"stable_id", "longitude", "latitude", "primary_source", "primary_source_id",
                        "name_en", "name_ar", "alternate_names", "email", "footprint_ref",
-                       "category", "source_keys", "attributions", "licenses", "geometry_provenance",
+                       "category", "source_category", "address", "phone", "hours", "website", "confidence",
+                       "geometry_method", "source_keys", "attributions", "licenses", "geometry_provenance",
                        "provenance_name_en", "provenance_name_ar", "provenance_category"}
     if expected_generated_names:
         required_fields.update({"name_en_method", "name_en_version", "name_en_confidence",
                                 "name_ar_method", "name_ar_version", "name_ar_confidence",
                                 "original_name_en", "original_name_ar"})
+    if any("name_en_generated" in row or "name_ar_generated" in row for row in expected_records):
+        required_fields.update({"name_en_generated", "name_ar_generated"})
     if feature_count and (missing_fields := required_fields - wfs_fields):
         raise RuntimeError(f"GeoServer WFS omitted dedicated POI fields: {sorted(missing_fields)}")
     if "properties" in wfs_fields:
         raise RuntimeError("GeoServer WFS still exposes a bundled properties column")
+    if wfs_data.get("features"):
+        first_feature = wfs_data["features"][0]
+        point = database_coordinates.get(first_feature["properties"].get("stable_id"))
+        geometry = first_feature.get("geometry") or {}
+        if geometry.get("type") != "Point" or point is None or any(
+                abs(float(actual) - expected) > 1e-8 for actual, expected in zip(geometry["coordinates"], point)):
+            raise RuntimeError("WFS geometry differs from the PostGIS point")
+        if expected_records:
+            expected = next(row for row in expected_records if row["stable_id"] == first_feature["properties"]["stable_id"])
+            for name in ("name_en", "name_ar", "category", "geometry_provenance"):
+                if first_feature["properties"].get(name) != expected.get(name):
+                    raise RuntimeError(f"WFS field {name} differs from the saved harvest")
+    style_xml = ElementTree.fromstring(_geoserver_request("GET", f"styles/{style_name}.sld"))
+    rules = {node.text for rule in style_xml.iter() if rule.tag.rsplit("}", 1)[-1] == "Rule"
+             for node in rule if node.tag.rsplit("}", 1)[-1] == "Name"}
+    if not {"pharmacy", "clinic", "hospital", "school", "other"} <= rules:
+        raise RuntimeError("GeoServer category style rules are missing")
+    if database_coordinates:
+        longitudes, latitudes = zip(*database_coordinates.values())
+        padding = 0.001
+        bbox = (min(longitudes) - padding, min(latitudes) - padding,
+                max(longitudes) + padding, max(latitudes) + padding)
+    else:
+        bbox = (-180, -90, 180, 90)
+    image_url = environ["GEOSERVER_URL"].rstrip("/") + f"/{workspace}/wms?" + urlencode({
+        "service": "WMS", "version": "1.1.1", "request": "GetMap", "layers": f"{workspace}:{layer}",
+        "styles": "", "srs": "EPSG:4326", "bbox": ",".join(map(str, bbox)),
+        "width": 256, "height": 256, "format": "image/png"})
+    with urlopen(Request(image_url, headers={"Authorization": "Basic " + service_auth}), timeout=30) as response:
+        map_bytes = response.read()
+    if not map_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise RuntimeError("WMS GetMap did not return a PNG map")
     return {
         "status": "passed",
         "layer": f"{workspace}:{layer}",
@@ -462,6 +512,9 @@ def verify_local(layer: str, database: str, workspace: str, schema: str = "publi
         "gold_coordinate_accuracy_verified": False,
         "geoserver_default_style": style_name,
         "wms_layer_available": True,
+        "wms_getmap_png_verified": True,
+        "category_style_rules_verified": sorted(rules),
+        "wfs_geometry_and_values_verified": bool(feature_count),
         "wfs_dedicated_fields_verified": bool(feature_count),
         "source_node_coordinate_checks": source_coordinate_checks,
     }

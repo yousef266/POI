@@ -19,7 +19,7 @@ _ARABIC_CATEGORIES = {
     "amenity_bank": ("بنك", "بنوك", "البنوك"),
     "amenity_atm": ("صراف", "الصرافات"),
     "amenity_cafe": ("مقهى", "مقاهي", "المقاهي"),
-    "amenity_fuel": ("محطة وقود", "محطات الوقود"),
+    "amenity_fuel": ("محطة وقود", "محطات وقود", "محطات الوقود", "محطة الوقود"),
     "shop_supermarket": ("سوبرماركت", "متاجر السوبرماركت"),
 }
 
@@ -34,9 +34,10 @@ def normalize_intent(value: str) -> dict:
         pass
     if language == "ar":
         words = re.findall(r"[\u0621-\u064a]+", text)
+        comparison_text = " ".join(word.removeprefix("و").removeprefix("ال") for word in words)
         normalized_words = {word.removeprefix("و").removeprefix("ال") for word in words}
         for category, aliases in _ARABIC_CATEGORIES.items():
-            if any((alias in normalized_words if " " not in alias else alias in text)
+            if any((alias in normalized_words if " " not in alias else alias in text or " ".join(part.removeprefix("ال") for part in alias.split()) in comparison_text)
                    for alias in aliases):
                 categories.add(category)
     if language == "ar":

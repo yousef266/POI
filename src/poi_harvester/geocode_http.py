@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from math import isfinite
 from urllib.parse import urlencode, urlparse
 import json
 
@@ -23,6 +24,10 @@ class HttpGeocoder:
             raise ValueError("Geocoder endpoint must use HTTPS")
         if parsed.hostname == "nominatim.openstreetmap.org":
             raise ValueError("Use an operator-approved self-hosted or third-party geocoding service")
+        if not isfinite(provider["rate_limit_per_second"]) or provider["rate_limit_per_second"] <= 0:
+            raise ValueError("Provider rate must be finite and positive")
+        if not isfinite(provider.get("reliability_weight", 0.5)) or not 0 <= provider.get("reliability_weight", 0.5) <= 1:
+            raise ValueError("Provider reliability must be between zero and one")
         if not contact:
             raise ValueError("A contact is required for live geocoding")
         self.provider = provider
@@ -38,8 +43,7 @@ class HttpGeocoder:
         url = source["endpoint"] + "?" + urlencode({"q": address, "format": "jsonv2", "limit": 5})
         agent = f"POIHarvesterAgent/0.1 ({self.contact})"
         limiter = _source_limiter(source, self.max_rate)
-        limiter.wait()
-        if not _robots_allowed(url, agent):
+        if not _robots_allowed(url, agent, limiter):
             raise PermissionError("Geocoder robots.txt disallows search endpoint")
         payload, _ = _get_json(url, limiter, agent)
         if not isinstance(payload, list):
