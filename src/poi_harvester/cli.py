@@ -97,6 +97,10 @@ def build_parser() -> ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Windows redirected consoles may otherwise reject Arabic output.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
     args = build_parser().parse_args(argv)
     try:
         if args.command == "review-names":

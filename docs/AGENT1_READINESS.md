@@ -20,7 +20,7 @@ Generated from actual local evidence. Every official status remains NOT_CERTIFIE
 ## Commands and outputs
 
 Each criterion in the machine-readable report includes its command and observed output.
-Tests: 77; passed: 77; failed: 0; skipped: 0.
+Tests: 80; passed: 80; failed: 0; skipped: 0.
 Arabic review: 0/100 reviewed; status NOT_REVIEWED.
 
 ## External blockers
@@ -30,10 +30,22 @@ Arabic review: 0/100 reviewed; status NOT_REVIEWED.
 - Human Arabic ratings and official benchmark hardware are unavailable.
 - No licensed live place/geocoder provider is configured.
 
-## Release package checks
+## Final real Cairo verification
 
-- Installed 0.3.0 wheel in a fresh isolated Python environment: 77/77 tests passed; offline evaluator passed.
-- Updated real-source layer `poi_osm_submission_0926:poi_clinic_pharmacy`: 42 points, 42 bilingual, 42 generated Arabic flags and 42 `rules-v2` values verified in PostGIS. WMS PNG, WFS geometry/values, provenance, styling and source-node coordinates passed.
-- Existing 30/35/42-point live layers and prior 42-point bilingual layer were checked without republishing them.
-- The detailed submission snapshot is `docs/LOCAL_EVALUATION.json`; all official scores remain NOT_CERTIFIED.
-- Docker is unavailable on this PC; build/run commands are prepared in README.
+The table above describes the automated fixture evaluator. The requested real Cairo E2E
+does not pass full bilingual completeness: 135/150 English-capture points and 132/147
+initial Arabic-capture points have both names. Fifteen unnamed source nodes remain in
+the review queue. **Final broader local A7 status: FAIL**; official A7 remains NOT_CERTIFIED.
+
+The initial Arabic source snapshot was older than the English capture and falsely
+removed three records. A narrow timestamp freshness guard now rejects such refreshes
+before changes/publication. Three regression tests were added without weakening
+existing assertions. The newer 150-point Cairo layer was restored and verified.
+The actual post-fix Arabic retry timed out externally and wrote no changes.
+Identical saved-input Arabic intent produces the same 150 business records, explicitly
+an offline parity check.
+
+All 80 tests passed in the final complete regression suite (zero failures/skips).
+Human Arabic review is 0/100; the separate AI assessment inspected 100 names and flagged
+37 for review. No human score was fabricated. See FINAL_VERIFICATION.json for measured
+commands, results, source dates, phase timings, blockers, and the NOT READY FOR SUBMISSION verdict.

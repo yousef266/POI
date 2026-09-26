@@ -10,6 +10,7 @@ from threading import Lock
 from time import monotonic, sleep, time, get_clock_info
 from tempfile import gettempdir
 from email.utils import parsedate_to_datetime
+from datetime import datetime
 from math import isfinite
 import sqlite3
 from urllib.error import HTTPError, URLError
@@ -249,6 +250,16 @@ def _fixture(source: dict, registry_path: Path) -> list[dict]:
     return json.loads(fixture_path.read_text(encoding="utf-8"))
 
 
+def _source_snapshot_time(value):
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed if parsed.tzinfo is not None else None
+
+
 def _overpass(source: dict, request: Request, prior_cache: dict | None = None,
               prior_records: list[dict] | None = None) -> tuple[list[dict], dict]:
     contact = request.operator_contact or environ.get("POI_CONTACT")
@@ -279,6 +290,15 @@ def _overpass(source: dict, request: Request, prior_cache: dict | None = None,
         if prior_records is None:
             raise RuntimeError("Source returned 304 but no previous records are available")
         return prior_records, cache
+    snapshot = _source_snapshot_time(payload.get("osm3s", {}).get("timestamp_osm_base"))
+    prior_snapshots = [
+        stamp for record in (prior_records or [])
+        if (stamp := _source_snapshot_time(record.get("source_version"))) is not None
+    ]
+    if snapshot is not None and prior_snapshots and snapshot < max(prior_snapshots):
+        raise RuntimeError(
+            "Source snapshot is older than the previous capture; refusing an incremental refresh "
+            "that could incorrectly remove newer records")
     records = []
     for element in payload.get("elements", []):
         capture_fields = {"source_payload": element,

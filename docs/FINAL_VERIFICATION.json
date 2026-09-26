@@ -1,0 +1,415 @@
+{
+  "generated_at": "2026-09-26T23:13:32.844179+00:00",
+  "verdict": "NOT READY FOR SUBMISSION",
+  "tests": {
+    "status": "PASS",
+    "tests": 80,
+    "passed": 80,
+    "failed": 0,
+    "skipped": 0,
+    "runtime_seconds": 5.38466
+  },
+  "final_regression": {
+    "total": 80,
+    "passed": 80,
+    "failed": 0,
+    "skipped": 0,
+    "runtime_seconds": 5.071,
+    "evidence": "final-regression.log"
+  },
+  "clean_environment": {
+    "python_version": "3.12.14",
+    "fresh_venv": ".venv-final",
+    "install_successful": true,
+    "requested_windows_launcher": "py -3.12 unavailable; existing bundled Python 3.12 used",
+    "run_py_evaluation": {
+      "status": "PASS",
+      "tests": 80,
+      "passed": 80,
+      "failed": 0,
+      "skipped": 0,
+      "runtime_seconds": 5.434325
+    },
+    "installed_module_evaluation": {
+      "status": "PASS",
+      "tests": 80,
+      "passed": 80,
+      "failed": 0,
+      "skipped": 0,
+      "runtime_seconds": 5.588083
+    },
+    "generated_exe_launcher": "Blocked by Windows Application Control after reinstall; supported Python entry points passed"
+  },
+  "small_fixes": [
+    "UTF-8 CLI output for redirected Arabic on Windows",
+    "Reject older timestamped Overpass snapshots before incremental changes or publication"
+  ],
+  "tests_added": 3,
+  "existing_tests_or_assertions_removed_or_weakened": false,
+  "arabic_review": {
+    "assessment_type": "AI_ONLY_NOT_HUMAN",
+    "ai_assessed": 100,
+    "ai_acceptable": 63,
+    "ai_needs_review": 37,
+    "human_reviewed": 0,
+    "human_score": null,
+    "human_status": "NOT_REVIEWED",
+    "evidence": "arabic-ai-assessment.json"
+  },
+  "cairo_scope": "Actual OSM Cairo Governorate boundary relation/4103336; supplied through an attributed capture catalog, not an unconfigured live named-place provider",
+  "english_e2e": {
+    "request": "I want all pharmacies in Cairo",
+    "pipeline_exit_code": 0,
+    "acceptance": "PARTIAL_FAIL_BILINGUAL_COMPLETENESS",
+    "pois": 150,
+    "bilingual": 135,
+    "unnamed": 15,
+    "unusable_coordinate_records_in_bbox": 4,
+    "source_timestamp": "2026-07-15T15:22:01Z",
+    "evidence": "cairo/english"
+  },
+  "arabic_e2e": {
+    "request": "عايز كل الصيدليات في القاهرة",
+    "initial_pipeline_exit_code": 0,
+    "initial_pois": 147,
+    "initial_bilingual": 132,
+    "initial_source_timestamp": "2026-05-31T22:37:44Z",
+    "initial_meaningful_difference": "Older response omitted 3 accepted nodes; all shared business fields identical",
+    "post_fix_live_retry": "FAILED_EXTERNAL_SOURCE_READ_TIMEOUT; no changes/publication written",
+    "same_input_captured_parity": "PASS, 150 records; offline same-input proof, not live-provider parity",
+    "evidence": "cairo/arabic; cairo/arabic-after-fix-command.log; cairo/same-input-parity.json"
+  },
+  "geometry": {
+    "english": {
+      "count": 150,
+      "valid_geometries": 150,
+      "outside_aoi": 0,
+      "unique_coordinates": 150,
+      "source_coordinate_mismatch": 0,
+      "derived_count": 0,
+      "methods": {
+        "osm_node": 150
+      },
+      "confidence_values": [
+        0.8
+      ],
+      "all_categories_pharmacy": true,
+      "all_stable_ids_unique": true,
+      "bilingual_complete": 135,
+      "field_provenance_missing": 0,
+      "timestamp_missing": 0,
+      "source_keys_missing": 0,
+      "centroid_collapse_detected": false,
+      "gold_accuracy": "NOT_CERTIFIED",
+      "status": "PASS"
+    },
+    "arabic": {
+      "count": 147,
+      "valid_geometries": 147,
+      "outside_aoi": 0,
+      "unique_coordinates": 147,
+      "source_coordinate_mismatch": 0,
+      "derived_count": 0,
+      "methods": {
+        "osm_node": 147
+      },
+      "confidence_values": [
+        0.8
+      ],
+      "all_categories_pharmacy": true,
+      "all_stable_ids_unique": true,
+      "bilingual_complete": 132,
+      "field_provenance_missing": 0,
+      "timestamp_missing": 0,
+      "source_keys_missing": 0,
+      "centroid_collapse_detected": false,
+      "gold_accuracy": "NOT_CERTIFIED",
+      "status": "PASS"
+    }
+  },
+  "geoserver": {
+    "final_cairo_layer": "poi_cairo_final_0926:poi_pharmacy",
+    "final_count": 150,
+    "newer_capture_restored": true,
+    "verification": {
+      "status": "passed",
+      "layer": "poi_cairo_final_0926:poi_pharmacy",
+      "database": "poi_agent_test",
+      "schema": "poi_cairo_final_0926",
+      "postgis_version": "3.6 USE_GEOS=1 USE_PROJ=1 USE_STATS=1",
+      "postgis_feature_count": 150,
+      "expected_feature_count": 150,
+      "wrong_srid_count": 0,
+      "missing_provenance_count": 0,
+      "coordinate_mismatch_count": 0,
+      "gold_coordinate_accuracy_verified": false,
+      "geoserver_default_style": "poi_harvester_style",
+      "wms_layer_available": true,
+      "wms_getmap_png_verified": true,
+      "category_style_rules_verified": [
+        "clinic",
+        "hospital",
+        "other",
+        "pharmacy",
+        "school"
+      ],
+      "wfs_geometry_and_values_verified": true,
+      "wfs_dedicated_fields_verified": true,
+      "source_node_coordinate_checks": 150
+    },
+    "existing_release_layer": {
+      "status": "passed",
+      "layer": "poi_osm_submission_0926:poi_clinic_pharmacy",
+      "database": "poi_agent_test",
+      "schema": "osm_submission_0926",
+      "postgis_version": "3.6 USE_GEOS=1 USE_PROJ=1 USE_STATS=1",
+      "postgis_feature_count": 42,
+      "expected_feature_count": 42,
+      "wrong_srid_count": 0,
+      "missing_provenance_count": 0,
+      "coordinate_mismatch_count": 0,
+      "gold_coordinate_accuracy_verified": false,
+      "geoserver_default_style": "poi_harvester_style",
+      "wms_layer_available": true,
+      "wms_getmap_png_verified": true,
+      "category_style_rules_verified": [
+        "clinic",
+        "hospital",
+        "other",
+        "pharmacy",
+        "school"
+      ],
+      "wfs_geometry_and_values_verified": true,
+      "wfs_dedicated_fields_verified": true,
+      "source_node_coordinate_checks": 42
+    },
+    "actual_wfs_wms_evidence_saved": true
+  },
+  "incremental": {
+    "seeded_counts": {
+      "added": 50,
+      "removed": 20,
+      "unchanged": 30,
+      "updated": 50
+    },
+    "field_diffs_verified": true,
+    "deterministic_repeat": true,
+    "stale_actual_capture_guard": "PASS; no new output",
+    "initial_cairo_refresh_counts": {
+      "added": 0,
+      "removed": 3,
+      "unchanged": 147,
+      "updated": 0
+    }
+  },
+  "replay": {
+    "english_capture": [
+      {
+        "identical": true,
+        "capture_integrity": {
+          "status": "PASS",
+          "checks": {
+            "source_capture.json": true,
+            "raw.json": true,
+            "sources_snapshot.json": true,
+            "previous_snapshot.json": true,
+            "records.json": true,
+            "conflation_algorithm_version": true
+          }
+        },
+        "comparison_representation": "Canonical UTF-8 JSON with sorted keys and compact separators",
+        "reproducibility_hash": "dfb3b71849a119dc2f830c88732f9e78006cbb01611d960b30eeeb2c872b3cf2",
+        "feature_count": 150
+      },
+      {
+        "identical": true,
+        "capture_integrity": {
+          "status": "PASS",
+          "checks": {
+            "source_capture.json": true,
+            "raw.json": true,
+            "sources_snapshot.json": true,
+            "previous_snapshot.json": true,
+            "records.json": true,
+            "conflation_algorithm_version": true
+          }
+        },
+        "comparison_representation": "Canonical UTF-8 JSON with sorted keys and compact separators",
+        "reproducibility_hash": "dfb3b71849a119dc2f830c88732f9e78006cbb01611d960b30eeeb2c872b3cf2",
+        "feature_count": 150
+      }
+    ],
+    "initial_arabic_capture": [
+      {
+        "identical": true,
+        "capture_integrity": {
+          "status": "PASS",
+          "checks": {
+            "source_capture.json": true,
+            "raw.json": true,
+            "sources_snapshot.json": true,
+            "previous_snapshot.json": true,
+            "records.json": true,
+            "conflation_algorithm_version": true
+          }
+        },
+        "comparison_representation": "Canonical UTF-8 JSON with sorted keys and compact separators",
+        "reproducibility_hash": "95e42ea42a71d85872619269aa48499576e1ab4919f24fbe3c1f74010f0ac2ec",
+        "feature_count": 147
+      },
+      {
+        "identical": true,
+        "capture_integrity": {
+          "status": "PASS",
+          "checks": {
+            "source_capture.json": true,
+            "raw.json": true,
+            "sources_snapshot.json": true,
+            "previous_snapshot.json": true,
+            "records.json": true,
+            "conflation_algorithm_version": true
+          }
+        },
+        "comparison_representation": "Canonical UTF-8 JSON with sorted keys and compact separators",
+        "reproducibility_hash": "95e42ea42a71d85872619269aa48499576e1ab4919f24fbe3c1f74010f0ac2ec",
+        "feature_count": 147
+      }
+    ],
+    "comparison": "Canonical UTF-8 JSON, sorted keys, compact separators; no LLM/network at replay time"
+  },
+  "performance": {
+    "features": 10000,
+    "kind": "synthetic_fixture_with_local_publication",
+    "complete_pipeline_seconds": 51.060914,
+    "complete_features_per_hour": 705040,
+    "hardware": {
+      "cpu": "Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",
+      "logical_cpu_count": 8,
+      "official_hardware_verified": false,
+      "physical_memory_bytes": 34213380096,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "process_peak_rss_bytes": 212811776
+    },
+    "phase_timings": {
+      "artifact_change_audit_seconds": 2.9818842000095174,
+      "conflation_reconciliation_seconds": 0.8878830999892671,
+      "geoserver_seconds": 16.711679100000765,
+      "harvesting_normalization_seconds": 0.3618623999936972,
+      "pipeline_seconds": 4.231629699992482,
+      "postgis_seconds": 13.431862700002966,
+      "process_cpu_seconds": 4.234375,
+      "publication_seconds": 46.797532199998386,
+      "publication_setup_seconds": 0.1673478000157047,
+      "target_guard_seconds": 16.48663659999147,
+      "verification_seconds": 12.959220799995819
+    },
+    "process_cpu_seconds": 15.859375,
+    "four_vcpu_eight_gb_verified": false,
+    "official_status": "NOT_CERTIFIED",
+    "measurement_scope": "Generation/setup and verification are excluded from complete_pipeline_seconds; artifact writes are included"
+  },
+  "postgis_and_geoserver_included": true,
+  "criteria": {
+    "A1": {
+      "local_status": "PASS",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "Denied sources are never collected; declarations validated",
+      "missing_official_evidence": "Official benchmark and operator/legal approval"
+    },
+    "A10": {
+      "local_status": "PASS",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "Repeated fixture classifies 50 adds, 50 updates, 20 removals, 30 unchanged",
+      "missing_official_evidence": "Official seeded change set"
+    },
+    "A11": {
+      "local_status": "PASS",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "10K synthetic probe with separate phases, CPU/memory and optional publication",
+      "missing_official_evidence": "Official 4-vCPU/8-GB source workload"
+    },
+    "A12": {
+      "local_status": "PASS",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "Two exact canonical replays; capture integrity and transformation/conflation sidecars",
+      "missing_official_evidence": "Official full provenance replay corpus"
+    },
+    "A2": {
+      "local_status": "PASS",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "Four-process pacing and actual loopback HTTP arrivals; robots, retry/date/backoff, ceiling and 304 tests",
+      "missing_official_evidence": "Official deployment/source workload"
+    },
+    "A3": {
+      "local_status": "PASS",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "Fixture provenance/attribution; optional real publication verification",
+      "missing_official_evidence": "Official benchmark attribution audit"
+    },
+    "A4": {
+      "local_status": "PASS",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "Project-authored pairwise labels; conflicting-phone and Zurich regressions",
+      "missing_official_evidence": "Official labelled Riyadh and held-out AOI"
+    },
+    "A5": {
+      "local_status": "PASS",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "Project-authored pairwise labels",
+      "missing_official_evidence": "Official labelled Riyadh and held-out AOI"
+    },
+    "A6": {
+      "local_status": "NOT_CERTIFIED",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "244-leaf taxonomy validated; unmapped/ambiguous mappings reported",
+      "missing_official_evidence": "Official category gold labels"
+    },
+    "A7": {
+      "local_status": "FAIL",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "Requested Cairo E2E: 135/150 English capture and 132/147 initial Arabic capture are bilingual; fixture-only evaluator PASS does not establish real-data completeness.",
+      "missing_official_evidence": "Official corpus bilingual coverage"
+    },
+    "A8": {
+      "local_status": "NOT_CERTIFIED",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "100 deterministic generated names with explicit human-rating workflow",
+      "missing_official_evidence": "Human Arabic review of a representative official sample"
+    },
+    "A9": {
+      "local_status": "NOT_CERTIFIED",
+      "official_status": "NOT_CERTIFIED",
+      "scope": "Local source-coordinate preservation is separate from real-world accuracy",
+      "missing_official_evidence": "Gold source-of-truth coordinates"
+    }
+  },
+  "commands": [
+    ".\\run.ps1 evaluate --out output/submission-20260926/final-verification --readiness docs/AGENT1_READINESS.md --local-services --database poi_agent_test --schema poi_final_verification_0926 --workspace poi_final_verification_0926",
+    "& \"$env:USERPROFILE\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe\" -m venv .venv-final",
+    ".\\.venv-final\\Scripts\\python.exe -m pip install -e .",
+    ".\\.venv-final\\Scripts\\python.exe run.py evaluate --out output/evaluation-final --readiness output/evaluation-final/readiness.md",
+    ".\\.venv-final\\Scripts\\python.exe -m poi_harvester.cli evaluate --out output/evaluation-final-module --readiness output/evaluation-final-module/readiness.md",
+    ".\\run.ps1 review-names --interactive --reviewer \"Yousef\"",
+    ".\\run.ps1 run --intent \"I want all pharmacies in Cairo\" --place-catalog output/submission-20260926/final-verification/cairo/cairo-place-catalog.geojson --sources openstreetmap --use internal --out output/submission-20260926/final-verification/cairo/english --publish --database poi_agent_test --schema poi_cairo_final_0926 --workspace poi_cairo_final_0926 --layer poi_pharmacy",
+    ".\\run.ps1 run --intent \"عايز كل الصيدليات في القاهرة\" --place-catalog output/submission-20260926/final-verification/cairo/cairo-place-catalog.geojson --sources openstreetmap --use internal --out output/submission-20260926/final-verification/cairo/arabic --previous output/submission-20260926/final-verification/cairo/english/records.json --publish --database poi_agent_test --schema poi_cairo_final_0926 --workspace poi_cairo_final_0926 --layer poi_pharmacy",
+    ".\\.venv-final\\Scripts\\python.exe -m unittest tests.test_snapshot_freshness tests.test_pipeline tests.test_source_policy -v",
+    ".\\.venv-final\\Scripts\\python.exe -m unittest discover -s tests -v"
+  ],
+  "live_contact": "Previously authorized operator contact used only in request User-Agent; omitted from committed evidence",
+  "execution_events": [
+    "Initial evaluator: 77/77 PASS",
+    "Arabic stdout encoding failure fixed; interactive command exits with no fabricated ratings",
+    "Independent live captures differed in source age; stale-source fix and 3 regression tests added",
+    "One approval review timed out before the independent geometry command executed; permitted retry succeeded",
+    "One local-services evaluator rerun aborted at benchmark timeout; complete subsequent rerun passed",
+    "Actual post-fix Arabic live retry failed with external read timeout; no further source retries made"
+  ],
+  "remaining_blockers": [
+    "15 Cairo source nodes have no authoritative names; complete bilingual output cannot be honestly supplied",
+    "4 source records in the query bbox lack usable point coordinates; an approved validated point/geocoder source is needed before publication",
+    "Representative human Arabic quality review is pending",
+    "Live source availability/freshness prevented a successful post-fix Arabic live refresh",
+    "Official Common Agent Contract, gold labels/coordinates/change sets, and benchmark 4-vCPU/8-GB environment are unavailable",
+    "Production source/license approvals require operator/legal confirmation"
+  ]
+}
