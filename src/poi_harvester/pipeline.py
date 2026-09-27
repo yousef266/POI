@@ -14,6 +14,7 @@ from .sources import collect, covers_area, license_gate, load_registry
 from .taxonomy import by_id
 from .audit import build_provenance, canonical_hash, verify_capture_integrity
 from .snapshots import describe, accept_latest, timestamp, validate_age
+from .names import bilingual_counts
 
 
 def _write_json(path: Path, value: object) -> None:
@@ -122,7 +123,8 @@ def run(
             failures.append({"source": source["name"], "error": str(exc)})
             continue
         source_captures.append({"source": source["name"],
-                                "retrieval_timestamp": datetime.now(timezone.utc).isoformat(),
+                                "retrieval_timestamp": (cache_entry or {}).get('snapshot', {}).get('original_retrieval_timestamp') or datetime.now(timezone.utc).isoformat(),
+                                "input_access_timestamp": datetime.now(timezone.utc).isoformat(),
                                 "capture_hash": canonical_hash(source_records),
                                 "version": cache_entry or {"version": "capture_hash_only"},
                                 "records": source_records})
@@ -214,6 +216,7 @@ def run(
         "conflation_algorithm_version": 3,
         "enrichment_algorithm_version": ENRICHMENT_VERSION,
         "bilingual_complete_count": sum(bool(row.get("language_complete")) for row in current),
+        "bilingual_measurements": bilingual_counts(current),
         "unnamed_source_count": sum(row.get("name_status") == "unnamed_source" for row in current),
         "derived_geometry_count": sum(bool(row.get("geometry_derived")) or row["geometry_method"] == "geocode_derived" for row in current),
         "source_snapshots": {name: cache["snapshot"] for name, cache in current_cache.items() if "snapshot" in cache},

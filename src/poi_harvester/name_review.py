@@ -7,6 +7,7 @@ from pathlib import Path
 import json
 
 from .enrichment import VERSION, enrich_record
+from .names import clean_name
 
 
 def build_review_dataset() -> dict:
@@ -71,18 +72,51 @@ def score_reviews(dataset: dict, ratings: dict | None = None) -> dict:
             "rating_definition": "ACCEPT only if the generic translation and proper-name rendering are both acceptable"}
 
 
+def write_review_queue(dataset: dict, path: Path) -> dict:
+    """Export uncertain examples without inventing decisions or changing the sample."""
+    score_reviews(dataset)
+    entries = [{'id': x['id'], 'current_arabic_name': x['generated_arabic_name'],
+                'source_name': x['source_name'],
+                'proposed_normalized_arabic': clean_name(x['generated_arabic_name']),
+                'reason': x['review_reason'], 'confidence': x['confidence'],
+                'provenance': x['provenance'], 'rating': None, 'reviewer': None,
+                'review_status': 'NOT_REVIEWED'} for x in dataset['entries'] if x.get('review_reason')]
+    queue = {'dataset_hash': _dataset_hash(dataset), 'dataset_kind': dataset['dataset_kind'],
+             'official_status': 'NOT_CERTIFIED', 'human_reviewed': 0, 'entries': entries}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(queue, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    lines = ['# Human review queue', '',
+             'Uncertain generated examples, not human-approved or official gold. The complete 100-record denominator is retained.', '']
+    for x in entries:
+        lines += [f"## {x['id']}", '', f"- Source name: {x['source_name']}",
+                  f"- Current Arabic: {x['current_arabic_name']}",
+                  f"- Proposed normalization only: {x['proposed_normalized_arabic']}",
+                  f"- Reason: {x['reason']}", f"- Confidence: {x['confidence']}",
+                  f"- Provenance: {x['provenance']}", '- Human decision: pending', '']
+    path.with_suffix('.md').write_text('\n'.join(lines), encoding='utf-8')
+    return queue
+
+
 def review_names(dataset_path: Path, ratings_path: Path, output_path: Path,
-                 interactive: bool = False, reviewer: str | None = None) -> dict:
+                 interactive: bool = False, reviewer: str | None = None,
+                 queue_path: Path | None = None) -> dict:
     dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
     ratings = (json.loads(ratings_path.read_text(encoding="utf-8")) if ratings_path.exists() else
                {"dataset_hash": _dataset_hash(dataset), "ratings": []})
     score_reviews(dataset, ratings)  # Validate before prompting or writing.
+    selected = {entry['id'] for entry in dataset['entries']}
+    if queue_path is not None:
+        queue = json.loads(queue_path.read_text(encoding='utf-8'))
+        ids = [entry['id'] for entry in queue['entries']]
+        if queue.get('dataset_hash') != _dataset_hash(dataset) or len(ids) != len(set(ids)) or not set(ids) <= selected:
+            raise ValueError('Review queue does not match the full dataset')
+        selected = set(ids)
     if interactive:
         if not reviewer or not reviewer.strip():
             raise ValueError("Interactive review requires --reviewer")
         completed = {item["id"] for item in ratings["ratings"]}
         for index, entry in enumerate(dataset["entries"], 1):
-            if entry["id"] in completed:
+            if entry["id"] in completed or entry['id'] not in selected:
                 continue
             print(f"[{index}/{len(dataset['entries'])}] {entry['source_name']} -> {entry['generated_arabic_name']}")
             print(f"Category: {entry['category']}; confidence: {entry['confidence']}")

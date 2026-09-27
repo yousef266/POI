@@ -24,3 +24,19 @@ Score an existing ratings file without prompting:
 ```
 
 The partial score is accepted/reviewed. A complete-sample score is produced only after all 100 names are explicitly rated by a named reviewer. No automatic rating is generated, and the official status always remains `NOT_CERTIFIED`. Human review of this synthetic corpus does not certify Arabic quality on the official real-source sample.
+
+## Queue uncertain names first
+
+Export the 30 uncertain examples without generating human decisions:
+
+```powershell
+.\run.ps1 review-names --queue-out output/arabic-review/queue.json
+.\run.ps1 review-names --queue output/arabic-review/queue.json --interactive --reviewer "Yousef"
+```
+
+The export also creates `queue.md` for reading. Each item includes its ID, current
+Arabic name, source English name, proposed Unicode/whitespace normalization only,
+reason, confidence and provenance. A queue hash binds it to the complete dataset.
+Reviewing just this queue remains a partial review of 100; run the regular command
+afterward to review the remaining names. Human decisions are saved only after
+explicit keyboard input. The synthetic corpus remains separate from Cairo POIs.

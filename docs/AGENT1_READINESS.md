@@ -20,7 +20,7 @@ Generated from actual local evidence. Every official status remains NOT_CERTIFIE
 ## Commands and outputs
 
 Each criterion in the machine-readable report includes its command and observed output.
-Tests: 110; passed: 110; failed: 0; skipped: 0.
+Tests: 136; passed: 136; failed: 0; skipped: 0.
 Arabic review: 0/100 reviewed; status NOT_REVIEWED.
 
 ## External blockers
@@ -30,27 +30,16 @@ Arabic review: 0/100 reviewed; status NOT_REVIEWED.
 - Human Arabic ratings and official benchmark hardware are unavailable.
 - No licensed live place/geocoder provider is configured.
 
-## Cairo blocker-resolution verification (2026-09-27)
+## September 27 Cairo and audit qualifications
 
-See [BLOCKER_RESOLUTION.md](BLOCKER_RESOLUTION.md) and
-[BLOCKER_RESOLUTION.json](BLOCKER_RESOLUTION.json) for current source-level
-verification and missing official evidence. All 110 tests pass with zero failures
-and skips, including all original 80 tests unchanged and 30 added regressions.
-
-The A7 local PASS above is for the evaluator's synthetic fixture. The two Cairo
-intents use the same explicitly pinned July 24 capture: 155 POIs, 140 bilingual
-and 15 genuinely unnamed (90.32% completeness). The four OSM way centers are
-opt-in derived points with confidence 0.35, not verified entrances. The configured
-provider cannot currently demonstrate freshness within the default 24-hour live
-policy; the public alternative was blocked by robots.txt and was not bypassed.
-Stale live/captured publication attempts were rejected without false removals.
-Final layer `poi_cairo_final_0926:poi_pharmacy` passed WFS, WMS, geometry, attributes,
-CRS, styling, attribution and provenance checks.
-
-AI review: 100 synthetic names assessed, 70 provisionally acceptable, 30 needing
-review, zero human reviews. Official statuses remain NOT_CERTIFIED. No optional
-provider configuration is needed for the verified captured Cairo AOI flow.
-
-**NOT READY FOR SUBMISSION**: current source access/freshness/names, human review,
-official gold, Common Agent Contract, legal/provider approval and official hardware
-evidence remain unavailable. No implementation blocker was observed in this pass.
+See [EVIDENCE_INVESTIGATION.md](EVIDENCE_INVESTIGATION.md) for final evidence.
+136 tests passed with zero failures/skips; the original 110 assertions remain unchanged.
+Cairo uses an explicitly historical July 24 snapshot. Both languages produce 155
+records: 63 source-authoritative bilingual names (40.65%), 140 including generated
+translations (90.32%), and 15 genuinely unnamed records. Both completeness measures
+are below 95%. The A7 PASS above concerns only the evaluator’s fixture mechanics.
+A2 regression tests pass, but one unintended disallowed metadata request occurred
+during this audit before the wildcard parser fix. Zero violations cannot be claimed
+for this audit; official A2 remains NOT_CERTIFIED. Human review remains 0/100.
+All official A1–A12 statuses remain NOT_CERTIFIED. Local catalog-based place
+resolution works; an optional live geocoder is not required for these Cairo runs.

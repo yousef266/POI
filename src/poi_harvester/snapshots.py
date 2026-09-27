@@ -48,6 +48,23 @@ def validate_age(source, descriptor, now=None):
         raise RuntimeError(f"Stale live source snapshot {descriptor['timestamp']}: age {age:.0f}s exceeds {limit}s; no fallback, changes or publication")
 
 
+def freshness_state(source, descriptor, now=None):
+    """Explicit state evaluated at use time; a pin never claims to be current."""
+    try:
+        stamp = timestamp(descriptor.get('timestamp'))
+    except ValueError:
+        return 'UNKNOWN'
+    if stamp is None:
+        return 'UNKNOWN'
+    if descriptor.get('mode') != 'live':
+        return 'HISTORICAL'
+    limit = source.get('max_snapshot_age_seconds', descriptor.get('max_snapshot_age_seconds'))
+    if limit is None:
+        return 'UNKNOWN'
+    age = ((now or datetime.now(timezone.utc)) - stamp).total_seconds()
+    return 'UNKNOWN' if age < -300 else 'STALE' if age > limit else 'CURRENT'
+
+
 def describe(source, request, payload, mode="live", now=None):
     stamp = payload.get("osm3s", {}).get("timestamp_osm_base")
     parsed = timestamp(stamp)
@@ -71,6 +88,7 @@ def describe(source, request, payload, mode="live", now=None):
         descriptor["max_snapshot_age_seconds"] = source["max_snapshot_age_seconds"]
     elif mode != "live":
         descriptor["freshness"] = "HISTORICAL_CAPTURE_NOT_LIVE"
+    descriptor['freshness_state'] = freshness_state(source, descriptor, now)
     return descriptor
 
 
@@ -149,6 +167,8 @@ def load_pinned(directory, sources, request, selected):
         payload = {"osm3s":{"timestamp_osm_base":stamp},
                    "elements":[r["source_payload"] for r in capture["records"]]}
         descriptor = describe(source, request, payload, "pinned_capture_not_live")
+        if capture.get('retrieval_timestamp'):
+            descriptor['original_retrieval_timestamp'] = timestamp(capture['retrieval_timestamp']).isoformat()
         if saved and (saved["query_hash"] != descriptor["query_hash"] or saved["dataset_hash"] != descriptor["dataset_hash"]):
             raise ValueError("Pinned source scope/version mismatch")
         descriptor["freshness_decision"] = accept_latest(source, descriptor, write=False)

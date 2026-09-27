@@ -13,7 +13,7 @@ from .geocode import CatalogGeocoder
 from .geocode_http import load_http_geocoder
 from .evaluation import evaluate_local
 from .benchmark import add_benchmark_arguments, benchmark_10000
-from .name_review import review_names
+from .name_review import review_names, write_review_queue
 from .intent import normalize_intent
 from .place import CatalogPlaceResolver, choose_unique_place, load_http_place_resolver
 from .pipeline import replay, reprocess_capture, run
@@ -69,6 +69,8 @@ def build_parser() -> ArgumentParser:
     review_cmd.add_argument("--out", type=Path, default=Path("output/arabic-review/score.json"))
     review_cmd.add_argument("--interactive", action="store_true")
     review_cmd.add_argument("--reviewer")
+    review_cmd.add_argument('--queue-out', type=Path, help='Export uncertain examples as JSON and Markdown; no human ratings generated')
+    review_cmd.add_argument('--queue', type=Path, help='Review only IDs from a hash-bound queue; retain the full sample denominator')
     replay_cmd = commands.add_parser("replay", help="Rebuild from captured raw input without network or LLM")
     replay_cmd.add_argument("output_dir", type=Path)
     reprocess_cmd = commands.add_parser("reprocess", help="Apply current rules to a saved capture without network")
@@ -110,7 +112,9 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         if args.command == "review-names":
-            print(json.dumps(review_names(args.dataset, args.ratings, args.out, args.interactive, args.reviewer), indent=2))
+            if args.queue_out:
+                write_review_queue(json.loads(args.dataset.read_text(encoding='utf-8')), args.queue_out)
+            print(json.dumps(review_names(args.dataset, args.ratings, args.out, args.interactive, args.reviewer, args.queue), indent=2))
             return 0
         if args.command == "benchmark":
             target = {"database": args.database, "schema": args.schema, "workspace": args.workspace} if args.publish else None
@@ -200,10 +204,13 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     except KeyboardInterrupt:
-        print(json.dumps({"status": "cancelled", "error": "Refresh cancelled; no stale fallback"}), file=sys.stderr)
+        print(json.dumps({"status": "cancelled", "freshness_state": "FAILED_REFRESH", "error": "Refresh cancelled; no stale fallback"}), file=sys.stderr)
         return 130
     except Exception as exc:
-        print(json.dumps({"status": "failed", "error": str(exc)}), file=sys.stderr)
+        failure = {"status": "failed", "error": str(exc)}
+        if args.command == 'run':
+            failure['freshness_state'] = 'FAILED_REFRESH'
+        print(json.dumps(failure), file=sys.stderr)
         return 1
 
 

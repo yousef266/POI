@@ -22,6 +22,37 @@ def arabic_key(value):
     return value.translate(str.maketrans({"ک": "ك", "ی": "ي"}))
 
 
+def valid_language_name(value, language):
+    """Check usable script, not human linguistic quality or verified business truth."""
+    if not isinstance(value, str) or any(unicodedata.category(c) == 'Cs' or c == '\ufffd' or
+                                        (unicodedata.category(c) == 'Cc' and not c.isspace()) for c in value):
+        return False
+    value = clean_name(value) or ''
+    return any(unicodedata.category(c).startswith('L') and
+               ('ARABIC' if language == 'ar' else 'LATIN') in unicodedata.name(c, '') for c in value)
+
+
+def bilingual_counts(records):
+    """Keep the denominator intact and distinguish generated from source names."""
+    presentation = authoritative = 0
+    for row in records:
+        if not all(valid_language_name(row.get('name_' + lang), lang) for lang in ('ar', 'en')):
+            continue
+        presentation += 1
+        provenance = row.get('provenance', {})
+        keys = row.get('source_keys', [])
+        if all(not row.get(f'name_{lang}_method') and not row.get(f'name_{lang}_generated') and
+               any(provenance.get(f'name_{lang}', '') == key or
+                   provenance.get(f'name_{lang}', '').startswith(key + ':tags.') for key in keys)
+               for lang in ('en', 'ar')):
+            authoritative += 1
+    total = len(records)
+    return {'total': total, 'valid_bilingual_including_generated': presentation,
+            'authoritative_bilingual': authoritative,
+            'authoritative_bilingual_fraction': authoritative / total if total else None,
+            'definition': 'Valid Latin/Arabic letter-bearing source names with field provenance; generated names excluded. Source linguistic quality is not human certified.'}
+
+
 def resolve_osm_names(tags, source_key):
     result = {}
     chosen = {}
@@ -29,7 +60,7 @@ def resolve_osm_names(tags, source_key):
         fields = (f"name:{lang}", f"official_name:{lang}", f"short_name:{lang}", f"alt_name:{lang}")
         for field in fields:
             options = [clean_name(part) for part in (tags.get(field) or "").split(";")] if isinstance(tags.get(field), str) else []
-            value = next((part for part in options if part), None)
+            value = next((part for part in options if valid_language_name(part, lang)), None)
             if value:
                 result[f"name_{lang}"] = value
                 chosen[lang] = field
@@ -40,7 +71,7 @@ def resolve_osm_names(tags, source_key):
             continue
         for part in value.split(";"):
             part = clean_name(part)
-            language = "ar" if re.search(r"[\u0600-\u06ff]", part or "") else "en" if re.search(r"[A-Za-z]", part or "") else None
+            language = "ar" if valid_language_name(part, 'ar') else "en" if valid_language_name(part, 'en') else None
             if language and not result.get(f"name_{language}"):
                 result[f"name_{language}"] = part
                 chosen[language] = field

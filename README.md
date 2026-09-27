@@ -200,3 +200,24 @@ See [the new verification report](docs/BLOCKER_RESOLUTION.md) and
 Local evidence remains under `output/blockers-resolution`; runtime data and
 credentials are excluded from Git. Official benchmarks and human review are
 reported separately from local test results.
+
+## Evidence and completeness
+
+`metadata.json` includes `bilingual_measurements`: the complete record denominator,
+valid bilingual names including generated translations, and source-authoritative
+bilingual names with field provenance. The stricter authoritative measurement
+excludes generated names, empty/malformed strings, missing provenance and wrong
+scripts. Script validity does not certify linguistic quality. The legacy
+`bilingual_complete_count` and record `language_complete` fields retain their
+presentation semantics for compatibility with captured replay.
+
+Snapshot descriptors expose `CURRENT`, `HISTORICAL`, `STALE` or `UNKNOWN`.
+Publication rechecks age and version and exposes the state in layer metadata.
+An explicit capture pin always reports `HISTORICAL` and retains the original
+retrieval timestamp; input-access time is recorded separately. Failed CLI/API
+refreshes report `FAILED_REFRESH`, with no automatic stale fallback.
+
+Robots matching supports wildcards, end anchors, combined matching agent groups,
+longest-rule precedence, and conservatively honors unrooted provider exclusions.
+See [the September 27 evidence investigation](docs/EVIDENCE_INVESTIGATION.md)
+for actual results, source restrictions, and the disclosed audit request incident.

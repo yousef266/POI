@@ -300,8 +300,9 @@ def publish_geoserver(layer: str, metadata: dict, database: str, workspace: str,
         abstract += " Footprint centers are derived, not verified entrances; see geometry_derived and geometry_confidence."
     snapshots = metadata.get("source_snapshots", {})
     if snapshots:
+        from .snapshots import freshness_state
         abstract += " Source snapshots: " + "; ".join(
-            f"{name}: {value['timestamp']} ({value['mode']})" for name, value in sorted(snapshots.items())) + "."
+            f"{name}: {value['timestamp']} ({value['mode']}; {freshness_state({}, value)})" for name, value in sorted(snapshots.items())) + "."
     feature_type = {
         "name": layer, "nativeName": layer, "title": ("DEMO - " if demo_data else "") + layer.replace("_", " ").title(),
         "abstract": abstract, "srs": "EPSG:4326",

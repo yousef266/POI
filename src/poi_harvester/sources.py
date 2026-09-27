@@ -16,14 +16,14 @@ import sqlite3
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlparse
 from urllib.request import Request as HttpRequest, urlopen
-from urllib.robotparser import RobotFileParser
 import json
 import re
 
 from .core import Area, Request
 from .taxonomy import by_id
 from .names import resolve_osm_names
-from .snapshots import describe, accept_latest, validate_age, query_identity, digest
+from .robots import allowed as robots_allowed
+from .snapshots import describe, accept_latest, validate_age, query_identity, digest, freshness_state
 
 
 def load_registry(path: Path) -> list[dict]:
@@ -199,7 +199,10 @@ def _robots_allowed(endpoint: str, user_agent: str, limiter: TokenBucket | None 
     try:
         with limiter.request_slot() if limiter else nullcontext():
             with urlopen(HttpRequest(robots_url, headers={"User-Agent": user_agent}), timeout=10) as response:
-                lines = response.read(256_000).decode("utf-8", errors="replace").splitlines()
+                body = response.read(512_001)
+                if len(body) > 512_000:
+                    raise RuntimeError("robots.txt exceeds supported size; refusing unverified access")
+                lines = body.decode("utf-8", errors="replace").splitlines()
     except HTTPError as exc:
         if exc.code == 429:
             raise RuntimeError(f"robots.txt rate limited for {endpoint}") from exc
@@ -208,9 +211,7 @@ def _robots_allowed(endpoint: str, user_agent: str, limiter: TokenBucket | None 
         raise RuntimeError(f"Could not verify robots.txt for {endpoint}: {exc}") from exc
     except (URLError, TimeoutError) as exc:
         raise RuntimeError(f"Could not verify robots.txt for {endpoint}: {exc}") from exc
-    parser = RobotFileParser()
-    parser.parse(lines)
-    return parser.can_fetch(user_agent, endpoint)
+    return robots_allowed(lines, user_agent, endpoint)
 
 
 def _retry_after_seconds(value: str | None, attempt: int) -> float:
@@ -354,6 +355,7 @@ def _overpass(source: dict, request: Request, prior_cache: dict | None = None,
         validate_age(source, candidate)
         candidate["freshness_decision"] = accept_latest(source, candidate, write=False)
         candidate["freshness"] = "LIVE_AGE_POLICY_VALIDATED" if source.get("max_snapshot_age_seconds") else "TIMESTAMP_VALIDATED"
+        candidate['freshness_state'] = freshness_state(source, candidate)
         cache = {**cache, "snapshot": candidate}
         return parse_overpass_payload(source, request, {"elements": elements, "osm3s": {"timestamp_osm_base": candidate["timestamp"]}}), cache
     if not isinstance(payload, dict) or not isinstance(payload.get("elements"), list):

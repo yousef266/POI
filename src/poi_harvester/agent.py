@@ -110,4 +110,4 @@ def invoke(payload: dict[str, Any]) -> dict[str, Any]:
                 payload.get("schema") or "public", payload.get("allow_demo_publish") is True)
         return result
     except Exception as exc:
-        return {"status": "failed", "error": str(exc)}
+        return {"status": "failed", "freshness_state": "FAILED_REFRESH", "error": str(exc)}
