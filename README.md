@@ -2,6 +2,14 @@
 
 An executable starting point for the GURA POI Harvester bounty. It collects from a declared source registry, checks the declared use before any source access, normalizes POIs, merges likely duplicates, preserves field-level provenance, writes an incremental change set, and can publish the spatial layer to PostGIS and GeoServer.
 
+## Start with Claude, Codex, or another coding assistant
+
+Clone this repository, open its folder in your coding assistant, and send this message:
+
+> This folder contains a POI Harvester agent. Read its setup instructions, install it, and help me configure `.env` for my servers using `.env.example`. Then use this agent to handle my POI collection requests, following its source, geometry validation, and publication rules.
+
+After setup, tell your assistant the POI category and location you want. Use your own server credentials in `.env`; provide the database name, workspace, and optional schema when publishing. File-only collection does not require PostGIS or GeoServer.
+
 ## Run the local fixture
 
 Python 3.11+ is sufficient for the local run; no API key, database, or installed Python package is needed.
