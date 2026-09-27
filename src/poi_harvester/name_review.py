@@ -72,9 +72,10 @@ def score_reviews(dataset: dict, ratings: dict | None = None) -> dict:
             "rating_definition": "ACCEPT only if the generic translation and proper-name rendering are both acceptable"}
 
 
-def write_review_queue(dataset: dict, path: Path) -> dict:
+def write_review_queue(dataset: dict, path: Path, ratings: dict | None = None) -> dict:
     """Export uncertain examples without inventing decisions or changing the sample."""
-    score_reviews(dataset)
+    score = score_reviews(dataset, ratings)
+    decisions = {item['id']: item for item in (ratings or {}).get('ratings', [])}
     entries = [{'id': x['id'], 'current_arabic_name': x['generated_arabic_name'],
                 'source_name': x['source_name'],
                 'proposed_normalized_arabic': clean_name(x['generated_arabic_name']),
@@ -82,17 +83,25 @@ def write_review_queue(dataset: dict, path: Path) -> dict:
                 'provenance': x['provenance'], 'rating': None, 'reviewer': None,
                 'review_status': 'NOT_REVIEWED'} for x in dataset['entries'] if x.get('review_reason')]
     queue = {'dataset_hash': _dataset_hash(dataset), 'dataset_kind': dataset['dataset_kind'],
-             'official_status': 'NOT_CERTIFIED', 'human_reviewed': 0, 'entries': entries}
+             'official_status': 'NOT_CERTIFIED', 'human_reviewed': score['reviewed'],
+             'human_accepted': score['accepted'], 'human_rejected': score['rejected'],
+             'unreviewed': score['unreviewed'], 'corpus_count': score['total'], 'entries': entries}
+    for entry in entries:
+        if entry['id'] in decisions:
+            decision = decisions[entry['id']]
+            entry.update(rating=decision['rating'], reviewer=decision['reviewer'], review_status='REVIEWED')
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(queue, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     lines = ['# Human review queue', '',
-             'Uncertain generated examples, not human-approved or official gold. The complete 100-record denominator is retained.', '']
+             'Generated examples with algorithmic uncertainty; human decisions are shown when supplied. These are not official gold. The complete corpus denominator is retained.',
+             f"Human review: {score['reviewed']}/{score['total']}; accepted: {score['accepted']}; rejected: {score['rejected']}; unreviewed: {score['unreviewed']}.", '']
     for x in entries:
         lines += [f"## {x['id']}", '', f"- Source name: {x['source_name']}",
                   f"- Current Arabic: {x['current_arabic_name']}",
                   f"- Proposed normalization only: {x['proposed_normalized_arabic']}",
                   f"- Reason: {x['reason']}", f"- Confidence: {x['confidence']}",
-                  f"- Provenance: {x['provenance']}", '- Human decision: pending', '']
+                  f"- Provenance: {x['provenance']}",
+                  f"- Human decision: {x['rating']} — {x['reviewer']}" if x['rating'] else '- Human decision: pending', '']
     path.with_suffix('.md').write_text('\n'.join(lines), encoding='utf-8')
     return queue
 

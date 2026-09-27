@@ -15,7 +15,7 @@
 
 Conflation versions 1 and 2 remain supported for historical replay. New runs use version 3, which also blocks known conflicting phone numbers across sources and through a phone-less bridge. The Zurich same-source branch guard remains in place. Address similarity is recorded as a diagnostic; it does not override distance, category or phone guards. Precision/recall on official data remain unmeasured.
 
-Generated-name rules are versioned as `rules-v2`. Each generated field has a boolean flag, method, version, confidence and field provenance. Already bilingual records are unchanged. Captured enriched values are replayed without calling a translation service or rerunning mutable language rules.
+Generated-name rules are versioned as `rules-v3`. Each generated field has a boolean flag, method, version, confidence and field provenance. Already bilingual records are unchanged. Captured enriched values are replayed without calling a translation service or rerunning mutable language rules.
 
 ## Capture and replay
 
@@ -31,7 +31,7 @@ The 10K dataset is project-authored synthetic data. Reports separate harvesting/
 
 ## External requirements
 
-The Common Agent Contract, official gold labels, operator/legal source approval and a representative human-rated Arabic sample are unavailable. Live place/geocoder adapters are optional; their configured endpoint and policy must be supplied by the operator. Offline tests use project fixtures or loopback HTTP only. Docker is optional and its build must be checked on a host with Docker installed.
+The Common Agent Contract and official gold labels are unavailable. The existing 100-name Arabic corpus has been explicitly reviewed and accepted by Yousef; its ratings and manifest are stored in fixtures. Actual source-term compliance and deployment license declarations still require evidence. Live place/geocoder adapters are optional; their configured endpoint and policy must be supplied by the operator. Offline tests use project fixtures or loopback HTTP only. Native development can use Windows services. The required clean-container submission run still must be verified on a container-capable host.
 
 ## Snapshot freshness and explicit historical processing
 
@@ -77,8 +77,9 @@ Arabic/Persian variants; published source spellings and the original payload rem
 available. Empty/malformed values do not satisfy bilingual completeness. Generic
 establishment terms are translated; uncertain proper-name transliterations retain
 low confidence and review reasons. The versioned synthetic review corpus was
-regenerated with the same 100 source examples for rules-v3; it contains no human
-ratings. Name selection in conflation preserves the selected field's provenance.
+regenerated with the same 100 source examples for rules-v3. Its immutable input
+fixture remains unrated; the supplied human ratings overlay records 100 ACCEPT
+decisions without altering the examples. Name selection in conflation preserves the selected field's provenance.
 
 Records without source names remain unnamed, with `name_status`, a reason and
 field provenance. Nearby records, operator names and brands are not substituted
@@ -97,3 +98,11 @@ freshness checks against today's clock, network requests, translation regenerati
 or LLM calls; snapshot descriptors are captured provenance verified by integrity
 hashes. Cross-request parity compares canonical POI identities and business fields,
 excluding the distinct execution timestamps.
+
+## Performance evidence correction
+
+The 10,000-record grid contains invented locations. It remains a processing and
+publication load probe, not a valid real-POI harvest/geometry benchmark. The evaluator
+now reports A11 as NOT_CERTIFIED even when the grid is processed quickly. Real
+source acquisition, correct real-world locations and the required hardware were
+not demonstrated by this probe.

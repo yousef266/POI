@@ -37,7 +37,7 @@
     "benchmark_report_json",
     "tests_log"
   ],
-  "enrichment_version": "rules-v2",
+  "enrichment_version": "rules-v3",
   "supported_conflation_versions": [
     1,
     2,
@@ -47,5 +47,16 @@
     "source_capture_json",
     "provenance_json",
     "timings_json"
-  ]
+  ],
+  "human_review_evidence": {
+    "dataset": "fixtures/arabic_name_review.json",
+    "ratings": "fixtures/arabic_name_review_human_ratings.json",
+    "manifest": "fixtures/arabic_name_review_manifest.json",
+    "status": "REVIEWED",
+    "human_reviewed": 100,
+    "human_accepted": 100,
+    "human_rejected": 0,
+    "unreviewed": 0,
+    "official_status": "NOT_CERTIFIED"
+  }
 }

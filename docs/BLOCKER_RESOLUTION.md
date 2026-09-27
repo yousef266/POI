@@ -1,3 +1,5 @@
+> **Superseded by [FINAL_VERIFICATION.md](FINAL_VERIFICATION.md).** This report is a historical record of the preceding pass. Current evidence is 146/146 tests and human-reviewed/accepted 100/100, rejected/unreviewed 0. Human review is no longer a blocker. The PDF allows generated translations in A7 after enrichment; 140/155 is the applicable Cairo measurement. Previous synthetic-grid “POIs/hour” / local A11 PASS claims below are withdrawn as real-POI evidence: this was load testing with invented coordinates, and A11 is NOT_CERTIFIED. Latest refresh failed with read timeouts; the earlier HTTP 504 remains historical evidence. Blanket signed production/acquisition approval is not a universal PDF condition. See the new report for actual remaining requirements.
+
 # Final blocker verification — Agent 1
 
 ## Executive summary

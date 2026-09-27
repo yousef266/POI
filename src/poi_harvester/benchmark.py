@@ -73,6 +73,12 @@ def benchmark_10000(root: Path, publication_target: dict | None = None,
                               replay_one["reproducibility_hash"] == replay_two["reproducibility_hash"],
               "replay_checks": [replay_one, replay_two], "gold_benchmark": False,
               "four_vcpu_eight_gb_verified": False, "official_status": "NOT_CERTIFIED",
+              "performance_evidence_kind": "SYNTHETIC_LOAD_TEST_ONLY",
+              "geometry_fixture_status": "INVENTED_GRID_NOT_REAL_POI_LOCATIONS",
+              "real_poi_count": 0,
+              "real_source_harvesting_included": False,
+              "real_world_geometry_accuracy_verified": False,
+              "a11_evidence_status": "NOT_CERTIFIED",
               "measurement_scope": "Generation/setup and verification are excluded from complete_pipeline_seconds; artifact writes are included"}
     (root / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return report

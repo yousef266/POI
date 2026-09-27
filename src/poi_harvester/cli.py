@@ -113,7 +113,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "review-names":
             if args.queue_out:
-                write_review_queue(json.loads(args.dataset.read_text(encoding='utf-8')), args.queue_out)
+                existing_ratings = json.loads(args.ratings.read_text(encoding='utf-8')) if args.ratings.exists() else None
+                write_review_queue(json.loads(args.dataset.read_text(encoding='utf-8')), args.queue_out, existing_ratings)
             print(json.dumps(review_names(args.dataset, args.ratings, args.out, args.interactive, args.reviewer, args.queue), indent=2))
             return 0
         if args.command == "benchmark":

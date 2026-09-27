@@ -583,5 +583,28 @@
     "credentials": ".env,.runtime,.local-deps ignored; no credentials in changed files",
     "final_commit": "See git log/current final response; report does not attempt to embed its own commit hash.",
     "secret_scan_evidence": "output\\evidence-investigation\\security-and-test-preservation.json"
+  },
+  "historical_report": true,
+  "superseded_by": "docs/FINAL_VERIFICATION.json",
+  "current_corrections": {
+    "human_review": {
+      "ai_assessed": 100,
+      "human_reviewed": 100,
+      "human_accepted": 100,
+      "human_rejected": 0,
+      "unreviewed": 0,
+      "reviewer": "Yousef",
+      "evidence_type": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE",
+      "dataset_hash": "cc43efb2920ebd21234b5c721f9c26eef5d72ac1287ac8fb8b0fd5bbe0296ec8",
+      "ratings": "fixtures/arabic_name_review_human_ratings.json",
+      "manifest": "fixtures/arabic_name_review_manifest.json",
+      "review_time": "Not supplied by human; recording timestamp is not a fabricated review timestamp."
+    },
+    "a7_generated_allowed": true,
+    "a7_denominator": 155,
+    "a7_bilingual": 140,
+    "a11_real_poi_evidence": "NOT_CERTIFIED: invented grid only",
+    "latest_live_failure": "two read timeouts; previous HTTP 504 remains historical",
+    "blanket_signed_production_approval": "NOT APPLICABLE as a universal PDF condition"
   }
 }

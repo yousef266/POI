@@ -1,0 +1,611 @@
+{
+  "dataset_hash": "cc43efb2920ebd21234b5c721f9c26eef5d72ac1287ac8fb8b0fd5bbe0296ec8",
+  "reviewer": "Yousef",
+  "evidence_type": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE",
+  "attestation": "I personally reviewed ALL 100 Arabic uncertain examples from the review queue. AI assessed: 100. Human reviewed: 100. Human accepted: 100. Human rejected: 0. Remaining unreviewed: 0. Treat this as authoritative human-review evidence for this verification run.",
+  "recorded_at": "2026-09-27T12:40:03.212400+00:00",
+  "review_time": "Not supplied; recorded_at is transcription time, not an invented review timestamp",
+  "scope": "The existing100-example corpus; the former30-item queue is a subset. No new example IDs.",
+  "ratings": [
+    {
+      "id": "02d497dff1538335",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "74857f9bda924408",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "749124e3a3cea517",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "a32ee0b405076f85",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "e31fb31e54cdd2de",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "25967eace4ff1702",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "4f65e854836e376d",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "315322541475fc72",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "6fcfdc476332153e",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "013b7e3969def854",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "8da0413f2dd53133",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "1d8baacc9d02df06",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "4ace128ca0e83ea1",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "b19af75ad14710ed",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "01e6f8b2eb98647d",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "69de0fdfac5dd781",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "2e7d1be58b50f4d4",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "174468bc18522b86",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "fc466fcdc8783b7c",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "d5cc18adda6034d3",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "6512b30e2387bb33",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "e59df1686976680e",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "1c953d53f08ad313",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "7c97699ed01cae89",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "9087e971573727f5",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "4469d02a26c01b1b",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "1d0d070a1afdf362",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "3564da16b541b94c",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "31734e4ffbe67c0f",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "35c4d66f6ce3bb42",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "6dbab2163c5b9560",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "e5043678532cffbb",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "b002527a73154791",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "c2d3871e312d4453",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "8c76e48ceb3ae40c",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "aa0c8795cf4dbb5d",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "2abd9a2a3f413cd7",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "9b0b96059c6f26a3",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "896d928182059c1b",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "5daa1392e4883ed4",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "27ba9847426356fe",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "a708b56fa0351d0a",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "381be733268a9eb7",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "2a6fe66d533769bf",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "301fa1dbd3bdb7ce",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "8321364649fd1765",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "16c3289d15d70366",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "7c850c4e2edfbe57",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "f5eb4c7cbff37c3e",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "a53753f8add556e8",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "a1bb0f2aace17bb3",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "10298ddc8ee21af2",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "b2ac96b2bf370173",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "8a6b34013f284c44",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "15487b91faca9c06",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "40ba4e6436e020fd",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "466782b7ea76f640",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "9263a8189007e5b4",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "31b5249a0f72642c",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "bbc5780027dd4c4b",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "d53f04c597fb38d7",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "7b0e740acbbcc50d",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "714f1958e8deb062",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "6206ce4b63e1292b",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "a665a0e38fffb4f0",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "987c64e09d0a4250",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "62a44ef679a686f7",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "3f2e6488cc5cfa08",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "06f40b659473e102",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "39828016327a36f0",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "31f56e733b7f9c86",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "4377729344864302",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "7cf2ef87015ebeb9",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "5add9e16285c1978",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "28c3698be9c854d1",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "16f7ba6e837e6558",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "7cdad54238cc4519",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "b7fafd1d31a27ad8",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "34f5c1d1fb4bfa6d",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "299e38313cc86c9a",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "6fe7bbf8066de98f",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "4d9abbead8fc0549",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "177a8840a13315ea",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "2f91dcf11a9a883c",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "db4cf5e18a1b02be",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "561112fa03898b1c",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "2900e2baae41dbec",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "e82b8951d7fdbeee",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "a9ac8ba29a849b38",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "78b362240de5d5d9",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "387d2d00913f888b",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "54b8a8f63099636f",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "0baf027c593b5f4c",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "8386f56fbca66d74",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "86af67144fe28042",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "645495935b724db6",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "68fdd282cc4e58e6",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "aa9ad877e99e0892",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "c0cd64f9546adfd9",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    },
+    {
+      "id": "6cd551fa0825b1d9",
+      "rating": "ACCEPT",
+      "reviewer": "Yousef",
+      "evidence": "EXPLICIT_HUMAN_ATTESTATION_IN_USER_MESSAGE"
+    }
+  ]
+}

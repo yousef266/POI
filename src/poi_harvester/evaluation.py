@@ -39,6 +39,15 @@ def _criterion(local_status: str, evidence: str, blocker: str, command: str | No
             "evidence": evidence, "remaining_blocker": blocker, "command": command, "output": output}
 
 
+def _throughput_criterion(speed, command):
+    """A grid load probe cannot certify real, correctly located POI harvesting."""
+    probe_passed = bool(speed and speed['complete_features_per_hour'] >= 10_000)
+    return _criterion('NOT_CERTIFIED' if probe_passed else 'FAIL',
+                      'Synthetic grid load test only; invented locations, no real source harvest or accuracy evidence',
+                      'Real benchmark POIs with reference geometry and the required 4-vCPU/8-GB environment',
+                      command, speed)
+
+
 def evaluate_local(output_dir: Path, registry_path: Path | None = None,
                    readiness_path: Path | None = None, publication_target: dict | None = None,
                    env_file: Path | None = None, ratings_path: Path | None = None) -> dict:
@@ -172,7 +181,7 @@ def evaluate_local(output_dir: Path, registry_path: Path | None = None,
                           "zurich_complete": zurich.get("bilingual_complete"), "zurich_count": zurich.get("count")}),
         "A8": _criterion(("PASS" if name_review["complete_sample_score"] >= 0.90 else "FAIL") if review_complete else "NOT_CERTIFIED",
                          "100 deterministic generated names with explicit human-rating workflow",
-                         "Human Arabic review of a representative official sample",
+                         "Official platform acceptance of recorded review evidence" if review_complete else "Human Arabic review of the 100-name sample",
                          "python run.py review-names --interactive --reviewer YOUR_NAME",
                          name_review),
         "A9": _criterion("NOT_CERTIFIED", "Local source-coordinate preservation is separate from real-world accuracy",
@@ -180,10 +189,7 @@ def evaluate_local(output_dir: Path, registry_path: Path | None = None,
                          {"publication": publication, "zurich_coordinates_preserved": zurich.get("stable_ids_and_coordinates_preserved")}),
         "A10": _criterion(incremental["status"], "Repeated fixture classifies 50 adds, 50 updates, 20 removals, 30 unchanged",
                           "Official seeded change set", evaluation_command, incremental),
-        "A11": _criterion("PASS" if speed and speed["complete_features_per_hour"] >= 10_000 else "FAIL",
-                          "10K synthetic probe with separate phases, CPU/memory and optional publication",
-                          "Official 4-vCPU/8-GB source workload", benchmark_command,
-                          speed or {"status": "FAIL", "output": benchmark.stderr}),
+        "A11": _throughput_criterion(speed, benchmark_command),
         "A12": _criterion("PASS" if replay_pass and checked and preserved_layers_pass else "FAIL",
                           "Two exact canonical replays; capture integrity and transformation/conflation sidecars",
                           "Official full provenance replay corpus",
@@ -216,8 +222,10 @@ def evaluate_local(output_dir: Path, registry_path: Path | None = None,
                       f"Arabic review: {name_review['reviewed']}/{name_review['total']} reviewed; status {name_review['status']}.",
                       "", "## External blockers", "", "- Common Agent Contract and official gold labels are unavailable.",
                       "- Source policy declarations require operator/legal approval.",
-                      "- Human Arabic ratings and official benchmark hardware are unavailable.",
+                      "- Official benchmark hardware evidence is unavailable.",
                       "- No licensed live place/geocoder provider is configured.", ""])
+        if not review_complete:
+            lines.extend(['- Human Arabic review is incomplete.', ''])
         readiness_path.parent.mkdir(parents=True, exist_ok=True)
         readiness_path.write_text("\n".join(lines), encoding="utf-8")
     return report

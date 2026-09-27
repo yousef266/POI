@@ -86,7 +86,7 @@ Run the one-command offline evaluator, then inspect its machine-readable reports
 .\run.ps1 evaluate --out output/evaluation --readiness docs/AGENT1_READINESS.md
 ```
 
-It runs the unit suite, project-authored conflation labels, license and taxonomy reports, a 10,000-record synthetic throughput probe, exact replay, and bilingual reprocessing of the saved 42-record Zurich capture when present. This is local evidence only; the official gold labels and specified benchmark hardware were not supplied. The evaluator marks unavailable scores `NOT_CERTIFIED`. `docs/AGENT1_READINESS.md` lists A1–A12 separately.
+It runs the unit suite, project-authored conflation labels, license and taxonomy reports, a 10, 000-record synthetic throughput probe, exact replay, and bilingual reprocessing of the saved 42-record Zurich capture when present. This is local evidence only; the official gold labels and specified benchmark hardware were not supplied. The evaluator marks unavailable scores `NOT_CERTIFIED`. `docs/AGENT1_READINESS.md` lists A1–A12 separately.
 
 The 42-record Zurich capture can be reprocessed without another source request and published to an isolated schema:
 
@@ -221,3 +221,30 @@ Robots matching supports wildcards, end anchors, combined matching agent groups,
 longest-rule precedence, and conservatively honors unrooted provider exclusions.
 See [the September 27 evidence investigation](docs/EVIDENCE_INVESTIGATION.md)
 for actual results, source restrictions, and the disclosed audit request incident.
+
+## Latest human review and performance correction
+
+Yousef explicitly accepted all 100 existing Arabic review examples. The exact IDs
+and input names remain unchanged. Decisions are in
+`fixtures/arabic_name_review_human_ratings.json`; the canonical-hash manifest is
+`fixtures/arabic_name_review_manifest.json`. Apply them using:
+
+```powershell
+.\run.ps1 evaluate --ratings fixtures/arabic_name_review_human_ratings.json --out output/evaluation-reviewed
+```
+
+Human review is complete: 100 reviewed, 100 accepted, 0 rejected, 0 unreviewed. The
+priority queue has 30 IDs from the 100-example corpus; export with `--ratings` to
+show those decisions. The original unrated input fixture is preserved for
+reproducible generation/tests. No names or POI data were invented or changed.
+
+The PDF's A7 measures bilingual fields **after enrichment**; generated translations
+are permitted. For Cairo the denominator remains 155, including 15 unnamed POIs.
+`ceil(0.95 * 155)=148`; current 140/155 means 8 additional legitimately named bilingual
+records are needed. The 63/155 source-authoritative metric is diagnostic, not a
+separate requirement imposed by the PDF. No unnamed-record exclusion is specified.
+
+The 10K performance grid has invented geometry. It is a synthetic load test only,
+not valid evidence for real-POI throughput or location accuracy. A11 is now
+NOT_CERTIFIED, with explicit dataset/geometry labels in benchmark output.
+See [the corrected final verification](docs/FINAL_VERIFICATION.md).
