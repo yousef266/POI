@@ -54,7 +54,10 @@ def build_parser() -> ArgumentParser:
     run_cmd.add_argument("--snapshot-from", type=Path, help="Explicit immutable source capture; never presented as a fresh live request")
     run_cmd.add_argument("--allow-source-centers", action="store_true", help="Explicitly use captured footprint centers as low-confidence derived points")
     run_cmd.add_argument("--previous", type=Path, help="Previous records.json for an incremental change set")
-    run_cmd.add_argument("--publish", action="store_true", help="Publish to PostGIS and GeoServer")
+    publication = run_cmd.add_mutually_exclusive_group()
+    publication.add_argument("--publish", dest="publish", action="store_true", help="Publish to PostGIS and styled GeoServer layer (default)")
+    publication.add_argument("--no-publish", dest="publish", action="store_false", help="Explicit file-only preview; not the final bounty deliverable")
+    run_cmd.set_defaults(publish=True)
     run_cmd.add_argument("--allow-demo-publish", action="store_true", help="Explicitly publish invented fixture points for an isolated test")
     run_cmd.add_argument("--layer", help="SQL-safe layer name; defaults to poi_<category>")
     run_cmd.add_argument("--database", help="PostGIS database name; required with --publish")
@@ -111,6 +114,7 @@ def main(argv: list[str] | None = None) -> int:
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8")
     args = build_parser().parse_args(argv)
+    phase = 'harvest'
     try:
         if args.command == "review-names":
             if args.queue_out:
@@ -181,10 +185,12 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError("Provide --bbox, --polygon, --place, or an intent containing a place")
         request = Request(selected_area, category, args.use, args.contact,
                           args.max_requests_per_second, area_resolution, args.allow_source_centers)
-        if args.publish:
-            if not args.database or not args.workspace:
-                raise ValueError("--publish requires --database and --workspace")
-            require_publish_env()
+        if args.publish and args.database and args.workspace:
+            try:
+                require_publish_env()
+            except ValueError as exc:
+                print(json.dumps({'status':'needs_input','question':f"Configure server connection settings in .env: {exc}", 'publication_status':'PENDING_CONFIGURATION'}))
+                return 2
         if args.geocode_catalog and args.geocode_provider:
             raise ValueError("Choose either --geocode-catalog or --geocode-provider")
         geocoder = (CatalogGeocoder(args.geocode_catalog, args.use) if args.geocode_catalog else
@@ -202,8 +208,18 @@ def main(argv: list[str] | None = None) -> int:
                      snapshot_store_path=args.snapshot_store, max_snapshot_age_seconds=args.max_snapshot_age_seconds,
                      freshness_policy=args.freshness_policy)
         if args.publish:
+            if not args.database or not args.workspace:
+                result.update(status='needs_input', question='To finish database and styled GeoServer publication, provide --database and --workspace. Schema is optional.', publication_status='PENDING_CONFIGURATION')
+                print(json.dumps(result, ensure_ascii=False, indent=2))
+                return 2
             default_layer = "poi_" + "_".join(categories)
-            result["publication"] = publish(args.out, args.layer or default_layer, args.database, args.workspace, args.schema, args.allow_demo_publish)
+            layer = args.layer or default_layer
+            phase = 'publication'
+            result["publication"] = publish(args.out, layer, args.database, args.workspace, args.schema, args.allow_demo_publish)
+            result['publication_verification'] = verify_local(layer, args.database, args.workspace, args.schema, args.out)
+            result['publication_status'] = 'PUBLISHED_AND_VERIFIED'
+        else:
+            result['publication_status'] = 'EXPLICIT_FILE_ONLY_PREVIEW'
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     except KeyboardInterrupt:
@@ -212,7 +228,10 @@ def main(argv: list[str] | None = None) -> int:
     except Exception as exc:
         failure = {"status": "failed", "error": str(exc)}
         if args.command == 'run':
-            failure['freshness_state'] = 'FAILED_REFRESH'
+            if phase == 'publication':
+                failure['publication_status'] = 'FAILED'
+            else:
+                failure['freshness_state'] = 'FAILED_REFRESH'
         print(json.dumps(failure), file=sys.stderr)
         return 1
 

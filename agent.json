@@ -3,6 +3,8 @@
   "version": "0.3.0",
   "description": "Harvests policy-gated POIs, enriches bilingual names, deduplicates them, and publishes an auditable spatial layer.",
   "entrypoint": "poi-harvester run",
+  "publication_default": "database_layer_and_styled_geoserver_layer_with_verification",
+  "file_only_preview": "Explicit --no-publish or API publish=false; not the final bounty deliverable",
   "inputs": [
     "bbox_or_polygon_or_named_place",
     "category_or_categories_or_English_Arabic_intent",

@@ -12,13 +12,14 @@ from .geocode_http import load_http_geocoder
 from .intent import normalize_intent
 from .pipeline import run
 from .place import CatalogPlaceResolver, choose_unique_place, load_http_place_resolver
-from .publish import publish
+from .publish import publish, verify_local
 from .snapshots import load_pinned
 from .sources import load_registry
 
 
 def invoke(payload: dict[str, Any]) -> dict[str, Any]:
     """Run a POI harvest from structured input or English/Arabic intent."""
+    phase = 'harvest'
     try:
         normalized = normalize_intent(payload["intent"]) if payload.get("intent") else None
         category = payload.get("categories") or payload.get("category")
@@ -72,6 +73,11 @@ def invoke(payload: dict[str, Any]) -> dict[str, Any]:
             return {"status": "needs_input", "question":
                     "To publish, provide the database name and GeoServer workspace. Schema is optional."}
         load_env_file(Path(payload["env_file"]) if payload.get("env_file") else None)
+        if publish_requested:
+            try:
+                require_publish_env()
+            except ValueError as exc:
+                return {'status':'needs_input','question':f"Configure your server connection settings in .env: {exc}", 'publication_status':'PENDING_CONFIGURATION'}
         request = Request(
             selected_area, category[0] if len(category) == 1 else category,
             payload.get("declared_use", "internal"), payload.get("contact"),
@@ -106,9 +112,16 @@ def invoke(payload: dict[str, Any]) -> dict[str, Any]:
         if publish_requested:
             require_publish_env()
             layer = payload.get("layer") or "poi_" + "_".join(request.categories)
+            phase = 'publication'
             result["publication"] = publish(
                 output_dir, layer, payload["database"], payload["workspace"],
                 payload.get("schema") or "public", payload.get("allow_demo_publish") is True)
+            result['publication_verification'] = verify_local(layer, payload['database'], payload['workspace'], payload.get('schema') or 'public', output_dir)
+            result['publication_status'] = 'PUBLISHED_AND_VERIFIED'
+        else:
+            result['publication_status'] = 'EXPLICIT_FILE_ONLY_PREVIEW'
         return result
     except Exception as exc:
-        return {"status": "failed", "freshness_state": "FAILED_REFRESH", "error": str(exc)}
+        result = {"status": "failed", "error": str(exc)}
+        result['publication_status' if phase == 'publication' else 'freshness_state'] = 'FAILED' if phase == 'publication' else 'FAILED_REFRESH'
+        return result

@@ -9,7 +9,7 @@
 5. Route unknown categories, ambiguous geometry and missing coordinates to review. Optional licensed geocoding produces an explicitly derived point with confidence at most 0.5.
 6. Preserve source names; generate only a missing language. Translate known generic/category/location terms and transliterate proper names. Mixed-script names and numbers are supported; unfamiliar names stay low confidence and require review.
 7. Conflate compatible nearby records, select verified language fields before generated fields, reconcile stable IDs, and compute incremental field changes.
-8. Write canonical records, GeoJSON, changes, source snapshots, review queue, audit sidecars and timings. Optionally publish dedicated columns to PostGIS and GeoServer.
+8. Write canonical records, GeoJSON, changes, source snapshots, review queue, audit sidecars and timings. Normal CLI/API runs publish dedicated columns to PostGIS and a styled GeoServer layer, then verify WFS/WMS, CRS, metadata and styling. Explicit file-only previews remain available; missing targets require input instead of claiming final completion.
 
 ## Versioned decisions
 
@@ -45,11 +45,12 @@ changes or publication. Repeated identical snapshots are accepted deterministica
 The full source capture, including unresolved and outside-AOI records, is retained;
 a conditional response does not reuse only the previously published subset.
 
-Live runs through the CLI/API default to a maximum source snapshot age of 86,400
-seconds. Configure `--max-snapshot-age-seconds` or the structured field
-`max_snapshot_age_seconds` for an explicit deployment policy. The lower-level
-adapter preserves its existing relative-version behavior unless the source declares
-`max_snapshot_age_seconds`; callers of `pipeline.run` can pass the same option.
+The included live sources use `latest_available`: the 86,400-second age threshold
+labels older available data and discloses its source timestamp rather than rejecting
+it. Configure `--freshness-policy strict` or structured `freshness_policy: strict`
+to reject data beyond `--max-snapshot-age-seconds` / `max_snapshot_age_seconds`.
+Sources without an explicit policy retain strict age validation. Relative-version
+downgrade protection remains enforced in both modes.
 Timestamp ordering alone is not evidence that a source is current. Age validation
 also rejects future timestamps beyond five minutes of clock tolerance.
 

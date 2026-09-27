@@ -12,10 +12,12 @@ After setup, tell your assistant the POI category and location you want. Use you
 
 ## Run the local fixture
 
+Normal CLI/API runs publish a database POI layer and a styled GeoServer layer by default, then verify WFS/WMS, CRS, metadata and styling. Provide the database and workspace at run time; schema is optional and `.env` contains server connections. A run without a publication target reports `needs_input`, not a completed final deliverable. Use `--no-publish` (API: `"publish": false`) only for an explicit file-only preview. The examples below label those previews explicitly. To publish an existing preview, use `publish` followed by `verify-local`.
+
 Python 3.11+ is sufficient for the local run; no API key, database, or installed Python package is needed.
 
 ```powershell
-python run.py run --bbox 24.70 46.66 24.73 46.69 --category pharmacy --sources demo,demo_alt --out output/demo
+python run.py run --bbox 24.70 46.66 24.73 46.69 --category pharmacy --sources demo,demo_alt --no-publish --out output/demo
 python run.py replay output/demo
 python -m unittest discover -s tests -v
 ```
@@ -37,7 +39,7 @@ The included live sources use `latest_available` freshness policy: older availab
 The included registry contains an Overpass adapter driven by the packaged 244-leaf taxonomy. Provide a real operator contact before making a live request:
 
 ```powershell
-.\run.ps1 run --bbox 24.65 46.62 24.79 46.79 --intent "pharmacies in Riyadh" --sources openstreetmap --contact you@example.com --use internal --out output/riyadh
+.\run.ps1 run --bbox 24.65 46.62 24.79 46.79 --intent "pharmacies in Riyadh" --sources openstreetmap --contact you@example.com --use internal --out output/riyadh --no-publish
 ```
 
 Live requests fail closed when `robots.txt` cannot be reached or disallows the endpoint. An HTTP 4xx for `robots.txt` is treated as unavailable under RFC 9309. Source policies in `sources.json` are **operator declarations**, not a legal determination. Review the ODbL and any source-specific terms before commercial use or redistribution. Both uses are deliberately disabled for the OSM source in the starter registry pending that review. Missing Arabic or English names are filled by a deterministic rule baseline: generic establishment terms are translated and proper names are transliterated. Original names are preserved, generated fields carry method/version/confidence and provenance, and low-confidence names go to review. Human Arabic quality is not certified.
@@ -47,7 +49,7 @@ The registry also includes a Swiss OSM Overpass source for a real local test. Th
 Natural-language intent can name more than one category. A corrected Zurich run publishes 42 pharmacy/clinic records; a bakery run collected 35 `shop=bakery` POIs. Two same-name clinic nodes with different phone numbers are kept separate. Arabic intent supports common categories including pharmacies, clinics, hospitals, schools, restaurants, hotels, mosques, bakeries, banks, ATMs, cafes and fuel stations. The complete 244-leaf taxonomy has not been manually localized.
 
 ```powershell
-.\run.ps1 run --bbox 47.37 8.52 47.39 8.55 --category pharmacy --sources osm_swiss --contact you@example.com --out output/zurich-osm-real
+.\run.ps1 run --bbox 47.37 8.52 47.39 8.55 --category pharmacy --sources osm_swiss --contact you@example.com --out output/zurich-osm-real --no-publish
 .\run.ps1 publish --out output/zurich-osm-real --layer poi_pharmacy --database poi_agent_test --schema osm_live --workspace poi_osm_live
 .\run.ps1 verify-local --database poi_agent_test --schema osm_live --workspace poi_osm_live --layer poi_pharmacy --out output/zurich-osm-real
 ```
@@ -142,7 +144,7 @@ Copy-Item .env.example .env
 Edit `.env` with your own PostgreSQL and GeoServer connection settings. Give the database name and workspace at run time; schema is optional. Run the offline fixture and evaluator:
 
 ```powershell
-.\.venv\Scripts\python.exe run.py run --bbox 24.70 46.66 24.73 46.69 --category pharmacy --sources demo,demo_alt --out output/demo
+.\.venv\Scripts\python.exe run.py run --bbox 24.70 46.66 24.73 46.69 --category pharmacy --sources demo,demo_alt --no-publish --out output/demo
 .\.venv\Scripts\python.exe run.py replay output/demo
 .\.venv\Scripts\python.exe run.py evaluate --out output/evaluation --readiness docs/AGENT1_READINESS.md
 .\.venv\Scripts\python.exe scripts/benchmark_agent1.py
@@ -190,13 +192,13 @@ See [docs/DESIGN.md](docs/DESIGN.md), [docs/LOCAL_EVALUATION.json](docs/LOCAL_EV
 
 ## Snapshot safety and final blocker verification
 
-The CLI/API reject older snapshots and default to a 24-hour maximum age for live
-OSM snapshots. Failures do not silently fall back or publish removals. Equivalent
+The CLI/API reject snapshot downgrades. Included sources accept older available
+OSM data with timestamp disclosure; strict age rejection is an explicit policy. Failures do not silently fall back or publish removals. Equivalent
 English/Arabic requests can explicitly use one immutable capture:
 
 ```powershell
-.\run.ps1 run --intent "I want all pharmacies in Cairo" --place-catalog PATH_TO_CATALOG --snapshot-from PATH_TO_CAPTURE --sources openstreetmap --use internal --out output/cairo-english
-.\run.ps1 run --intent "عايز كل الصيدليات في القاهرة" --place-catalog PATH_TO_CATALOG --snapshot-from PATH_TO_CAPTURE --sources openstreetmap --use internal --out output/cairo-arabic
+.\run.ps1 run --intent "I want all pharmacies in Cairo" --place-catalog PATH_TO_CATALOG --snapshot-from PATH_TO_CAPTURE --sources openstreetmap --use internal --out output/cairo-english --no-publish
+.\run.ps1 run --intent "عايز كل الصيدليات في القاهرة" --place-catalog PATH_TO_CATALOG --snapshot-from PATH_TO_CAPTURE --sources openstreetmap --use internal --out output/cairo-arabic --no-publish
 ```
 
 These are historical runs with the original source timestamp, not fresh harvests.
