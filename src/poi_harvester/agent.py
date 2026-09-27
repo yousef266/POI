@@ -13,6 +13,8 @@ from .intent import normalize_intent
 from .pipeline import run
 from .place import CatalogPlaceResolver, choose_unique_place, load_http_place_resolver
 from .publish import publish
+from .snapshots import load_pinned
+from .sources import load_registry
 
 
 def invoke(payload: dict[str, Any]) -> dict[str, Any]:
@@ -73,7 +75,8 @@ def invoke(payload: dict[str, Any]) -> dict[str, Any]:
         request = Request(
             selected_area, category[0] if len(category) == 1 else category,
             payload.get("declared_use", "internal"), payload.get("contact"),
-            payload.get("max_requests_per_second"), area_resolution)
+            payload.get("max_requests_per_second"), area_resolution,
+            payload.get("allow_source_centers") is True)
         output_dir = Path(payload.get("output_dir") or "output/agent-run")
         source_names = payload.get("sources", ["openstreetmap"])
         if not isinstance(source_names, list) or not all(isinstance(name, str) for name in source_names):
@@ -86,8 +89,17 @@ def invoke(payload: dict[str, Any]) -> dict[str, Any]:
                     load_http_geocoder(Path(payload["geocode_provider"]), request.declared_use,
                                        payload.get("contact") or "", payload.get("max_requests_per_second"))
                     if payload.get("geocode_provider") else None)
-        result = run(request, Path(payload.get("registry", "sources.json")).resolve(),
-                     output_dir, set(source_names), previous, geocoder)
+        registry = Path(payload.get("registry", "sources.json")).resolve()
+        store = Path(payload.get("snapshot_store") or "output/.source-snapshots.sqlite3")
+        sources = load_registry(registry)
+        for source in sources:
+            if source["kind"] == "overpass":
+                source["snapshot_store"] = str(store)
+        captured, descriptors = (load_pinned(payload["snapshot_from"], sources, request, set(source_names))
+                                 if payload.get("snapshot_from") else (None, None))
+        result = run(request, registry, output_dir, set(source_names), previous, geocoder,
+                     source_records_override=captured, source_snapshots_override=descriptors,
+                     snapshot_store_path=store, max_snapshot_age_seconds=payload.get("max_snapshot_age_seconds",86400))
         if normalized:
             result["intent"] = normalized
         if publish_requested:

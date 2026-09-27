@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from pathlib import Path
-from contextlib import contextmanager, nullcontext
+from contextlib import contextmanager, nullcontext, closing
 from hashlib import sha256
 from os import environ
 from threading import Lock
-from time import monotonic, sleep, time, get_clock_info
+from time import monotonic, sleep, time, get_clock_info, perf_counter
 from tempfile import gettempdir
 from email.utils import parsedate_to_datetime
 from datetime import datetime
@@ -22,6 +22,8 @@ import re
 
 from .core import Area, Request
 from .taxonomy import by_id
+from .names import resolve_osm_names
+from .snapshots import describe, accept_latest, validate_age, query_identity, digest
 
 
 def load_registry(path: Path) -> list[dict]:
@@ -50,6 +52,11 @@ def load_registry(path: Path) -> list[dict]:
         field = "path" if source["kind"] == "fixture" else "endpoint"
         if not source.get(field):
             raise ValueError(f"Source {source['name']} missing {field}")
+        for field in ("request_timeout_seconds", "total_timeout_seconds", "max_snapshot_age_seconds"):
+            if field in source and (not isfinite(source[field]) or source[field] <= 0):
+                raise ValueError(f"{field} must be finite and positive")
+        if "request_attempts" in source and (not isinstance(source["request_attempts"], int) or not 1 <= source["request_attempts"] <= 4):
+            raise ValueError("request_attempts must be between 1 and 4")
         if source["auth_mode"] != "none":
             raise ValueError("Only auth_mode=none is implemented; configure an authentication adapter first")
         if not isinstance(source["allowed_uses"], list) or not set(source["allowed_uses"]) <= {"internal", "commercial", "redistribute"}:
@@ -122,7 +129,7 @@ class TokenBucket:
             self.next_allowed = monotonic() + 1 / self.rate
 
     @contextmanager
-    def request_slot(self):
+    def request_slot(self, remaining=None):
         """Serialize actual HTTP transport per endpoint, with shared post-response cooldown."""
         if not self.endpoint:
             self.wait()
@@ -132,14 +139,24 @@ class TokenBucket:
                      str(Path(gettempdir()) / "poi_harvester_rate_v1.sqlite3"))
         state = state.with_name(state.name + ".request_" + sha256(self.endpoint.encode()).hexdigest()[:16])
         state.parent.mkdir(parents=True, exist_ok=True)
-        with sqlite3.connect(state, timeout=180, isolation_level=None) as database:
+        with closing(sqlite3.connect(state, timeout=min(180, remaining()) if remaining else 180, isolation_level=None)) as database:
             database.execute("CREATE TABLE IF NOT EXISTS transport_slot "
                              "(id INTEGER PRIMARY KEY, next_at REAL NOT NULL, interval REAL NOT NULL)")
             database.execute("BEGIN IMMEDIATE")
             prior = database.execute("SELECT next_at, interval FROM transport_slot WHERE id=1").fetchone()
             interval = max(1 / self.rate + get_clock_info("time").resolution, prior[1] if prior else 0)
             if prior:
-                sleep(max(0.0, prior[0] - time()))
+                delay = max(0.0, prior[0] - time())
+                if remaining:
+                    if delay >= remaining():
+                        raise TimeoutError("Source cooldown exceeds refresh budget; no stale fallback")
+                    while delay > 0:
+                        remaining()
+                        interval_wait = min(delay, 0.25)
+                        sleep(interval_wait)
+                        delay = max(0.0, prior[0] - time())
+                else:
+                    sleep(delay)
             cooldown = interval
             try:
                 yield
@@ -210,9 +227,22 @@ def _retry_after_seconds(value: str | None, attempt: int) -> float:
     return float(2 ** attempt)
 
 
-def _get_json(url: str, limiter: TokenBucket, user_agent: str, prior_cache: dict | None = None) -> tuple[dict | None, dict]:
+def _get_json(url: str, limiter: TokenBucket, user_agent: str, prior_cache: dict | None = None,
+              *, timeout_seconds: float = 60, attempts: int = 4,
+              total_timeout_seconds: float = 300, cancel_event=None) -> tuple[dict | None, dict]:
     prior_cache = prior_cache if prior_cache and prior_cache.get("url") == url else None
-    for attempt in range(4):
+    if not all(isfinite(v) and v > 0 for v in (timeout_seconds, total_timeout_seconds)) or not 1 <= attempts <= 4:
+        raise ValueError("Invalid HTTP timeout/retry configuration")
+    deadline = perf_counter() + total_timeout_seconds
+    def remaining():
+        if cancel_event is not None and cancel_event.is_set():
+            raise RuntimeError("Source refresh cancelled; no stale fallback")
+        seconds = deadline - perf_counter()
+        if seconds <= 0:
+            raise TimeoutError("Source refresh total timeout budget exhausted; no stale fallback")
+        return seconds
+    for attempt in range(attempts):
+        remaining()
         try:
             headers = {"User-Agent": user_agent, "Accept": "application/json"}
             if prior_cache:
@@ -221,9 +251,25 @@ def _get_json(url: str, limiter: TokenBucket, user_agent: str, prior_cache: dict
                 if prior_cache.get("last_modified"):
                     headers["If-Modified-Since"] = prior_cache["last_modified"]
             request = HttpRequest(url, headers=headers)
-            with limiter.request_slot():
-                with urlopen(request, timeout=60) as response:
-                    payload = response.read()
+            with limiter.request_slot(remaining=remaining):
+                remaining()
+                with urlopen(request, timeout=min(timeout_seconds, remaining())) as response:
+                    chunks = []
+                    if hasattr(response, "read1"):
+                        while True:
+                            budget = min(timeout_seconds, remaining())
+                            socket = getattr(getattr(getattr(response, "fp", None), "raw", None), "_sock", None)
+                            if socket is not None:
+                                socket.settimeout(budget)
+                            chunk = response.read1(65536)
+                            remaining()
+                            if not chunk:
+                                break
+                            chunks.append(chunk)
+                        payload = b"".join(chunks)
+                    else:
+                        payload = response.read()
+                    remaining()
                     try:
                         parsed = json.loads(payload)
                     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -233,15 +279,20 @@ def _get_json(url: str, limiter: TokenBucket, user_agent: str, prior_cache: dict
         except HTTPError as exc:
             if exc.code == 304 and prior_cache:
                 return None, prior_cache
-            if exc.code not in (429, 502, 503, 504) or attempt == 3:
+            if exc.code not in (429, 502, 503, 504) or attempt == attempts - 1:
                 raise
             retry_after = exc.headers.get("Retry-After")
             delay = _retry_after_seconds(retry_after, attempt)
+            if delay >= remaining():
+                raise TimeoutError("Retry-After exceeds refresh budget; no early retry or stale fallback")
             sleep(delay)
-        except (URLError, TimeoutError):
-            if attempt == 3:
-                raise
-            sleep(2 ** attempt)
+        except (URLError, TimeoutError) as exc:
+            if attempt == attempts - 1:
+                raise TimeoutError(f"Source refresh failed after {attempts} attempts; no stale fallback: {exc}") from exc
+            delay = 2 ** attempt
+            if delay >= remaining():
+                raise TimeoutError("Refresh retry budget exhausted; no stale fallback") from exc
+            sleep(delay)
     raise RuntimeError("Request retries exhausted")
 
 
@@ -285,20 +336,50 @@ def _overpass(source: dict, request: Request, prior_cache: dict | None = None,
         clauses.append(f'nwr["{key}"="{value}"]({box});')
     query = f'[out:json][timeout:60];({"".join(clauses)});out center tags;'
     url = endpoint + "?" + urlencode({"data": query})
-    payload, cache = _get_json(url, limiter, user_agent, prior_cache)
+    payload, cache = _get_json(url, limiter, user_agent, prior_cache,
+                               timeout_seconds=source.get("request_timeout_seconds", 60),
+                               attempts=source.get("request_attempts", 4),
+                               total_timeout_seconds=source.get("total_timeout_seconds", 300))
     if payload is None:
         if prior_records is None:
             raise RuntimeError("Source returned 304 but no previous records are available")
-        return prior_records, cache
+        if not cache.get("snapshot") or not all("source_payload" in row for row in prior_records):
+            raise RuntimeError("304 lacks verified full snapshot evidence; refusing stale fallback")
+        candidate = {**cache["snapshot"], "mode": "live"}
+        if candidate["query_hash"] != query_identity(source, request):
+            raise ValueError("Conditional response source snapshot scope mismatch")
+        elements = sorted((row["source_payload"] for row in prior_records), key=lambda row: (row["type"], row["id"]))
+        if digest(elements) != candidate["dataset_hash"]:
+            raise ValueError("Conditional response source dataset integrity mismatch")
+        validate_age(source, candidate)
+        candidate["freshness_decision"] = accept_latest(source, candidate, write=False)
+        candidate["freshness"] = "LIVE_AGE_POLICY_VALIDATED" if source.get("max_snapshot_age_seconds") else "TIMESTAMP_VALIDATED"
+        cache = {**cache, "snapshot": candidate}
+        return parse_overpass_payload(source, request, {"elements": elements, "osm3s": {"timestamp_osm_base": candidate["timestamp"]}}), cache
+    if not isinstance(payload, dict) or not isinstance(payload.get("elements"), list):
+        raise RuntimeError("Incomplete Overpass response: elements array missing; no changes/publication")
+    if payload.get("remark") or payload.get("error"):
+        raise RuntimeError("Incomplete Overpass response: " + str(payload.get("remark") or payload.get("error")) + "; no changes/publication")
     snapshot = _source_snapshot_time(payload.get("osm3s", {}).get("timestamp_osm_base"))
     prior_snapshots = [
         stamp for record in (prior_records or [])
         if (stamp := _source_snapshot_time(record.get("source_version"))) is not None
     ]
+    if prior_snapshots and snapshot is None:
+        raise ValueError("Missing source snapshot timestamp cannot replace previous capture")
     if snapshot is not None and prior_snapshots and snapshot < max(prior_snapshots):
         raise RuntimeError(
             "Source snapshot is older than the previous capture; refusing an incremental refresh "
-            "that could incorrectly remove newer records")
+            f"that could incorrectly remove newer records ({snapshot.isoformat()} < {max(prior_snapshots).isoformat()})")
+    descriptor = describe(source, request, payload)
+    descriptor["freshness_decision"] = accept_latest(source, descriptor, (prior_cache or {}).get("snapshot"))
+    cache = {**cache, "snapshot": descriptor}
+    return parse_overpass_payload(source, request, payload), cache
+
+
+def parse_overpass_payload(source: dict, request: Request, payload: dict) -> list[dict]:
+    tags_requested = {tag: category for category in request.categories
+                      for tag in by_id()[category]["osm_tags"]}
     records = []
     for element in payload.get("elements", []):
         capture_fields = {"source_payload": element,
@@ -316,15 +397,24 @@ def _overpass(source: dict, request: Request, prior_cache: dict | None = None,
             continue
         category = next(iter(categories))
         source_tag = sorted(tag for tag, _ in matching)[0]
-        base_name = tags.get("name", "")
-        base_is_arabic = bool(re.search(r"[\u0600-\u06ff]", base_name))
-        name_en = tags.get("name:en") or (None if base_is_arabic else base_name or None)
-        name_ar = tags.get("name:ar") or (base_name if base_is_arabic else None)
-        alternate_names = sorted({name.strip() for key in ("alt_name", "official_name", "short_name", "name:en", "name:ar") for name in (tags.get(key) or "").split(";") if name.strip() and name.strip() not in {name_en, name_ar}})
+        source_key = f"{source.get('name', 'openstreetmap')}:{element['type']}/{element['id']}"
+        names = resolve_osm_names(tags, source_key)
+        name_en, name_ar = names.get("name_en"), names.get("name_ar")
+        alternate_names = names["alternate_names"]
         location = element if element.get("type") == "node" else {}
+        derived = False
+        if element.get("type") != "node" and request.allow_source_centers:
+            center = element.get("center") or {}
+            try:
+                if all(isfinite(float(center[key])) for key in ("lat", "lon")) and -90 <= float(center["lat"]) <= 90 and -180 <= float(center["lon"]) <= 180:
+                    location, derived = center, True
+            except (KeyError, TypeError, ValueError):
+                pass
         if "lat" not in location or "lon" not in location:
             records.append({
-                **capture_fields,
+                **capture_fields, **names,
+                "geometry_status": "unresolved",
+                "geometry_unresolved_reason": "No usable source point; footprint center is not an authoritative entrance.",
                 "id": f"{element['type']}/{element['id']}",
                 "category": category,
                 "name_en": name_en,
@@ -337,7 +427,11 @@ def _overpass(source: dict, request: Request, prior_cache: dict | None = None,
             })
             continue
         records.append({
-            **capture_fields,
+            **capture_fields, **names,
+            **({"geometry_derived": True, "geometry_confidence": 0.35,
+                "geometry_derivation": "OSM footprint bounding-box center; not a verified pharmacy entrance",
+                "geometry_provenance": source_key + ":center",
+                "footprint_ref": f"https://www.openstreetmap.org/{element['type']}/{element['id']}"} if derived else {}),
             "id": f"{element['type']}/{element['id']}",
             "lat": location["lat"], "lon": location["lon"],
             "name_en": name_en,
@@ -345,7 +439,7 @@ def _overpass(source: dict, request: Request, prior_cache: dict | None = None,
             "alternate_names": alternate_names,
             "category": category,
             "source_category": source_tag,
-            "geometry_method": "osm_node",
+            "geometry_method": "source_center_derived" if derived else "osm_node",
             "phone": tags.get("phone") or tags.get("contact:phone"),
             "email": tags.get("email") or tags.get("contact:email"),
             "address": ", ".join(filter(None, [tags.get("addr:street"), tags.get("addr:city")])),
@@ -357,7 +451,7 @@ def _overpass(source: dict, request: Request, prior_cache: dict | None = None,
             "website": tags.get("website") or tags.get("contact:website"),
             "hours": tags.get("opening_hours"),
         })
-    return records, cache
+    return records
 
 
 def collect(source: dict, request: Request, registry_path: Path,

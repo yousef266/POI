@@ -32,3 +32,68 @@ The 10K dataset is project-authored synthetic data. Reports separate harvesting/
 ## External requirements
 
 The Common Agent Contract, official gold labels, operator/legal source approval and a representative human-rated Arabic sample are unavailable. Live place/geocoder adapters are optional; their configured endpoint and policy must be supplied by the operator. Offline tests use project fixtures or loopback HTTP only. Docker is optional and its build must be checked on a host with Docker installed.
+
+## Snapshot freshness and explicit historical processing
+
+The CLI and structured invocation share a durable SQLite latest-snapshot store
+(`output/.source-snapshots.sqlite3`). A scope hashes source/endpoint, AOI geometry
+and sorted categories, independently of input language. Captures bind the source
+timestamp, element identity/version and canonical dataset hash into a snapshot ID.
+Older snapshots, missing/malformed timestamps replacing known versions, source
+identity mismatches and equal timestamps with different datasets fail before
+changes or publication. Repeated identical snapshots are accepted deterministically.
+The full source capture, including unresolved and outside-AOI records, is retained;
+a conditional response does not reuse only the previously published subset.
+
+Live runs through the CLI/API default to a maximum source snapshot age of 86,400
+seconds. Configure `--max-snapshot-age-seconds` or the structured field
+`max_snapshot_age_seconds` for an explicit deployment policy. The lower-level
+adapter preserves its existing relative-version behavior unless the source declares
+`max_snapshot_age_seconds`; callers of `pipeline.run` can pass the same option.
+Timestamp ordering alone is not evidence that a source is current. Age validation
+also rejects future timestamps beyond five minutes of clock tolerance.
+
+Use `--snapshot-from PATH` / `snapshot_from` to select one integrity-checked capture
+for semantically equivalent requests. This is explicit historical processing,
+marked `HISTORICAL_CAPTURE_NOT_LIVE`, with its original timestamp and source ID
+visible in provenance and GeoServer metadata. It does not claim live freshness.
+It still cannot downgrade the latest known dataset for the same scope. Do not reset
+the store to bypass a rejection. Share the store between workers using the same
+source and query; it is local operational state, excluded from Git.
+
+There is no automatic stale fallback. HTTP retries use socket timeouts, a total
+data-request budget, bounded streaming reads and the provider's full Retry-After.
+An exhausted budget, cancellation, malformed response or freshness failure is an
+error. Source acquisition finishes before writing changes or publishing; failed
+acquisition leaves existing output and published records intact. The current
+Overpass data-request policy is two attempts, 60-second socket timeouts and a
+150-second total budget; robots verification is a separate prerequisite.
+
+## Names and unresolved geometry
+
+OSM multilingual, official, short and alternate name fields are resolved through
+the normal adapter. Unicode comparison keys normalize diacritics, tatweel and
+Arabic/Persian variants; published source spellings and the original payload remain
+available. Empty/malformed values do not satisfy bilingual completeness. Generic
+establishment terms are translated; uncertain proper-name transliterations retain
+low confidence and review reasons. The versioned synthetic review corpus was
+regenerated with the same 100 source examples for rules-v3; it contains no human
+ratings. Name selection in conflation preserves the selected field's provenance.
+
+Records without source names remain unnamed, with `name_status`, a reason and
+field provenance. Nearby records, operator names and brands are not substituted
+without evidence that they identify the establishment.
+
+Overpass way/relation centers are footprint-derived coordinates, not verified
+entrances. The default behavior still retains them as unresolved review records.
+`--allow-source-centers` / `allow_source_centers: true` explicitly permits valid
+captured centers. Their original payload, footprint reference, derivation method,
+geometry provenance, derived flag and coordinate confidence survive normalization,
+conflation and publication; confidence is capped at 0.35. Missing/invalid centers
+are not fabricated. Licensed geocoding likewise remains explicitly derived.
+
+Replay uses captured transformed inputs and versioned conflation. It never performs
+freshness checks against today's clock, network requests, translation regeneration
+or LLM calls; snapshot descriptors are captured provenance verified by integrity
+hashes. Cross-request parity compares canonical POI identities and business fields,
+excluding the distinct execution timestamps.

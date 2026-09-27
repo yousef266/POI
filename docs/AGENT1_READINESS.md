@@ -20,7 +20,7 @@ Generated from actual local evidence. Every official status remains NOT_CERTIFIE
 ## Commands and outputs
 
 Each criterion in the machine-readable report includes its command and observed output.
-Tests: 80; passed: 80; failed: 0; skipped: 0.
+Tests: 110; passed: 110; failed: 0; skipped: 0.
 Arabic review: 0/100 reviewed; status NOT_REVIEWED.
 
 ## External blockers
@@ -30,22 +30,27 @@ Arabic review: 0/100 reviewed; status NOT_REVIEWED.
 - Human Arabic ratings and official benchmark hardware are unavailable.
 - No licensed live place/geocoder provider is configured.
 
-## Final real Cairo verification
+## Cairo blocker-resolution verification (2026-09-27)
 
-The table above describes the automated fixture evaluator. The requested real Cairo E2E
-does not pass full bilingual completeness: 135/150 English-capture points and 132/147
-initial Arabic-capture points have both names. Fifteen unnamed source nodes remain in
-the review queue. **Final broader local A7 status: FAIL**; official A7 remains NOT_CERTIFIED.
+See [BLOCKER_RESOLUTION.md](BLOCKER_RESOLUTION.md) and
+[BLOCKER_RESOLUTION.json](BLOCKER_RESOLUTION.json) for current source-level
+verification and missing official evidence. All 110 tests pass with zero failures
+and skips, including all original 80 tests unchanged and 30 added regressions.
 
-The initial Arabic source snapshot was older than the English capture and falsely
-removed three records. A narrow timestamp freshness guard now rejects such refreshes
-before changes/publication. Three regression tests were added without weakening
-existing assertions. The newer 150-point Cairo layer was restored and verified.
-The actual post-fix Arabic retry timed out externally and wrote no changes.
-Identical saved-input Arabic intent produces the same 150 business records, explicitly
-an offline parity check.
+The A7 local PASS above is for the evaluator's synthetic fixture. The two Cairo
+intents use the same explicitly pinned July 24 capture: 155 POIs, 140 bilingual
+and 15 genuinely unnamed (90.32% completeness). The four OSM way centers are
+opt-in derived points with confidence 0.35, not verified entrances. The configured
+provider cannot currently demonstrate freshness within the default 24-hour live
+policy; the public alternative was blocked by robots.txt and was not bypassed.
+Stale live/captured publication attempts were rejected without false removals.
+Final layer `poi_cairo_final_0926:poi_pharmacy` passed WFS, WMS, geometry, attributes,
+CRS, styling, attribution and provenance checks.
 
-All 80 tests passed in the final complete regression suite (zero failures/skips).
-Human Arabic review is 0/100; the separate AI assessment inspected 100 names and flagged
-37 for review. No human score was fabricated. See FINAL_VERIFICATION.json for measured
-commands, results, source dates, phase timings, blockers, and the NOT READY FOR SUBMISSION verdict.
+AI review: 100 synthetic names assessed, 70 provisionally acceptable, 30 needing
+review, zero human reviews. Official statuses remain NOT_CERTIFIED. No optional
+provider configuration is needed for the verified captured Cairo AOI flow.
+
+**NOT READY FOR SUBMISSION**: current source access/freshness/names, human review,
+official gold, Common Agent Contract, legal/provider approval and official hardware
+evidence remain unavailable. No implementation blocker was observed in this pass.

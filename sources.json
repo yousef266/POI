@@ -40,7 +40,10 @@
       "freshness": "live source; feature dates vary",
       "attribution": "© OpenStreetMap contributors",
       "rate_limit_per_second": 0.2,
-      "reliability_weight": 0.8
+      "reliability_weight": 0.8,
+      "request_timeout_seconds": 60,
+      "request_attempts": 2,
+      "total_timeout_seconds": 150
     },
     {
       "name": "osm_swiss",
@@ -54,7 +57,10 @@
       "freshness": "live Swiss OpenStreetMap extract; feature dates vary",
       "attribution": "© OpenStreetMap contributors",
       "rate_limit_per_second": 0.2,
-      "reliability_weight": 0.8
+      "reliability_weight": 0.8,
+      "request_timeout_seconds": 60,
+      "request_attempts": 2,
+      "total_timeout_seconds": 150
     }
   ]
 }

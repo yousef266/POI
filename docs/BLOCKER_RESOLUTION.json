@@ -1,0 +1,496 @@
+{
+  "generated_at": "2026-09-27T00:27:16.171199+00:00",
+  "verdict": "NOT READY FOR SUBMISSION",
+  "implementation_status": "LOCAL_VERIFIED; no remaining implementation blocker observed in this verification",
+  "baseline_commit": "f13d80a48f0d988113bfc812a469124f21570df4",
+  "files_changed": [
+    "src/poi_harvester/snapshots.py",
+    "src/poi_harvester/names.py",
+    "src/poi_harvester/sources.py",
+    "src/poi_harvester/pipeline.py",
+    "src/poi_harvester/agent.py",
+    "src/poi_harvester/cli.py",
+    "src/poi_harvester/audit.py",
+    "src/poi_harvester/core.py",
+    "src/poi_harvester/enrichment.py",
+    "src/poi_harvester/publish.py",
+    "sources.json",
+    "fixtures/arabic_name_review.json",
+    "tests/test_blocker_resolution.py",
+    "README.md",
+    "docs/DESIGN.md",
+    "docs/AGENT1_READINESS.md",
+    "docs/BLOCKER_RESOLUTION.md",
+    "docs/BLOCKER_RESOLUTION.json"
+  ],
+  "root_causes": [
+    "Equivalent intents queried an unstable replica separately without an authoritative pinned dataset or durable latest-snapshot selection.",
+    "The old relative timestamp check skipped missing/malformed timestamps, lacked dataset/scope/version binding and could be bypassed by a 304 without verified snapshot evidence.",
+    "Snapshot ordering alone accepted severely lagging live replicas; the deployment interfaces lacked a configurable absolute age policy.",
+    "304 reuse could retain only accepted records instead of the complete source capture and did not reparse unresolved records under the requested processing policy.",
+    "The source adapter omitted authoritative official/short/alternate multilingual name mappings; all 15 investigated Cairo nodes nevertheless genuinely lack names across the available captures.",
+    "The four way centers were intentionally withheld as unverified entrances; valid derived centers existed and required explicit opt-in, provenance and lower confidence.",
+    "Unicode/empty-value/Arabic comparison normalization was incomplete, ATM word order was awkward, and name conflation could overwrite the selected field metadata.",
+    "Derived coordinate confidence was not retained in final records; timeout/retry handling lacked a total data-request budget and cancellation/stream/cooldown checks; HTTP 200 partial timeout responses also needed explicit rejection."
+  ],
+  "fixes": [
+    "Timestamp/version validation, canonical snapshot and semantic scope hashes, durable latest-version guard, equal-timestamp dataset conflict rejection and stale publication checks.",
+    "Integrity-bound snapshot metadata, explicit pinned historical captures, no automatic stale fallback and 24-hour live-age defaults in CLI/API.",
+    "Full-capture conditional response integrity/latest/age validation and deterministic reparse.",
+    "Authoritative alternate-name mapping with selected-field provenance; explicit unnamed status/reason without invented names.",
+    "Opt-in source center recovery with original payload/footprint reference, derived flag/method/derivation and 0.35 confidence in normalized records and published attributes.",
+    "Deterministic Unicode, whitespace, diacritic/tatweel and alias normalization, bilingual preservation, ATM generic translation and uncertainty retained.",
+    "Socket/stream/transport cooldown budgets, provider Retry-After compliance, bounded retries and explicit cancellation/failure without output mutation; HTTP 200 remarks/errors and missing element arrays cannot masquerade as complete datasets.",
+    "Regenerated the same 100 synthetic review inputs for rules-v3; no human ratings added."
+  ],
+  "tests": {
+    "command": "python -m unittest discover -s tests -v",
+    "exit_code": 0,
+    "failed": 0,
+    "passed": 110,
+    "runtime_seconds": 5.955497,
+    "skipped": 0,
+    "status": "PASS",
+    "tests": 110
+  },
+  "original_tests_preserved": 80,
+  "regression_tests_added": 30,
+  "existing_assertions_removed_weakened_or_modified": false,
+  "clean_environment": {
+    "fresh_venv": "output/blockers-resolution/clean-venv",
+    "install_from_scratch": true,
+    "run_py_evaluation_successful": true,
+    "installed_module_evaluation": {
+      "command": "python -m unittest discover -s tests -v",
+      "exit_code": 0,
+      "failed": 0,
+      "passed": 110,
+      "runtime_seconds": 5.980892,
+      "skipped": 0,
+      "status": "PASS",
+      "tests": 110
+    },
+    "python": "3.12.14",
+    "postgis_extra": "Service checks use the configured native runtime and existing local psycopg dependency; base clean install is evaluated offline."
+  },
+  "cairo_scope": "Actual captured OSM Cairo Governorate boundary relation/4103336, not Greater Cairo.",
+  "english": {
+    "request": "I want all pharmacies in Cairo",
+    "total": 155,
+    "bilingual": 140,
+    "unnamed": 15,
+    "evidence": "output/blockers-resolution/cairo-english-final",
+    "snapshot": {
+      "dataset_hash": "fa731fc50468b0ef57d06b4297ae89437436c05faffe9b113e5fab500da23942",
+      "endpoint": "https://overpass.private.coffee/api/interpreter",
+      "freshness": "HISTORICAL_CAPTURE_NOT_LIVE",
+      "freshness_decision": "EQUAL_SNAPSHOT",
+      "mode": "pinned_capture_not_live",
+      "query_hash": "a988117636835e2418f83dfd4112a42a52d29fca7beddebc1303d4bbe619a4f2",
+      "schema_version": 1,
+      "snapshot_id": "b3ede8d4f251d7d2b595b10a484f8c491bb132b8357fee80e95f96ce9a521d44",
+      "source": "openstreetmap",
+      "timestamp": "2026-07-24T11:04:51+00:00"
+    },
+    "status": "PASS_ON_EXPLICIT_HISTORICAL_CAPTURE; LIVE_FRESHNESS_NOT_CERTIFIED"
+  },
+  "arabic": {
+    "request": "عايز كل الصيدليات في القاهرة",
+    "total": 155,
+    "bilingual": 140,
+    "unnamed": 15,
+    "evidence": "output/blockers-resolution/cairo-arabic-final",
+    "snapshot": {
+      "dataset_hash": "fa731fc50468b0ef57d06b4297ae89437436c05faffe9b113e5fab500da23942",
+      "endpoint": "https://overpass.private.coffee/api/interpreter",
+      "freshness": "HISTORICAL_CAPTURE_NOT_LIVE",
+      "freshness_decision": "EQUAL_SNAPSHOT",
+      "mode": "pinned_capture_not_live",
+      "query_hash": "a988117636835e2418f83dfd4112a42a52d29fca7beddebc1303d4bbe619a4f2",
+      "schema_version": 1,
+      "snapshot_id": "b3ede8d4f251d7d2b595b10a484f8c491bb132b8357fee80e95f96ce9a521d44",
+      "source": "openstreetmap",
+      "timestamp": "2026-07-24T11:04:51+00:00"
+    },
+    "parity": "PASS",
+    "live_source_status": "Initial capture completed in 39.4883s before the absolute-age fix; historical July 24 snapshot. Post-fix live retry rejected an older snapshot before changes/publication. No stale fallback."
+  },
+  "names_investigation": {
+    "records": 15,
+    "pipeline_mapping_failures_for_these_records": 0,
+    "genuinely_missing_in_available_source": 15,
+    "evidence": "output/blockers-resolution/source-record-investigation.json"
+  },
+  "coordinate_investigation": {
+    "ways": 4,
+    "authoritative_entrance_coordinates_available": false,
+    "valid_source_centers_recovered_only_with_opt_in": 4,
+    "geometry_confidence": 0.35,
+    "default_remains_unresolved_review": true
+  },
+  "arabic_quality": {
+    "assessment_type": "AI_ONLY_NOT_HUMAN",
+    "ai_reviewed": 100,
+    "provisionally_acceptable": 70,
+    "needs_review": 30,
+    "human_reviewed": 0,
+    "human_acceptance_score": null,
+    "official_status": "NOT_CERTIFIED"
+  },
+  "snapshot_freshness": {
+    "current_snapshot": {
+      "dataset_hash": "fa731fc50468b0ef57d06b4297ae89437436c05faffe9b113e5fab500da23942",
+      "endpoint": "https://overpass.private.coffee/api/interpreter",
+      "freshness": "HISTORICAL_CAPTURE_NOT_LIVE",
+      "freshness_decision": "EQUAL_SNAPSHOT",
+      "mode": "pinned_capture_not_live",
+      "query_hash": "a988117636835e2418f83dfd4112a42a52d29fca7beddebc1303d4bbe619a4f2",
+      "schema_version": 1,
+      "snapshot_id": "b3ede8d4f251d7d2b595b10a484f8c491bb132b8357fee80e95f96ce9a521d44",
+      "source": "openstreetmap",
+      "timestamp": "2026-07-24T11:04:51+00:00"
+    },
+    "historical_live_capture_age_validation": {
+      "status": "REJECTED_STALE",
+      "error": "Stale live source snapshot 2026-07-24T11:04:51+00:00: age 5577685s exceeds 86400s; no fallback, changes or publication",
+      "publication_attempted": false
+    },
+    "may31_stale_attempt_output_exists": false,
+    "postfix_live_attempt_output_exists": false,
+    "postfix_live_error": "{\"status\": \"failed\", \"error\": \"Harvest incomplete; no change set or publication written. Source failures: [{'source': 'openstreetmap', 'error': 'Source snapshot is older than the previous capture; refusing an incremental refresh that could incorrectly remove newer records'}]\"}\n",
+    "final_published_count_after_failures": 155,
+    "no_false_removals": true
+  },
+  "public_alternative_probe": {
+    "endpoint": "https://overpass-api.de/api/interpreter",
+    "result": "ROBOTS_DISALLOWED; no source query or publication",
+    "evidence": "output/blockers-resolution/cairo-public-live-command.log"
+  },
+  "stale_publication_rejection": {
+    "result": "REJECTED_BEFORE_PUBLICATION",
+    "error": "Source snapshot is older than the previous capture; refusing false removals/publication",
+    "candidate_timestamp": "2026-07-15T15:22:01+00:00",
+    "newest_known_timestamp": "2026-07-24T11:04:51+00:00"
+  },
+  "geometry": {
+    "status": "PASS",
+    "poi_count": 155,
+    "valid_geometries": 155,
+    "outside_aoi": 0,
+    "wrong_crs": 0,
+    "unique_coordinates": 155,
+    "coordinates_within_earth_bounds": true,
+    "source_coordinate_mismatch_ids": [],
+    "source_node_points": 151,
+    "derived_points": 4,
+    "derived_missing_markers": [],
+    "derived_overconfident": 0,
+    "unnamed_source": 15,
+    "gold_accuracy_certified": false,
+    "city_center_collapse": false
+  },
+  "geoserver": {
+    "status": "PASS",
+    "layer": "poi_cairo_final_0926:poi_pharmacy",
+    "wfs_feature_count": 155,
+    "wfs_attribute_errors": [],
+    "wms_png": true,
+    "crs": "EPSG:4326",
+    "attribution_present": true,
+    "historical_snapshot_disclosed": true,
+    "derived_disclaimer_present": true,
+    "style": "poi_harvester_style",
+    "pharmacy_style_rule": true,
+    "abstract": "POI Harvester layer. Source attribution: © OpenStreetMap contributors. Field provenance is exposed in provenance_* columns. Footprint centers are derived, not verified entrances; see geometry_derived and geometry_confidence. Source snapshots: openstreetmap: 2026-07-24T11:04:51+00:00 (pinned_capture_not_live)."
+  },
+  "incremental": {
+    "status": "PASS",
+    "counts": {
+      "added": 50,
+      "removed": 20,
+      "unchanged": 30,
+      "updated": 50
+    },
+    "field_phone_diffs_verified": true,
+    "repeated_change_set_identical": true,
+    "change_set_hash": "8ab0084f2b4c09f59b4e706f59797f714e1977b76715e48f5b5cb9a3a2d7eac9",
+    "official_status": "NOT_CERTIFIED"
+  },
+  "replay": {
+    "network_prohibited": true,
+    "llm_required": false,
+    "results": {
+      "english": [
+        {
+          "identical": true,
+          "capture_integrity": {
+            "status": "PASS",
+            "checks": {
+              "source_capture.json": true,
+              "raw.json": true,
+              "sources_snapshot.json": true,
+              "previous_snapshot.json": true,
+              "records.json": true,
+              "source_snapshot_metadata": true,
+              "conflation_algorithm_version": true
+            }
+          },
+          "comparison_representation": "Canonical UTF-8 JSON with sorted keys and compact separators",
+          "reproducibility_hash": "8c6733937e0fbb7a42a90b5252c1fa26a535359951b7efb1580eb4cb04dc8bbb",
+          "feature_count": 155
+        },
+        {
+          "identical": true,
+          "capture_integrity": {
+            "status": "PASS",
+            "checks": {
+              "source_capture.json": true,
+              "raw.json": true,
+              "sources_snapshot.json": true,
+              "previous_snapshot.json": true,
+              "records.json": true,
+              "source_snapshot_metadata": true,
+              "conflation_algorithm_version": true
+            }
+          },
+          "comparison_representation": "Canonical UTF-8 JSON with sorted keys and compact separators",
+          "reproducibility_hash": "8c6733937e0fbb7a42a90b5252c1fa26a535359951b7efb1580eb4cb04dc8bbb",
+          "feature_count": 155
+        }
+      ],
+      "arabic": [
+        {
+          "identical": true,
+          "capture_integrity": {
+            "status": "PASS",
+            "checks": {
+              "source_capture.json": true,
+              "raw.json": true,
+              "sources_snapshot.json": true,
+              "previous_snapshot.json": true,
+              "records.json": true,
+              "source_snapshot_metadata": true,
+              "conflation_algorithm_version": true
+            }
+          },
+          "comparison_representation": "Canonical UTF-8 JSON with sorted keys and compact separators",
+          "reproducibility_hash": "4ae01dda854786435a41dfd4a52ef93e27da49d10edc0151958a40bbbb4371db",
+          "feature_count": 155
+        },
+        {
+          "identical": true,
+          "capture_integrity": {
+            "status": "PASS",
+            "checks": {
+              "source_capture.json": true,
+              "raw.json": true,
+              "sources_snapshot.json": true,
+              "previous_snapshot.json": true,
+              "records.json": true,
+              "source_snapshot_metadata": true,
+              "conflation_algorithm_version": true
+            }
+          },
+          "comparison_representation": "Canonical UTF-8 JSON with sorted keys and compact separators",
+          "reproducibility_hash": "4ae01dda854786435a41dfd4a52ef93e27da49d10edc0151958a40bbbb4371db",
+          "feature_count": 155
+        }
+      ]
+    }
+  },
+  "performance": {
+    "complete_features_per_hour": 605975,
+    "complete_pipeline_seconds": 59.408374,
+    "exact_replay": true,
+    "features": 10000,
+    "features_per_hour": 7486023,
+    "four_vcpu_eight_gb_verified": false,
+    "gold_benchmark": false,
+    "hardware": {
+      "cpu": "Intel64 Family 6 Model 158 Stepping 9, GenuineIntel",
+      "logical_cpu_count": 8,
+      "official_hardware_verified": false,
+      "physical_memory_bytes": 34213380096,
+      "platform": "Windows-11-10.0.26200-SP0",
+      "process_peak_rss_bytes": 215355392
+    },
+    "harvest_seconds": 4.808962,
+    "kind": "synthetic_fixture_with_local_publication",
+    "measurement_scope": "Generation/setup and verification are excluded from complete_pipeline_seconds; artifact writes are included",
+    "official_status": "NOT_CERTIFIED",
+    "phase_timings": {
+      "artifact_change_audit_seconds": 3.1956602999998722,
+      "conflation_reconciliation_seconds": 0.9486048000107985,
+      "geoserver_seconds": 16.73712889998569,
+      "harvesting_normalization_seconds": 0.6402500999975018,
+      "pipeline_seconds": 4.7845152000081725,
+      "postgis_seconds": 20.34517099999357,
+      "process_cpu_seconds": 4.765625,
+      "publication_seconds": 54.59107229998335,
+      "publication_setup_seconds": 1.034570599993458,
+      "target_guard_seconds": 16.47419639999862,
+      "verification_seconds": 13.066800400003558
+    },
+    "process_cpu_seconds": 24.109375,
+    "publication": {
+      "database": "poi_agent_test",
+      "demo_data": true,
+      "feature_count": 10000,
+      "layer": "poi_final_verification_0926:poi_pharmacy",
+      "schema": "poi_final_verification_0926",
+      "timings": {
+        "geoserver_seconds": 16.73712889998569,
+        "postgis_seconds": 20.34517099999357,
+        "publication_seconds": 54.59107229998335,
+        "publication_setup_seconds": 1.034570599993458,
+        "target_guard_seconds": 16.47419639999862
+      },
+      "wms_url": "http://localhost:8080/geoserver/poi_final_verification_0926/wms?service=WMS&request=GetCapabilities"
+    },
+    "publication_verification": {
+      "category_style_rules_verified": [
+        "clinic",
+        "hospital",
+        "other",
+        "pharmacy",
+        "school"
+      ],
+      "coordinate_mismatch_count": 0,
+      "database": "poi_agent_test",
+      "expected_feature_count": 10000,
+      "geoserver_default_style": "poi_harvester_style",
+      "gold_coordinate_accuracy_verified": false,
+      "layer": "poi_final_verification_0926:poi_pharmacy",
+      "missing_provenance_count": 0,
+      "postgis_feature_count": 10000,
+      "postgis_version": "3.6 USE_GEOS=1 USE_PROJ=1 USE_STATS=1",
+      "schema": "poi_final_verification_0926",
+      "source_node_coordinate_checks": 0,
+      "status": "passed",
+      "wfs_dedicated_fields_verified": true,
+      "wfs_geometry_and_values_verified": true,
+      "wms_getmap_png_verified": true,
+      "wms_layer_available": true,
+      "wrong_srid_count": 0
+    },
+    "replay_checks": [
+      {
+        "capture_integrity": {
+          "checks": {
+            "conflation_algorithm_version": true,
+            "previous_snapshot.json": true,
+            "raw.json": true,
+            "records.json": true,
+            "source_capture.json": true,
+            "source_snapshot_metadata": true,
+            "sources_snapshot.json": true
+          },
+          "status": "PASS"
+        },
+        "comparison_representation": "Canonical UTF-8 JSON with sorted keys and compact separators",
+        "feature_count": 10000,
+        "identical": true,
+        "reproducibility_hash": "0f34ebce886807207e369f4d15c948dab679843ddeb6d30bf01a05fef805b634"
+      },
+      {
+        "capture_integrity": {
+          "checks": {
+            "conflation_algorithm_version": true,
+            "previous_snapshot.json": true,
+            "raw.json": true,
+            "records.json": true,
+            "source_capture.json": true,
+            "source_snapshot_metadata": true,
+            "sources_snapshot.json": true
+          },
+          "status": "PASS"
+        },
+        "comparison_representation": "Canonical UTF-8 JSON with sorted keys and compact separators",
+        "feature_count": 10000,
+        "identical": true,
+        "reproducibility_hash": "0f34ebce886807207e369f4d15c948dab679843ddeb6d30bf01a05fef805b634"
+      }
+    ]
+  },
+  "A1_A12": {
+    "A1": {
+      "local": "PASS",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Operator/legal approval of provider permissions and downstream licensing obligations."
+    },
+    "A2": {
+      "local": "PASS",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Official rate-limit/robots benchmark evidence; local policy and real request behavior are not official certification."
+    },
+    "A3": {
+      "local": "PASS",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Official attribution/contract acceptance; local WFS/WMS/catalog attribution verified."
+    },
+    "A4": {
+      "local": "PASS",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Official gold conflation labels and benchmark corpus."
+    },
+    "A5": {
+      "local": "PASS",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Official gold recall corpus and authoritative completeness labels."
+    },
+    "A6": {
+      "local": "NOT_CERTIFIED",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Official category gold labels."
+    },
+    "A7": {
+      "local": "PASS_SYNTHETIC_FIXTURE; BELOW_95_PERCENT_FOR_CAIRO_ALL_RECORDS",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Official representative bilingual benchmark; Cairo is 140/155 (90.32%) because 15 source identities have no names."
+    },
+    "A8": {
+      "local": "AI_ASSESSED_ONLY; HUMAN_NOT_REVIEWED",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Human Arabic review: zero human ratings; AI assessment cannot certify this criterion."
+    },
+    "A9": {
+      "local": "SOURCE_COORDINATES_PRESERVED_AND_DERIVED_MARKED; REAL_WORLD_ACCURACY_NOT_CERTIFIED",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Gold real-world source-of-truth coordinates/accuracy benchmark; four centers are explicitly derived, not verified entrances."
+    },
+    "A10": {
+      "local": "PASS",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Official seeded change-set benchmark; project-authored 50/50/20/30 passes locally."
+    },
+    "A11": {
+      "local": "PASS",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Official source workload on 4 vCPU / 8 GB RAM; local host has 8 logical CPUs and approximately 32 GB."
+    },
+    "A12": {
+      "local": "PASS",
+      "official": "NOT_CERTIFIED",
+      "missing_evidence": "Official replay corpus/Common Agent Contract; local English/Arabic replay is exact and offline."
+    }
+  },
+  "remaining_blockers": [
+    "A current Cairo source snapshot is unavailable from the configured provider: July 24 capture is older than the 24-hour live policy; the later live retry returned an older snapshot and was rejected. The documented public alternative was blocked by robots.txt before the data request.",
+    "Fifteen source identities have no authoritative name across the available May 31, July 15 and July 24 captures; bilingual completeness remains 140/155 (90.32%), below the 95% target.",
+    "Human Arabic review is pending; 30 of 100 synthetic examples still need pronunciation/brand confirmation.",
+    "Common Agent Contract, official gold datasets, operator/legal source approval and the required official benchmark environment are unavailable."
+  ],
+  "repository": {
+    "generated_artifacts_ignored": true,
+    "credentials_and_env_excluded": true,
+    "raw_live_source_records_excluded_from_git": true,
+    "final_commit": "Use repository HEAD and final response; this report describes the committed source state."
+  },
+  "commands": [
+    ".\\run.ps1 evaluate --out output/submission-20260926/final-verification --readiness docs/AGENT1_READINESS.md --local-services --database poi_agent_test --schema poi_final_verification_0926 --workspace poi_final_verification_0926",
+    ".\\output\\blockers-resolution\\clean-venv\\Scripts\\python.exe -m poi_harvester.cli evaluate --out output/blockers-resolution/fresh-installed-module --readiness output/blockers-resolution/fresh-installed-module/readiness.md",
+    ".\\.venv-final\\Scripts\\python.exe -m unittest discover -s tests -v"
+  ],
+  "evidence_root": "output/blockers-resolution",
+  "exact_evaluator_report": "output/submission-20260926/final-verification/report.json"
+}

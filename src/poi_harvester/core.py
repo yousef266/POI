@@ -174,6 +174,7 @@ class Request:
     operator_contact: str | None = None
     max_requests_per_second: float | None = None
     area_resolution: dict[str, Any] | None = None
+    allow_source_centers: bool = False
 
     def __post_init__(self) -> None:
         if not self.categories or any(category not in SUPPORTED_CATEGORIES for category in self.categories):
@@ -286,6 +287,15 @@ def canonicalize(raw: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
                        for key, val in fields.items() if val is not None},
         "geometry_provenance": raw.get("geometry_provenance") or source_key,
     }
+    for field in ("name_status", "missing_name_reason", "geometry_derived", "geometry_derivation",
+                  "name_en_source_field", "name_ar_source_field", "name_normalization_version",
+                  "original_name_en", "original_name_ar"):
+        if field in raw:
+            result[field] = raw[field]
+    if "geometry_derived" in raw and "geometry_confidence" in raw:
+        result["geometry_confidence"] = raw["geometry_confidence"]
+    if raw.get("provenance_name_status"):
+        result["provenance"]["name_status"] = raw["provenance_name_status"]
     for language_field in ("name_en", "name_ar"):
         if raw.get(f"{language_field}_method"):
             for suffix in ("method", "version", "confidence"):
@@ -410,6 +420,10 @@ def conflate(records: list[dict[str, Any]], algorithm_version: int = 3,
             chosen = choices[0] if choices else None
             merged[field] = chosen[field] if chosen else None
             if chosen:
+                if field in ("name_en", "name_ar") and f"{field}_source_field" in chosen:
+                    merged[f"{field}_source_field"] = chosen[f"{field}_source_field"]
+                if f"original_{field}" in chosen:
+                    merged[f"original_{field}"] = chosen[f"original_{field}"]
                 merged["provenance"][field] = chosen["provenance"].get(field, chosen["source_key"])
                 if field in ("name_en", "name_ar") and chosen.get(f"{field}_method"):
                     for suffix in ("method", "version", "confidence"):
@@ -417,6 +431,17 @@ def conflate(records: list[dict[str, Any]], algorithm_version: int = 3,
                     merged[f"original_{field}"] = chosen.get(f"original_{field}")
                     if f"{field}_generated" in chosen:
                         merged[f"{field}_generated"] = chosen[f"{field}_generated"]
+        if any("name_status" in row for row in group):
+            merged["name_status"] = "named" if merged["name_en"] or merged["name_ar"] else "unnamed_source"
+            if merged["name_status"] == "unnamed_source":
+                merged["missing_name_reason"] = ranked[0].get("missing_name_reason")
+                merged["provenance"]["name_status"] = ranked[0]["provenance"].get("name_status", ranked[0]["source_key"])
+        for field in ("geometry_derived", "geometry_derivation", "geometry_confidence"):
+            if field in ranked[0]:
+                merged[field] = ranked[0][field]
+        for field in ("name_normalization_version",):
+            if field in ranked[0]:
+                merged[field] = ranked[0][field]
         merged["language_complete"] = bool(merged["name_en"] and merged["name_ar"])
         merged["alternate_names"] = sorted({name for row in group for name in row.get("alternate_names", [])})
         output.append(merged)

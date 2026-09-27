@@ -38,9 +38,14 @@ def build_provenance(captures: list[dict], raw: list[dict], sources: list[dict],
                                                      "taxonomy_hash": taxonomy_hash},
                                 "geometry": {"method": row.get("geometry_method"),
                                              "provenance": row.get("geometry_provenance") or f"{item['source']}:{row['id']}"},
-                                "enrichment": names})
+                                "enrichment": names,
+                                "name_status": row.get("name_status"),
+                                "missing_name_reason": row.get("missing_name_reason"),
+                                "geometry_derived": bool(row.get("geometry_derived")),
+                                "geometry_derivation": row.get("geometry_derivation")})
     return {"schema_version": 1, "capture_kind": "input_records_before_current_transformation",
             "comparison_representation": "UTF-8 JSON, sorted keys, compact separators, ordered record lists",
+            "source_snapshots": {capture["source"]:capture.get("version", {}).get("snapshot") for capture in captures},
             "capture_file_hash": canonical_hash(captures), "raw_file_hash": canonical_hash(raw),
             "source_registry_hash": canonical_hash(sources), "previous_snapshot_hash": canonical_hash(previous),
             "final_records_hash": canonical_hash(records), "taxonomy_hash": taxonomy_hash,
@@ -64,5 +69,8 @@ def verify_capture_integrity(output_dir: Path) -> dict:
     checks = {file: canonical_hash(json.loads((output_dir / file).read_text(encoding="utf-8"))) == manifest[field]
               for file, field in mapping.items()}
     metadata = json.loads((output_dir / "metadata.json").read_text(encoding="utf-8"))
+    if "source_snapshots" in manifest:
+        expected_snapshots = {name:descriptor for name,descriptor in manifest["source_snapshots"].items() if descriptor is not None}
+        checks["source_snapshot_metadata"] = metadata.get("source_snapshots", {}) == expected_snapshots
     checks["conflation_algorithm_version"] = metadata.get("conflation_algorithm_version") == manifest["conflation_algorithm_version"]
     return {"status": "PASS" if all(checks.values()) else "FAIL", "checks": checks}

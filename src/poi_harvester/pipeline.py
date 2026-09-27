@@ -13,6 +13,7 @@ from .enrichment import VERSION as ENRICHMENT_VERSION, enrich_record
 from .sources import collect, covers_area, license_gate, load_registry
 from .taxonomy import by_id
 from .audit import build_provenance, canonical_hash, verify_capture_integrity
+from .snapshots import describe, accept_latest, timestamp, validate_age
 
 
 def _write_json(path: Path, value: object) -> None:
@@ -27,9 +28,23 @@ def run(
     previous_path: Path | None = None,
     geocoder: Any | None = None,
     source_records_override: dict[str, list[dict]] | None = None,
+    source_snapshots_override: dict[str, dict] | None = None,
+    snapshot_store_path: Path | None = None,
+    max_snapshot_age_seconds: float | None = None,
 ) -> dict:
     started, cpu_started = perf_counter(), process_time()
     sources = load_registry(registry_path)
+    if snapshot_store_path is not None:
+        for source in sources:
+            if source["kind"] == "overpass":
+                source["snapshot_store"] = str(snapshot_store_path)
+    if max_snapshot_age_seconds is not None:
+        from math import isfinite
+        if not isfinite(max_snapshot_age_seconds) or max_snapshot_age_seconds <= 0:
+            raise ValueError("max_snapshot_age_seconds must be finite and positive")
+        for source in sources:
+            if source["kind"] == "overpass":
+                source["max_snapshot_age_seconds"] = max_snapshot_age_seconds
     source_captures = []
     known = {source["name"] for source in sources}
     if selected_sources is not None and not selected_sources:
@@ -41,12 +56,21 @@ def run(
     previous_cache = {}
     previous_raw: dict[str, list[dict]] = {}
     if previous_path:
+        if verify_capture_integrity(previous_path.parent)["status"] == "FAIL":
+            raise ValueError("Previous source capture integrity failed; no refresh or publication")
         cache_path = previous_path.parent / "http_cache.json"
         raw_path = previous_path.parent / "raw.json"
-        if cache_path.exists() and raw_path.exists():
+        if cache_path.exists():
             previous_cache = json.loads(cache_path.read_text(encoding="utf-8"))
+        if raw_path.exists():
             for item in json.loads(raw_path.read_text(encoding="utf-8")):
                 previous_raw.setdefault(item["source"], []).append(item["record"])
+        capture_path = previous_path.parent / "source_capture.json"
+        if capture_path.exists():
+            for capture in json.loads(capture_path.read_text(encoding="utf-8")):
+                previous_raw[capture["source"]] = capture["records"]
+                if capture.get("version", {}).get("snapshot"):
+                    previous_cache.setdefault(capture["source"], {})["snapshot"] = capture["version"]["snapshot"]
     current_cache = {}
     geocoder_used = False
     harvested_at = datetime.now(timezone.utc).isoformat()
@@ -69,6 +93,29 @@ def run(
                 source_records, cache_entry = collect(
                     source, request, registry_path, previous_cache.get(source["name"]),
                     previous_raw.get(source["name"]))
+            descriptor = (source_snapshots_override or {}).get(source["name"])
+            if source["kind"] == "overpass" and source_records_override is not None:
+                if descriptor is None and source_records and all("source_payload" in row for row in source_records):
+                    stamps = {row.get("source_snapshot_timestamp", row.get("source_version")) for row in source_records}
+                    if len(stamps) != 1:
+                        raise ValueError("Captured source has mixed snapshot timestamps/versions")
+                    stamp = next(iter(stamps))
+                    descriptor = describe(source, request, {"osm3s": {"timestamp_osm_base": stamp},
+                                          "elements": [row["source_payload"] for row in source_records]},
+                                          "captured_input_not_live")
+                if descriptor:
+                    descriptor = dict(descriptor)
+                    validate_age(source, descriptor)
+                    descriptor["freshness_decision"] = accept_latest(source, descriptor,
+                        previous_cache.get(source["name"], {}).get("snapshot"))
+                    cache_entry = {"snapshot": descriptor}
+                prior_stamps = [timestamp(row.get("source_snapshot_timestamp", row.get("source_version")))
+                                for row in previous_raw.get(source["name"], [])
+                                if isinstance(row.get("source_snapshot_timestamp", row.get("source_version")), str)]
+                if prior_stamps and (not descriptor or not descriptor.get("timestamp")):
+                    raise ValueError("Captured source has no validated timestamp to compare with previous capture")
+                if prior_stamps and timestamp(descriptor["timestamp"]) < max(prior_stamps):
+                    raise RuntimeError("Source snapshot is older than the previous capture; no changes/publication")
             if cache_entry:
                 current_cache[source["name"]] = cache_entry
         except Exception as exc:
@@ -96,6 +143,8 @@ def run(
                 if found:
                     record = {**record, "lat": found["lat"], "lon": found["lon"],
                               "geometry_method": "geocode_derived",
+                              "geometry_derived": True,
+                              "geometry_derivation": "Licensed address lookup; not a verified source entrance.",
                               "geometry_provenance": f"{found['provider']}:{found['reference']}",
                               "geometry_confidence": found["confidence"],
                               "geometry_attribution": found["attribution"],
@@ -165,6 +214,9 @@ def run(
         "conflation_algorithm_version": 3,
         "enrichment_algorithm_version": ENRICHMENT_VERSION,
         "bilingual_complete_count": sum(bool(row.get("language_complete")) for row in current),
+        "unnamed_source_count": sum(row.get("name_status") == "unnamed_source" for row in current),
+        "derived_geometry_count": sum(bool(row.get("geometry_derived")) or row["geometry_method"] == "geocode_derived" for row in current),
+        "source_snapshots": {name: cache["snapshot"] for name, cache in current_cache.items() if "snapshot" in cache},
         "generated_name_count": sum(bool(row.get("name_en_method")) + bool(row.get("name_ar_method"))
                                     for row in current),
         "caveats": [

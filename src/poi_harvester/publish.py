@@ -62,7 +62,8 @@ def publish_postgis(records: list[dict], layer: str, database: str, schema: str 
         "address_postcode": "text", "address_country": "text",
         "phone": "text", "email": "text", "website": "text", "hours": "text",
         "harvested_at": "timestamptz", "confidence": "double precision",
-        "language_complete": "boolean", "source_keys": "text",
+        "language_complete": "boolean", "name_status": "text", "missing_name_reason": "text",
+        "geometry_derived": "boolean", "geometry_confidence": "double precision", "geometry_derivation": "text", "source_keys": "text",
         "attributions": "text", "licenses": "text",
         "geometry_provenance": "text", "geometry_method": "text", "is_demo": "boolean",
         "provenance_name_en": "text", "provenance_name_ar": "text",
@@ -131,6 +132,10 @@ def publish_postgis(records: list[dict], layer: str, database: str, schema: str 
                     "phone": row.get("phone"), "email": row.get("email"), "website": row.get("website"), "hours": row.get("hours"),
                     "harvested_at": row.get("harvested_at"), "confidence": row["confidence"],
                     "language_complete": row.get("language_complete"),
+                    "name_status": row.get("name_status"), "missing_name_reason": row.get("missing_name_reason"),
+                    "geometry_derived": bool(row.get("geometry_derived") or row.get("geometry_method") == "geocode_derived"),
+                    "geometry_confidence": row.get("geometry_confidence", row.get("confidence")),
+                    "geometry_derivation": row.get("geometry_derivation"),
                     "source_keys": json.dumps(row.get("source_keys") or [], ensure_ascii=False),
                     "attributions": json.dumps(row.get("attributions") or [], ensure_ascii=False),
                     "licenses": json.dumps(row.get("licenses") or [], ensure_ascii=False),
@@ -291,6 +296,12 @@ def publish_geoserver(layer: str, metadata: dict, database: str, workspace: str,
     demo_data = bool(metadata.get("demo_data"))
     disclaimer = "DEMO DATA: invented locations for software testing; not verified POIs. " if demo_data else ""
     abstract = f"{disclaimer}POI Harvester layer. Source attribution: {attribution or 'none'}. Field provenance is exposed in provenance_* columns."
+    if metadata.get("derived_geometry_count"):
+        abstract += " Footprint centers are derived, not verified entrances; see geometry_derived and geometry_confidence."
+    snapshots = metadata.get("source_snapshots", {})
+    if snapshots:
+        abstract += " Source snapshots: " + "; ".join(
+            f"{name}: {value['timestamp']} ({value['mode']})" for name, value in sorted(snapshots.items())) + "."
     feature_type = {
         "name": layer, "nativeName": layer, "title": ("DEMO - " if demo_data else "") + layer.replace("_", " ").title(),
         "abstract": abstract, "srs": "EPSG:4326",
@@ -337,6 +348,20 @@ def publish(output_dir: Path, layer: str, database: str, workspace: str, schema:
     publication_started = perf_counter()
     records = json.loads((output_dir / "records.json").read_text(encoding="utf-8"))
     metadata = json.loads((output_dir / "metadata.json").read_text(encoding="utf-8"))
+    from .audit import verify_capture_integrity
+    if verify_capture_integrity(output_dir)["status"] == "FAIL":
+        raise ValueError("Publication capture integrity failed")
+    for descriptor in metadata.get("source_snapshots", {}).values():
+        if not descriptor.get("timestamp"):
+            raise ValueError("Unverified source snapshot timestamp cannot be published")
+        descriptor_source = next((source for source in json.loads((output_dir / "sources_snapshot.json").read_text(encoding="utf-8"))
+                                  if source["name"] == descriptor["source"]), None)
+        if descriptor_source is None:
+            raise ValueError("Publication source snapshot identity mismatch")
+        if descriptor_source:
+            from .snapshots import accept_latest, validate_age
+            validate_age(descriptor_source, descriptor)
+            accept_latest(descriptor_source, descriptor, write=False)
     snapshot = output_dir / "sources_snapshot.json"
     if snapshot.exists():
         selected = {item["source"] for item in metadata.get("contributors", [])}

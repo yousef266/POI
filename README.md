@@ -177,3 +177,26 @@ docker run --rm -v "$($PWD.Path)/output:/app/output" poi-harvester evaluate --ou
 The image includes tests, scripts, fixtures and documentation. Docker is not installed on this PC, so the image build/run is `NOT_AVAILABLE` locally; the equivalent native workflow is tested. Secrets and local runtimes are excluded from the build context.
 
 See [docs/DESIGN.md](docs/DESIGN.md), [docs/LOCAL_EVALUATION.json](docs/LOCAL_EVALUATION.json) and [docs/AGENT1_READINESS.md](docs/AGENT1_READINESS.md). Raw live OSM captures and service credentials remain local and are excluded from Git. Fresh run timestamps and measured runtimes can change; captured transformation/replay results remain deterministic.
+
+## Snapshot safety and final blocker verification
+
+The CLI/API reject older snapshots and default to a 24-hour maximum age for live
+OSM snapshots. Failures do not silently fall back or publish removals. Equivalent
+English/Arabic requests can explicitly use one immutable capture:
+
+```powershell
+.\run.ps1 run --intent "I want all pharmacies in Cairo" --place-catalog PATH_TO_CATALOG --snapshot-from PATH_TO_CAPTURE --sources openstreetmap --use internal --out output/cairo-english
+.\run.ps1 run --intent "عايز كل الصيدليات في القاهرة" --place-catalog PATH_TO_CATALOG --snapshot-from PATH_TO_CAPTURE --sources openstreetmap --use internal --out output/cairo-arabic
+```
+
+These are historical runs with the original source timestamp, not fresh harvests.
+The durable latest-version guard still applies. `--allow-source-centers` is an
+explicit option for captured OSM footprint centers; these remain derived, with
+coordinate confidence capped at 0.35. It is not required for source node points.
+Genuinely unnamed POIs remain unnamed and do not count as bilingual.
+
+See [the new verification report](docs/BLOCKER_RESOLUTION.md) and
+[snapshot policy](docs/DESIGN.md#snapshot-freshness-and-explicit-historical-processing).
+Local evidence remains under `output/blockers-resolution`; runtime data and
+credentials are excluded from Git. Official benchmarks and human review are
+reported separately from local test results.

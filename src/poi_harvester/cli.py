@@ -18,6 +18,8 @@ from .intent import normalize_intent
 from .place import CatalogPlaceResolver, choose_unique_place, load_http_place_resolver
 from .pipeline import replay, reprocess_capture, run
 from .publish import publish, verify_local
+from .snapshots import load_pinned
+from .sources import load_registry
 
 
 def build_parser() -> ArgumentParser:
@@ -46,6 +48,10 @@ def build_parser() -> ArgumentParser:
     run_cmd.add_argument("--geocode-provider", type=Path,
                          help="Optional licensed Nominatim-compatible address provider config")
     run_cmd.add_argument("--out", type=Path, default=Path("output/demo"))
+    run_cmd.add_argument("--max-snapshot-age-seconds", type=float, default=86400, help="Maximum live snapshot age; explicit historical pins are marked separately")
+    run_cmd.add_argument("--snapshot-store", type=Path, default=Path("output/.source-snapshots.sqlite3"), help="Durable latest-version guard keyed by semantic AOI/category/source")
+    run_cmd.add_argument("--snapshot-from", type=Path, help="Explicit immutable source capture; never presented as a fresh live request")
+    run_cmd.add_argument("--allow-source-centers", action="store_true", help="Explicitly use captured footprint centers as low-confidence derived points")
     run_cmd.add_argument("--previous", type=Path, help="Previous records.json for an incremental change set")
     run_cmd.add_argument("--publish", action="store_true", help="Publish to PostGIS and GeoServer")
     run_cmd.add_argument("--allow-demo-publish", action="store_true", help="Explicitly publish invented fixture points for an isolated test")
@@ -168,7 +174,7 @@ def main(argv: list[str] | None = None) -> int:
         else:
             raise ValueError("Provide --bbox, --polygon, --place, or an intent containing a place")
         request = Request(selected_area, category, args.use, args.contact,
-                          args.max_requests_per_second, area_resolution)
+                          args.max_requests_per_second, area_resolution, args.allow_source_centers)
         if args.publish:
             if not args.database or not args.workspace:
                 raise ValueError("--publish requires --database and --workspace")
@@ -178,12 +184,24 @@ def main(argv: list[str] | None = None) -> int:
         geocoder = (CatalogGeocoder(args.geocode_catalog, args.use) if args.geocode_catalog else
                     load_http_geocoder(args.geocode_provider, args.use, args.contact or "",
                                        args.max_requests_per_second) if args.geocode_provider else None)
-        result = run(request, args.registry.resolve(), args.out, set(args.sources.split(",")), args.previous, geocoder)
+        selected = set(args.sources.split(","))
+        registry_sources = load_registry(args.registry)
+        for source in registry_sources:
+            if source["kind"] == "overpass":
+                source["snapshot_store"] = str(args.snapshot_store)
+        captured, descriptors = (load_pinned(args.snapshot_from, registry_sources, request, selected)
+                                 if args.snapshot_from else (None, None))
+        result = run(request, args.registry.resolve(), args.out, selected, args.previous, geocoder,
+                     source_records_override=captured, source_snapshots_override=descriptors,
+                     snapshot_store_path=args.snapshot_store, max_snapshot_age_seconds=args.max_snapshot_age_seconds)
         if args.publish:
             default_layer = "poi_" + "_".join(categories)
             result["publication"] = publish(args.out, args.layer or default_layer, args.database, args.workspace, args.schema, args.allow_demo_publish)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
+    except KeyboardInterrupt:
+        print(json.dumps({"status": "cancelled", "error": "Refresh cancelled; no stale fallback"}), file=sys.stderr)
+        return 130
     except Exception as exc:
         print(json.dumps({"status": "failed", "error": str(exc)}), file=sys.stderr)
         return 1

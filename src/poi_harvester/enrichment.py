@@ -10,8 +10,10 @@ from __future__ import annotations
 import re
 import unicodedata
 
+from .names import clean_name, arabic_key, VERSION as NORMALIZATION_VERSION
 
-VERSION = "rules-v2"
+
+VERSION = "rules-v3"
 
 # Common establishment words are translated, never phoneticized as brand text.
 _GENERICS = {
@@ -107,8 +109,9 @@ def _latin_word(word: str) -> tuple[str, bool]:
 
 
 def _arabic_word(word: str) -> tuple[str, bool]:
-    if word in _PROPER_AR_EN:
-        return _PROPER_AR_EN[word], True
+    proper_lookup = {arabic_key(key): value for key, value in _PROPER_AR_EN.items()}
+    if arabic_key(word) in proper_lookup:
+        return proper_lookup[arabic_key(word)], True
     if not re.fullmatch(r"[\u0621-\u064a]+", word):
         return "", False
     if word.startswith("ال") and len(word) > 3:
@@ -146,6 +149,7 @@ def _proper_parts(words: list[str], target: str) -> list[tuple[str, bool]]:
 
 
 def _to_arabic(name: str, category: str) -> tuple[str | None, float, str | None]:
+    name = arabic_key(name)
     name = re.sub(r"(?i)\b(?:fuel|gas) station\b", "fuelstation", name)
     words = re.findall(r"[A-Za-zÀ-ÿ]+|[\u0621-\u064a]+|\d+", name)
     if not words:
@@ -166,15 +170,19 @@ def _to_arabic(name: str, category: str) -> tuple[str | None, float, str | None]
             return None, 0.0, "Proper name cannot be transliterated deterministically"
         proper = " ".join(value for value, _ in parts)
         reviewed = all(known for _, known in parts)
-    text = generic[0] + (" " + proper if proper else "")
+    text = ("صراف " + proper + " الآلي" if proper else "صراف آلي") if generic[1] == "ATM" else generic[0] + (" " + proper if proper else "")
     return text, (0.82 if reviewed else 0.48), ("generic-only name" if not proper else None)
 
 
 def _to_english(name: str, category: str) -> tuple[str | None, float, str | None]:
-    words = re.findall(r"[A-Za-z]+|[\u0621-\u064a]+|\d+", name.replace("صراف آلي", "صراف").replace("محطة وقود", "محطةوقود"))
+    name = arabic_key(name).replace("الصراف الالي", "صراف الي")
+    if name.startswith("صراف ") and name.endswith(" الالي"):
+        name = name[:-len(" الالي")]
+    name = re.sub(r"\bال(صيدلية|عيادة|مستشفى|مدرسة|مطعم|فندق|مسجد|مخبز|بنك)\b", r"\1", name)
+    words = re.findall(r"[A-Za-z]+|[\u0621-\u064a]+|\d+", name.replace("صراف الي", "صراف").replace("محطة وقود", "محطةوقود"))
     if not words:
         return None, 0.0, "Empty Arabic name"
-    arabic_generics = {**_AR_GENERICS, "صراف": "ATM", "محطةوقود": "Fuel Station"}
+    arabic_generics = {**{arabic_key(k):v for k,v in _AR_GENERICS.items()}, "صراف": "ATM", "محطةوقود": "Fuel Station"}
     generics = [arabic_generics[word] for word in words if word in arabic_generics]
     generics += [_GENERICS[_ascii(word)][1] for word in words if _ascii(word) in _GENERICS]
     if len(set(generics)) > 1:
@@ -184,8 +192,9 @@ def _to_english(name: str, category: str) -> tuple[str | None, float, str | None
         return None, 0.0, "No reviewed English generic term for category"
     proper_words = [word for word in words if word not in arabic_generics and _ascii(word) not in _GENERICS]
     proper_ar = " ".join(proper_words)
-    if proper_ar in _PROPER_AR_EN:
-        proper, reviewed = _PROPER_AR_EN[proper_ar], True
+    normalized_proper = {arabic_key(k):v for k,v in _PROPER_AR_EN.items()}
+    if proper_ar in normalized_proper:
+        proper, reviewed = normalized_proper[proper_ar], True
     else:
         parts = _proper_parts(proper_words, "en")
         if any(not value for value, _ in parts):
@@ -199,14 +208,25 @@ def _to_english(name: str, category: str) -> tuple[str | None, float, str | None
 def enrich_record(record: dict, source_key: str) -> tuple[dict, str | None]:
     """Return captured enrichment and an optional review reason."""
     result = dict(record)
-    en = (record.get("name_en") or "").strip()
-    ar = (record.get("name_ar") or "").strip()
+    for field in ("name_en", "name_ar"):
+        cleaned = clean_name(record.get(field))
+        if isinstance(record.get(field), str) and unicodedata.normalize("NFC", record[field]) == cleaned:
+            cleaned = record[field]  # Preserve source diacritic ordering; comparison/generation uses normalized keys.
+        if field in record and cleaned != record[field]:
+            result.setdefault(f"original_{field}", record[field])
+            result[field] = cleaned
+            result["name_normalization_version"] = NORMALIZATION_VERSION
+    en = result.get("name_en") or ""
+    ar = result.get("name_ar") or ""
     if en and ar:
         if any(record.get(f"{field}_method") and float(record.get(f"{field}_confidence", 0)) < 0.6
                for field in ("name_en", "name_ar")):
             return result, "Low-confidence proper-name transliteration requires human review"
         return result, None
     if not en and not ar:
+        result.update(name_status="unnamed_source",
+                      missing_name_reason="No usable source name for bilingual enrichment",
+                      provenance_name_status=f"{source_key}:name_fields_absent_or_empty")
         return result, "POI has no source name for bilingual enrichment"
     target = "name_ar" if en else "name_en"
     generated, confidence, review = (_to_arabic(en, record["category"]) if en
