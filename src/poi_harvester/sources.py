@@ -57,6 +57,8 @@ def load_registry(path: Path) -> list[dict]:
                 raise ValueError(f"{field} must be finite and positive")
         if "request_attempts" in source and (not isinstance(source["request_attempts"], int) or not 1 <= source["request_attempts"] <= 4):
             raise ValueError("request_attempts must be between 1 and 4")
+        if source.get('freshness_policy', 'strict') not in ('strict', 'latest_available'):
+            raise ValueError('Unsupported source freshness policy')
         if source["auth_mode"] != "none":
             raise ValueError("Only auth_mode=none is implemented; configure an authentication adapter first")
         if not isinstance(source["allowed_uses"], list) or not set(source["allowed_uses"]) <= {"internal", "commercial", "redistribute"}:
@@ -356,6 +358,12 @@ def _overpass(source: dict, request: Request, prior_cache: dict | None = None,
         candidate["freshness_decision"] = accept_latest(source, candidate, write=False)
         candidate["freshness"] = "LIVE_AGE_POLICY_VALIDATED" if source.get("max_snapshot_age_seconds") else "TIMESTAMP_VALIDATED"
         candidate['freshness_state'] = freshness_state(source, candidate)
+        if source.get('freshness_policy') == 'latest_available':
+            candidate['freshness_policy'] = 'latest_available'
+            candidate['availability_scope'] = 'Newest response accepted from the selected source; not a claim about all providers.'
+            if candidate['freshness_state'] == 'STALE':
+                candidate['freshness'] = 'OLDER_DATA_ACCEPTED_WITH_DISCLOSURE'
+                candidate['freshness_notice'] = f"Available source data is dated {candidate['timestamp']}; it is not current."
         cache = {**cache, "snapshot": candidate}
         return parse_overpass_payload(source, request, {"elements": elements, "osm3s": {"timestamp_osm_base": candidate["timestamp"]}}), cache
     if not isinstance(payload, dict) or not isinstance(payload.get("elements"), list):

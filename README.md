@@ -32,6 +32,8 @@ Address-only source records go to the review queue unless a licensed lookup cata
 
 ## Live OpenStreetMap collection
 
+The included live sources use `latest_available` freshness policy: older available data is accepted and its source timestamp/state is disclosed in the result metadata and published layer. This means the newest accepted response from the selected source, not a guarantee that no newer data exists elsewhere. An older snapshot still cannot replace a newer saved snapshot. Timeouts do not silently substitute cached data. Use `--freshness-policy strict` to require data within `--max-snapshot-age-seconds` (default 24 hours). API callers can set `freshness_policy` to either value. Sources without an explicit policy retain strict age validation for backward compatibility.
+
 The included registry contains an Overpass adapter driven by the packaged 244-leaf taxonomy. Provide a real operator contact before making a live request:
 
 ```powershell

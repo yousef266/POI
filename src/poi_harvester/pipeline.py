@@ -32,9 +32,16 @@ def run(
     source_snapshots_override: dict[str, dict] | None = None,
     snapshot_store_path: Path | None = None,
     max_snapshot_age_seconds: float | None = None,
+    freshness_policy: str | None = None,
 ) -> dict:
     started, cpu_started = perf_counter(), process_time()
     sources = load_registry(registry_path)
+    if freshness_policy is not None:
+        if freshness_policy not in ('strict', 'latest_available'):
+            raise ValueError('Unsupported freshness policy')
+        for source in sources:
+            if source['kind'] == 'overpass':
+                source['freshness_policy'] = freshness_policy
     if snapshot_store_path is not None:
         for source in sources:
             if source["kind"] == "overpass":

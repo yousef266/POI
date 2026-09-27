@@ -30,6 +30,7 @@
     },
     {
       "name": "openstreetmap",
+      "freshness_policy": "latest_available",
       "kind": "overpass",
       "endpoint": "https://overpass.private.coffee/api/interpreter",
       "license": "Open Database License 1.0 (ODbL); downstream obligations require review",
@@ -47,6 +48,7 @@
     },
     {
       "name": "osm_swiss",
+      "freshness_policy": "latest_available",
       "kind": "overpass",
       "endpoint": "https://overpass.osm.ch/api/interpreter",
       "license": "Open Database License 1.0 (ODbL); downstream obligations require review",

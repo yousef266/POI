@@ -99,7 +99,8 @@ def invoke(payload: dict[str, Any]) -> dict[str, Any]:
                                  if payload.get("snapshot_from") else (None, None))
         result = run(request, registry, output_dir, set(source_names), previous, geocoder,
                      source_records_override=captured, source_snapshots_override=descriptors,
-                     snapshot_store_path=store, max_snapshot_age_seconds=payload.get("max_snapshot_age_seconds",86400))
+                     snapshot_store_path=store, max_snapshot_age_seconds=payload.get("max_snapshot_age_seconds",86400),
+                     freshness_policy=payload.get('freshness_policy'))
         if normalized:
             result["intent"] = normalized
         if publish_requested:

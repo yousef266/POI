@@ -13,7 +13,8 @@
     "optional_geocode_catalog_or_provider",
     "database_for_publication",
     "workspace_for_publication",
-    "optional_schema"
+    "optional_schema",
+    "optional_freshness_policy"
   ],
   "outputs": [
     "poi_layer",

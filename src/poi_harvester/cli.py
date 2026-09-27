@@ -48,7 +48,8 @@ def build_parser() -> ArgumentParser:
     run_cmd.add_argument("--geocode-provider", type=Path,
                          help="Optional licensed Nominatim-compatible address provider config")
     run_cmd.add_argument("--out", type=Path, default=Path("output/demo"))
-    run_cmd.add_argument("--max-snapshot-age-seconds", type=float, default=86400, help="Maximum live snapshot age; explicit historical pins are marked separately")
+    run_cmd.add_argument("--max-snapshot-age-seconds", type=float, default=86400, help="Age threshold for disclosure; rejects older data under strict policy")
+    run_cmd.add_argument('--freshness-policy', choices=('strict', 'latest_available'), help='Override source policy: accept older available data with disclosure, or require fresh data')
     run_cmd.add_argument("--snapshot-store", type=Path, default=Path("output/.source-snapshots.sqlite3"), help="Durable latest-version guard keyed by semantic AOI/category/source")
     run_cmd.add_argument("--snapshot-from", type=Path, help="Explicit immutable source capture; never presented as a fresh live request")
     run_cmd.add_argument("--allow-source-centers", action="store_true", help="Explicitly use captured footprint centers as low-confidence derived points")
@@ -198,7 +199,8 @@ def main(argv: list[str] | None = None) -> int:
                                  if args.snapshot_from else (None, None))
         result = run(request, args.registry.resolve(), args.out, selected, args.previous, geocoder,
                      source_records_override=captured, source_snapshots_override=descriptors,
-                     snapshot_store_path=args.snapshot_store, max_snapshot_age_seconds=args.max_snapshot_age_seconds)
+                     snapshot_store_path=args.snapshot_store, max_snapshot_age_seconds=args.max_snapshot_age_seconds,
+                     freshness_policy=args.freshness_policy)
         if args.publish:
             default_layer = "poi_" + "_".join(categories)
             result["publication"] = publish(args.out, args.layer or default_layer, args.database, args.workspace, args.schema, args.allow_demo_publish)

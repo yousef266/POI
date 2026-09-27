@@ -45,6 +45,8 @@ def validate_age(source, descriptor, now=None):
     if age < -300:
         raise ValueError("Source snapshot timestamp is in the future")
     if age > limit:
+        if source.get('freshness_policy', 'strict') == 'latest_available':
+            return
         raise RuntimeError(f"Stale live source snapshot {descriptor['timestamp']}: age {age:.0f}s exceeds {limit}s; no fallback, changes or publication")
 
 
@@ -89,6 +91,12 @@ def describe(source, request, payload, mode="live", now=None):
     elif mode != "live":
         descriptor["freshness"] = "HISTORICAL_CAPTURE_NOT_LIVE"
     descriptor['freshness_state'] = freshness_state(source, descriptor, now)
+    if source.get('freshness_policy') == 'latest_available':
+        descriptor['freshness_policy'] = 'latest_available'
+        descriptor['availability_scope'] = 'Newest response accepted from the selected source; not a claim about all providers.'
+        if descriptor['freshness_state'] == 'STALE':
+            descriptor['freshness'] = 'OLDER_DATA_ACCEPTED_WITH_DISCLOSURE'
+            descriptor['freshness_notice'] = f"Available source data is dated {descriptor['timestamp']}; it is not current."
     return descriptor
 
 
