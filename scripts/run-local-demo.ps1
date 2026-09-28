@@ -12,6 +12,7 @@ docker compose --env-file .env.container --profile run run --rm --build agent ru
   --use internal `
   --out output/demo `
   --publish `
+  --allow-demo-publish `
   --database poi `
   --layer poi_pharmacy `
   --workspace poi

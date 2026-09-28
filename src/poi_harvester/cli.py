@@ -83,7 +83,7 @@ def build_parser() -> ArgumentParser:
     evaluate_cmd = commands.add_parser("evaluate", help="Run local offline A1-A12 evaluation")
     evaluate_cmd.add_argument("--out", type=Path, default=Path("output/evaluation"))
     evaluate_cmd.add_argument("--registry", type=Path, default=Path("sources.json"))
-    evaluate_cmd.add_argument("--readiness", type=Path, default=Path("docs/AGENT1_READINESS.md"))
+    evaluate_cmd.add_argument("--readiness", type=Path, default=Path("output/evaluation/readiness.md"))
     evaluate_cmd.add_argument("--local-services", action="store_true", help="Also publish/verify 10K synthetic points in an isolated target")
     evaluate_cmd.add_argument("--database")
     evaluate_cmd.add_argument("--schema", default="poi_submission_probe")

@@ -8,7 +8,7 @@ COPY fixtures /app/fixtures
 COPY tests /app/tests
 COPY scripts /app/scripts
 COPY docs /app/docs
-COPY CONTRACT_BLOCKER.md AGENT1_AUDIT.md .env.example /app/
+COPY .env.example /app/
 RUN pip install --no-cache-dir -e ".[postgis]"
 
 ENTRYPOINT ["poi-harvester"]

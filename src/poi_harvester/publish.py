@@ -39,7 +39,117 @@ def _pg_kwargs(database: str) -> dict[str, str]:
     return kwargs
 
 
-def publish_postgis(records: list[dict], layer: str, database: str, schema: str = "public", demo_data: bool = False) -> None:
+COLUMN_TYPES = {
+    "longitude": "double precision", "latitude": "double precision",
+    "primary_source": "text", "primary_source_id": "text", "footprint_ref": "text",
+    "name_en": "text", "name_ar": "text", "alternate_names": "text",
+    "original_name_en": "text", "original_name_ar": "text",
+    "name_en_generated": "boolean", "name_ar_generated": "boolean",
+    "name_en_method": "text", "name_en_version": "text", "name_en_confidence": "double precision",
+    "name_ar_method": "text", "name_ar_version": "text", "name_ar_confidence": "double precision",
+    "category": "text", "source_category": "text", "address": "text",
+    "address_street": "text", "address_city": "text", "address_region": "text",
+    "address_postcode": "text", "address_country": "text",
+    "phone": "text", "email": "text", "website": "text", "hours": "text",
+    "harvested_at": "timestamptz", "confidence": "double precision",
+    "language_complete": "boolean", "name_status": "text", "missing_name_reason": "text",
+    "geometry_derived": "boolean", "geometry_confidence": "double precision", "geometry_derivation": "text", "source_keys": "text",
+    "attributions": "text", "licenses": "text",
+    "geometry_provenance": "text", "geometry_method": "text", "is_demo": "boolean",
+    "provenance_name_en": "text", "provenance_name_ar": "text",
+    "provenance_category": "text", "provenance_phone": "text",
+    "provenance_address": "text", "provenance_hours": "text",
+    "provenance_source_category": "text", "provenance_website": "text",
+    "provenance_address_street": "text", "provenance_address_city": "text",
+    "provenance_address_region": "text", "provenance_address_postcode": "text",
+    "provenance_address_country": "text",
+    "provenance_email": "text", "provenance_footprint_ref": "text",
+}
+
+# FR5 canonical fields and safety/attribution fields stay visible even when empty.
+REQUIRED_PUBLIC_FIELDS = frozenset({
+    'longitude', 'latitude', 'primary_source', 'primary_source_id',
+    'name_en', 'name_ar', 'alternate_names', 'category', 'source_category',
+    'address', 'address_street', 'address_city', 'address_region', 'address_postcode', 'address_country',
+    'phone', 'email', 'website', 'hours', 'harvested_at', 'confidence',
+    'name_en_generated', 'name_ar_generated', 'name_status',
+    'geometry_derived', 'geometry_confidence', 'geometry_method', 'geometry_provenance',
+    'source_keys', 'attributions', 'licenses', 'is_demo',
+    'provenance_name_en', 'provenance_name_ar', 'provenance_category',
+})
+
+def _publication_values(row, demo_data=False):
+    lon, lat = float(row['lon']), float(row['lat'])
+    provenance = row.get('provenance') or {}
+    source_name, _, source_id = ((row.get('source_keys') or [''])[0]).partition(':')
+    values = {
+        "longitude": lon, "latitude": lat,
+        "primary_source": source_name or None, "primary_source_id": source_id or None,
+        "footprint_ref": row.get("footprint_ref"),
+        "name_en": row.get("name_en"), "name_ar": row.get("name_ar"),
+        "original_name_en": row.get("original_name_en"),
+        "original_name_ar": row.get("original_name_ar"),
+        "name_en_generated": bool(row.get("name_en_generated") or row.get("name_en_method")),
+        "name_ar_generated": bool(row.get("name_ar_generated") or row.get("name_ar_method")),
+        "name_en_method": row.get("name_en_method"),
+        "name_en_version": row.get("name_en_version"),
+        "name_en_confidence": row.get("name_en_confidence"),
+        "name_ar_method": row.get("name_ar_method"),
+        "name_ar_version": row.get("name_ar_version"),
+        "name_ar_confidence": row.get("name_ar_confidence"),
+        "alternate_names": json.dumps(row.get("alternate_names") or [], ensure_ascii=False),
+        "category": row["category"], "source_category": row.get("source_category"),
+        "address": row.get("address"),
+        "address_street": row.get("address_street"), "address_city": row.get("address_city"),
+        "address_region": row.get("address_region"), "address_postcode": row.get("address_postcode"),
+        "address_country": row.get("address_country"),
+        "phone": row.get("phone"), "email": row.get("email"), "website": row.get("website"), "hours": row.get("hours"),
+        "harvested_at": row.get("harvested_at"), "confidence": row["confidence"],
+        "language_complete": row.get("language_complete"),
+        "name_status": row.get("name_status"), "missing_name_reason": row.get("missing_name_reason"),
+        "geometry_derived": bool(row.get("geometry_derived") or row.get("geometry_method") == "geocode_derived"),
+        "geometry_confidence": row.get("geometry_confidence", row.get("confidence")),
+        "geometry_derivation": row.get("geometry_derivation"),
+        "source_keys": json.dumps(row.get("source_keys") or [], ensure_ascii=False),
+        "attributions": json.dumps(row.get("attributions") or [], ensure_ascii=False),
+        "licenses": json.dumps(row.get("licenses") or [], ensure_ascii=False),
+        "geometry_provenance": row.get("geometry_provenance"),
+        "geometry_method": row.get("geometry_method") or ("fixture_synthetic" if demo_data else "source_point"),
+        "is_demo": demo_data,
+        "provenance_name_en": provenance.get("name_en"),
+        "provenance_name_ar": provenance.get("name_ar"),
+        "provenance_category": provenance.get("category"),
+        "provenance_phone": provenance.get("phone"),
+        "provenance_address": provenance.get("address"),
+        "provenance_hours": provenance.get("hours"),
+        "provenance_source_category": provenance.get("source_category"),
+        "provenance_website": provenance.get("website"),
+        "provenance_address_street": provenance.get("address_street"),
+        "provenance_address_city": provenance.get("address_city"),
+        "provenance_address_region": provenance.get("address_region"),
+        "provenance_address_postcode": provenance.get("address_postcode"),
+        "provenance_address_country": provenance.get("address_country"),
+        "provenance_email": provenance.get("email"),
+        "provenance_footprint_ref": provenance.get("footprint_ref"),
+    }
+    return values
+
+def _has_value(value):
+    if value is None:
+        return False
+    if isinstance(value, str):
+        return value.strip() not in ('', '[]', '{}')
+    if isinstance(value, (list, tuple, dict)):
+        return bool(value)
+    return True  # False and zero are meaningful values.
+
+def _public_columns(records, demo_data=False):
+    values = [_publication_values(row, demo_data) for row in records]
+    return ['id', *(name for name in COLUMN_TYPES
+                   if name in REQUIRED_PUBLIC_FIELDS or any(_has_value(row[name]) for row in values))]
+
+
+def publish_postgis(records: list[dict], layer: str, database: str, schema: str = "public", demo_data: bool = False) -> list[str]:
     """Write a versioned active layer, retaining inactive records for audit."""
     try:
         import psycopg
@@ -49,44 +159,38 @@ def publish_postgis(records: list[dict], layer: str, database: str, schema: str 
     layer = _identifier(layer)
     table = _identifier(layer + "_records")
     schema = _identifier(schema)
-    column_types = {
-        "longitude": "double precision", "latitude": "double precision",
-        "primary_source": "text", "primary_source_id": "text", "footprint_ref": "text",
-        "name_en": "text", "name_ar": "text", "alternate_names": "text",
-        "original_name_en": "text", "original_name_ar": "text",
-        "name_en_generated": "boolean", "name_ar_generated": "boolean",
-        "name_en_method": "text", "name_en_version": "text", "name_en_confidence": "double precision",
-        "name_ar_method": "text", "name_ar_version": "text", "name_ar_confidence": "double precision",
-        "category": "text", "source_category": "text", "address": "text",
-        "address_street": "text", "address_city": "text", "address_region": "text",
-        "address_postcode": "text", "address_country": "text",
-        "phone": "text", "email": "text", "website": "text", "hours": "text",
-        "harvested_at": "timestamptz", "confidence": "double precision",
-        "language_complete": "boolean", "name_status": "text", "missing_name_reason": "text",
-        "geometry_derived": "boolean", "geometry_confidence": "double precision", "geometry_derivation": "text", "source_keys": "text",
-        "attributions": "text", "licenses": "text",
-        "geometry_provenance": "text", "geometry_method": "text", "is_demo": "boolean",
-        "provenance_name_en": "text", "provenance_name_ar": "text",
-        "provenance_category": "text", "provenance_phone": "text",
-        "provenance_address": "text", "provenance_hours": "text",
-        "provenance_source_category": "text", "provenance_website": "text",
-        "provenance_address_street": "text", "provenance_address_city": "text",
-        "provenance_address_region": "text", "provenance_address_postcode": "text",
-        "provenance_address_country": "text",
-        "provenance_email": "text", "provenance_footprint_ref": "text",
-    }
-    public_columns = ["stable_id", *column_types]
+    column_types = COLUMN_TYPES
+    public_columns = _public_columns(records, demo_data)
     with psycopg.connect(**_pg_kwargs(database)) as connection:
         with connection.cursor() as cursor:
             cursor.execute("SELECT PostGIS_Version()")
             cursor.execute(sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(sql.Identifier(schema)))
             cursor.execute(sql.SQL("""
                 CREATE TABLE IF NOT EXISTS {}.{} (
-                    stable_id text PRIMARY KEY,
+                    id serial PRIMARY KEY,
+                    stable_id text NOT NULL UNIQUE,
                     geom geometry(Point,4326) NOT NULL,
                     is_active boolean NOT NULL DEFAULT true
                 )
             """).format(sql.Identifier(schema), sql.Identifier(table)))
+            # Migrate existing layers without rebuilding their records or changing geometry.
+            cursor.execute(sql.SQL('ALTER TABLE {}.{} ADD COLUMN IF NOT EXISTS id serial').format(sql.Identifier(schema), sql.Identifier(table)))
+            cursor.execute("SELECT data_type FROM information_schema.columns WHERE table_schema=%s AND table_name=%s AND column_name='id'", (schema, table))
+            if cursor.fetchone()[0] != 'integer':
+                raise ValueError('Existing id is not an integer; refusing an unsafe ID migration')
+            cursor.execute("""SELECT c.conname, array_agg(a.attname ORDER BY u.ordinality)
+                FROM pg_constraint c JOIN pg_class t ON t.oid=c.conrelid
+                JOIN pg_namespace n ON n.oid=t.relnamespace
+                CROSS JOIN LATERAL unnest(c.conkey) WITH ORDINALITY AS u(attnum,ordinality)
+                JOIN pg_attribute a ON a.attrelid=t.oid AND a.attnum=u.attnum
+                WHERE c.contype='p' AND n.nspname=%s AND t.relname=%s GROUP BY c.conname""", (schema,table))
+            primary=cursor.fetchone()
+            if primary and primary[1] != ['id']:
+                cursor.execute(sql.SQL('ALTER TABLE {}.{} DROP CONSTRAINT {}').format(sql.Identifier(schema),sql.Identifier(table),sql.Identifier(primary[0])))
+                primary=None
+            if primary is None:
+                cursor.execute(sql.SQL('ALTER TABLE {}.{} ADD PRIMARY KEY (id)').format(sql.Identifier(schema),sql.Identifier(table)))
+            cursor.execute(sql.SQL('CREATE UNIQUE INDEX IF NOT EXISTS {} ON {}.{} (stable_id)').format(sql.Identifier(table+'_stable_key'),sql.Identifier(schema),sql.Identifier(table)))
             cursor.execute(sql.SQL("DROP VIEW IF EXISTS {}.{}").format(sql.Identifier(schema), sql.Identifier(layer)))
             cursor.execute(sql.SQL("ALTER TABLE {}.{} DROP COLUMN IF EXISTS properties").format(
                 sql.Identifier(schema), sql.Identifier(table)))
@@ -108,56 +212,7 @@ def publish_postgis(records: list[dict], layer: str, database: str, schema: str 
                 lon, lat = float(row["lon"]), float(row["lat"])
                 provenance = row.get("provenance") or {}
                 source_name, _, source_id = ((row.get("source_keys") or [""])[0]).partition(":")
-                values = {
-                    "longitude": lon, "latitude": lat,
-                    "primary_source": source_name or None, "primary_source_id": source_id or None,
-                    "footprint_ref": row.get("footprint_ref"),
-                    "name_en": row.get("name_en"), "name_ar": row.get("name_ar"),
-                    "original_name_en": row.get("original_name_en"),
-                    "original_name_ar": row.get("original_name_ar"),
-                    "name_en_generated": bool(row.get("name_en_generated") or row.get("name_en_method")),
-                    "name_ar_generated": bool(row.get("name_ar_generated") or row.get("name_ar_method")),
-                    "name_en_method": row.get("name_en_method"),
-                    "name_en_version": row.get("name_en_version"),
-                    "name_en_confidence": row.get("name_en_confidence"),
-                    "name_ar_method": row.get("name_ar_method"),
-                    "name_ar_version": row.get("name_ar_version"),
-                    "name_ar_confidence": row.get("name_ar_confidence"),
-                    "alternate_names": json.dumps(row.get("alternate_names") or [], ensure_ascii=False),
-                    "category": row["category"], "source_category": row.get("source_category"),
-                    "address": row.get("address"),
-                    "address_street": row.get("address_street"), "address_city": row.get("address_city"),
-                    "address_region": row.get("address_region"), "address_postcode": row.get("address_postcode"),
-                    "address_country": row.get("address_country"),
-                    "phone": row.get("phone"), "email": row.get("email"), "website": row.get("website"), "hours": row.get("hours"),
-                    "harvested_at": row.get("harvested_at"), "confidence": row["confidence"],
-                    "language_complete": row.get("language_complete"),
-                    "name_status": row.get("name_status"), "missing_name_reason": row.get("missing_name_reason"),
-                    "geometry_derived": bool(row.get("geometry_derived") or row.get("geometry_method") == "geocode_derived"),
-                    "geometry_confidence": row.get("geometry_confidence", row.get("confidence")),
-                    "geometry_derivation": row.get("geometry_derivation"),
-                    "source_keys": json.dumps(row.get("source_keys") or [], ensure_ascii=False),
-                    "attributions": json.dumps(row.get("attributions") or [], ensure_ascii=False),
-                    "licenses": json.dumps(row.get("licenses") or [], ensure_ascii=False),
-                    "geometry_provenance": row.get("geometry_provenance"),
-                    "geometry_method": row.get("geometry_method") or ("fixture_synthetic" if demo_data else "source_point"),
-                    "is_demo": demo_data,
-                    "provenance_name_en": provenance.get("name_en"),
-                    "provenance_name_ar": provenance.get("name_ar"),
-                    "provenance_category": provenance.get("category"),
-                    "provenance_phone": provenance.get("phone"),
-                    "provenance_address": provenance.get("address"),
-                    "provenance_hours": provenance.get("hours"),
-                    "provenance_source_category": provenance.get("source_category"),
-                    "provenance_website": provenance.get("website"),
-                    "provenance_address_street": provenance.get("address_street"),
-                    "provenance_address_city": provenance.get("address_city"),
-                    "provenance_address_region": provenance.get("address_region"),
-                    "provenance_address_postcode": provenance.get("address_postcode"),
-                    "provenance_address_country": provenance.get("address_country"),
-                    "provenance_email": provenance.get("email"),
-                    "provenance_footprint_ref": provenance.get("footprint_ref"),
-                }
+                values = _publication_values(row, demo_data)
                 names = ["stable_id", *column_types]
                 parameters = [row["stable_id"], *(values[name] for name in column_types), lon, lat]
                 updates = sql.SQL(", ").join(
@@ -182,6 +237,8 @@ def publish_postgis(records: list[dict], layer: str, database: str, schema: str 
                 sql.SQL(", ").join(map(sql.Identifier, public_columns)),
                 sql.Identifier(schema), sql.Identifier(table),
             ))
+
+    return public_columns
 
 
 STYLE_SLD = """<?xml version="1.0" encoding="UTF-8"?>
@@ -292,6 +349,13 @@ def publish_geoserver(layer: str, metadata: dict, database: str, workspace: str,
     }})
     if not _geoserver_request("GET", f"workspaces/{workspace}/datastores/{store}.json", not_found_ok=True):
         _geoserver_request("POST", f"workspaces/{workspace}/datastores", body)
+    existing_feature = _geoserver_request('GET', f'workspaces/{workspace}/datastores/{store}/featuretypes/{layer}.json', not_found_ok=True)
+    if existing_feature and metadata.get('published_columns'):
+        saved = json.loads(existing_feature).get('featureType', {}).get('attributes', {}).get('attribute', [])
+        if {item['name'] for item in saved} != set(metadata['published_columns']) | {'geom'}:
+            # JDBC caches the old native schema. Reopen only this datastore on schema changes.
+            _geoserver_request('PUT', f'workspaces/{workspace}/datastores/{store}', json.dumps({'dataStore':{'enabled':False}}))
+            _geoserver_request('PUT', f'workspaces/{workspace}/datastores/{store}', body)
     attribution = "; ".join(sorted({item["attribution"] for item in metadata.get("contributors", [])}))
     demo_data = bool(metadata.get("demo_data"))
     disclaimer = "DEMO DATA: invented locations for software testing; not verified POIs. " if demo_data else ""
@@ -307,10 +371,18 @@ def publish_geoserver(layer: str, metadata: dict, database: str, workspace: str,
         "name": layer, "nativeName": layer, "title": ("DEMO - " if demo_data else "") + layer.replace("_", " ").title(),
         "abstract": abstract, "srs": "EPSG:4326",
     }
+    if metadata.get('published_columns'):
+        bindings = {'text':'java.lang.String', 'double precision':'java.lang.Double',
+                    'boolean':'java.lang.Boolean', 'timestamptz':'java.sql.Timestamp'}
+        feature_type['attributes'] = {'attribute':[
+            {'name':name, 'binding':'java.lang.Integer' if name=='id' else bindings[COLUMN_TYPES[name]]}
+            for name in metadata['published_columns']
+        ] + [{'name':'geom', 'binding':'org.locationtech.jts.geom.Point'}]}
     if not _geoserver_request("GET", f"workspaces/{workspace}/datastores/{store}/featuretypes/{layer}.json", not_found_ok=True):
         _geoserver_request("POST", f"workspaces/{workspace}/datastores/{store}/featuretypes", json.dumps({"featureType": feature_type}))
     _geoserver_request("PUT", f"workspaces/{workspace}/datastores/{store}/featuretypes/{layer}", json.dumps({
-        "featureType": {"title": feature_type["title"], "abstract": abstract}
+        "featureType": {"title": feature_type["title"], "abstract": abstract,
+                        **({'attributes':feature_type['attributes']} if 'attributes' in feature_type else {})}
     }))
     style_name = "poi_harvester_style"
     if not _geoserver_request("GET", f"styles/{style_name}.json", not_found_ok=True):
@@ -375,7 +447,7 @@ def publish(output_dir: Path, layer: str, database: str, workspace: str, schema:
     guard_started = perf_counter()
     _guard_publication_target(layer, database, workspace, schema)
     postgis_started = perf_counter()
-    publish_postgis(records, layer, database, schema, bool(metadata.get("demo_data")))
+    metadata["published_columns"] = publish_postgis(records, layer, database, schema, bool(metadata.get("demo_data")))
     postgis_seconds = perf_counter() - postgis_started
     geoserver_started = perf_counter()
     url = publish_geoserver(layer, metadata, database, workspace, schema)
@@ -410,9 +482,22 @@ def verify_local(layer: str, database: str, workspace: str, schema: str = "publi
                 FROM {}.{}
             """).format(sql.Identifier(schema), sql.Identifier(layer)))
             feature_count, wrong_srid, missing_provenance, coordinate_mismatch = cursor.fetchone()
-            cursor.execute(sql.SQL("SELECT stable_id, ST_X(geom), ST_Y(geom) FROM {}.{}").format(
-                sql.Identifier(schema), sql.Identifier(layer)))
-            database_coordinates = {stable_id: (lon, lat) for stable_id, lon, lat in cursor.fetchall()}
+            cursor.execute('SELECT column_name FROM information_schema.columns WHERE table_schema=%s AND table_name=%s', (schema,layer))
+            actual_columns={row[0] for row in cursor.fetchall()}
+            numeric_ids = 'id' in actual_columns
+            if numeric_ids:
+                if 'stable_id' in actual_columns:
+                    raise RuntimeError('Internal stable_id leaked into the public layer')
+                cursor.execute(sql.SQL('SELECT r.stable_id, v.id, ST_X(v.geom), ST_Y(v.geom) FROM {}.{} v JOIN {}.{} r ON r.id=v.id').format(
+                    sql.Identifier(schema),sql.Identifier(layer),sql.Identifier(schema),sql.Identifier(_identifier(layer+'_records'))))
+                joined=cursor.fetchall()
+                database_coordinates={stable:(lon,lat) for stable,serial,lon,lat in joined}
+                public_to_stable={serial:stable for stable,serial,lon,lat in joined}
+            else:  # Read-only verification of legacy layers remains supported.
+                cursor.execute(sql.SQL("SELECT stable_id, ST_X(geom), ST_Y(geom) FROM {}.{}").format(
+                    sql.Identifier(schema), sql.Identifier(layer)))
+                database_coordinates = {stable_id: (lon, lat) for stable_id, lon, lat in cursor.fetchall()}
+                public_to_stable={stable:stable for stable in database_coordinates}
     if wrong_srid or missing_provenance or coordinate_mismatch:
         raise RuntimeError(f"PostGIS layer invalid: {wrong_srid} wrong-SRID features, {missing_provenance} missing provenance, {coordinate_mismatch} coordinate mismatches")
     layer_response = json.loads(_geoserver_request("GET", f"layers/{workspace}:{layer}.json"))
@@ -443,8 +528,8 @@ def verify_local(layer: str, database: str, workspace: str, schema: str = "publi
                     name_cursor.execute(sql.SQL("""
                         SELECT count(*) FILTER
                           (WHERE name_en_method IS NOT NULL OR name_ar_method IS NOT NULL)
-                        FROM {}.{}
-                    """).format(sql.Identifier(schema), sql.Identifier(layer)))
+                        FROM {}.{} WHERE is_active=true
+                    """).format(sql.Identifier(schema), sql.Identifier(_identifier(layer+'_records'))))
                     published_generated = name_cursor.fetchone()[0]
             if published_generated != sum(bool(row.get("name_en_method") or row.get("name_ar_method"))
                                           for row in expected_records):
@@ -477,30 +562,41 @@ def verify_local(layer: str, database: str, workspace: str, schema: str = "publi
     with urlopen(Request(wfs_url, headers={"Authorization": "Basic " + service_auth}), timeout=30) as response:
         wfs_data = json.load(response)
     wfs_fields = set(wfs_data["features"][0]["properties"]) if wfs_data.get("features") else set()
-    required_fields = {"stable_id", "longitude", "latitude", "primary_source", "primary_source_id",
-                       "name_en", "name_ar", "alternate_names", "email", "footprint_ref",
-                       "category", "source_category", "address", "phone", "hours", "website", "confidence",
-                       "geometry_method", "source_keys", "attributions", "licenses", "geometry_provenance",
-                       "provenance_name_en", "provenance_name_ar", "provenance_category"}
-    if expected_generated_names:
-        required_fields.update({"name_en_method", "name_en_version", "name_en_confidence",
-                                "name_ar_method", "name_ar_version", "name_ar_confidence",
-                                "original_name_en", "original_name_ar"})
-    if any("name_en_generated" in row or "name_ar_generated" in row for row in expected_records):
-        required_fields.update({"name_en_generated", "name_ar_generated"})
+    if numeric_ids:
+        required_fields = {'id', *REQUIRED_PUBLIC_FIELDS}
+        if expected_records:
+            required_fields.update(_public_columns(expected_records))
+        if 'stable_id' in wfs_fields:
+            raise RuntimeError('Internal stable_id leaked into WFS output')
+    else:
+        required_fields = {"stable_id", "longitude", "latitude", "primary_source", "primary_source_id",
+                           "name_en", "name_ar", "alternate_names", "email", "footprint_ref",
+                           "category", "source_category", "address", "phone", "hours", "website", "confidence",
+                           "geometry_method", "source_keys", "attributions", "licenses", "geometry_provenance",
+                           "provenance_name_en", "provenance_name_ar", "provenance_category"}
+        if expected_generated_names:
+            required_fields.update({"name_en_method", "name_en_version", "name_en_confidence",
+                                    "name_ar_method", "name_ar_version", "name_ar_confidence",
+                                    "original_name_en", "original_name_ar"})
+        if any("name_en_generated" in row or "name_ar_generated" in row for row in expected_records):
+            required_fields.update({"name_en_generated", "name_ar_generated"})
     if feature_count and (missing_fields := required_fields - wfs_fields):
         raise RuntimeError(f"GeoServer WFS omitted dedicated POI fields: {sorted(missing_fields)}")
     if "properties" in wfs_fields:
         raise RuntimeError("GeoServer WFS still exposes a bundled properties column")
     if wfs_data.get("features"):
         first_feature = wfs_data["features"][0]
-        point = database_coordinates.get(first_feature["properties"].get("stable_id"))
+        public_id = first_feature['properties'].get('id' if numeric_ids else 'stable_id')
+        if numeric_ids and (not isinstance(public_id, int) or isinstance(public_id, bool)):
+            raise RuntimeError('WFS id is not an integer')
+        stable = public_to_stable.get(public_id)
+        point = database_coordinates.get(stable)
         geometry = first_feature.get("geometry") or {}
         if geometry.get("type") != "Point" or point is None or any(
                 abs(float(actual) - expected) > 1e-8 for actual, expected in zip(geometry["coordinates"], point)):
             raise RuntimeError("WFS geometry differs from the PostGIS point")
         if expected_records:
-            expected = next(row for row in expected_records if row["stable_id"] == first_feature["properties"]["stable_id"])
+            expected = next(row for row in expected_records if row["stable_id"] == stable)
             for name in ("name_en", "name_ar", "category", "geometry_provenance"):
                 if first_feature["properties"].get(name) != expected.get(name):
                     raise RuntimeError(f"WFS field {name} differs from the saved harvest")
@@ -531,6 +627,9 @@ def verify_local(layer: str, database: str, workspace: str, schema: str = "publi
         "schema": schema,
         "postgis_version": postgis_version,
         "postgis_feature_count": feature_count,
+        "public_id_type": 'integer' if numeric_ids else 'legacy_text',
+        "public_attribute_count": len(actual_columns),
+        "internal_identity_hidden": numeric_ids and 'stable_id' not in wfs_fields,
         "expected_feature_count": expected_count,
         "wrong_srid_count": wrong_srid,
         "missing_provenance_count": missing_provenance,

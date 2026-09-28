@@ -5,6 +5,7 @@
 .downloads
 .local-deps
 .venv
+.venv-final
 output
 build
 *.egg-info
