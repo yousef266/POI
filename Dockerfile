@@ -4,6 +4,7 @@ WORKDIR /app
 COPY pyproject.toml README.md /app/
 COPY src /app/src
 COPY run.py agent.json sources.json /app/
+COPY prompts /app/prompts
 COPY fixtures /app/fixtures
 COPY tests /app/tests
 COPY scripts /app/scripts
